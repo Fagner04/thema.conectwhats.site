@@ -578,7 +578,7 @@
           "selector_mode": "block",
           "color_mode": "color",
           "show_payment_button": false,
-          "enable_back_in_stock_notification": true,
+          "enable_back_in_stock_notification": false,
           "image_size": "small",
           "enable_image_zoom": true,
           "enable_video_looping": true,
