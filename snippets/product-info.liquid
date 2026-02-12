@@ -766,6 +766,11 @@
             {%- endif -%}
           {%- else -%}
             <button type="submit" class="product-form__add-button button button--disabled" disabled>{{ 'product.form.sold_out' | t }}</button>
+            
+            {%- comment -%}Formulário de notificação de estoque{%- endcomment -%}
+            {%- if section.settings.enable_back_in_stock_notification -%}
+              {% render 'back-in-stock-notification', product: product, variant: selected_variant %}
+            {%- endif -%}
           {%- endif -%}
 
           {%- if section.settings.show_payment_button -%}
@@ -817,6 +822,11 @@
 {% endif %}
                  
     {%- endform -%}
+    
+    {%- comment -%}Script para controlar formulário de notificação de estoque{%- endcomment -%}
+    {%- if section.settings.enable_back_in_stock_notification -%}
+      {% render 'back-in-stock-script' %}
+    {%- endif -%}
        
 {%- if section.settings.mostrar_bandeiras -%}
     {%- if section.settings.bandeiras_style == 'b_style_1' -%}

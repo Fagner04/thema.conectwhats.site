@@ -1,0 +1,50 @@
+<script>
+(function() {
+  // Função para mostrar/ocultar formulário de notificação
+  function toggleBackInStockForm(productId, variantId, isAvailable) {
+    const form = document.getElementById('back-in-stock-' + productId);
+    const variantInput = document.getElementById('notify-variant-id-' + productId);
+    
+    if (form) {
+      if (!isAvailable) {
+        form.style.display = 'block';
+        if (variantInput) {
+          variantInput.value = variantId;
+        }
+      } else {
+        form.style.display = 'none';
+      }
+    }
+  }
+  
+  // Escutar mudanças de variante
+  document.addEventListener('variant:changed', function(event) {
+    const variant = event.detail.variant;
+    if (variant) {
+      const productId = variant.product_id || event.target.closest('[data-product-id]')?.dataset.productId;
+      if (productId) {
+        toggleBackInStockForm(productId, variant.id, variant.available);
+      }
+    }
+  });
+  
+  // Verificar estado inicial ao carregar a página
+  document.addEventListener('DOMContentLoaded', function() {
+    const productForms = document.querySelectorAll('.product-form');
+    productForms.forEach(function(form) {
+      const productData = form.querySelector('[data-product-json]');
+      if (productData) {
+        try {
+          const data = JSON.parse(productData.textContent);
+          const selectedVariant = data.product.variants.find(v => v.id === data.selected_variant_id);
+          if (selectedVariant) {
+            toggleBackInStockForm(data.product.id, selectedVariant.id, selectedVariant.available);
+          }
+        } catch (e) {
+          console.error('Erro ao processar dados do produto:', e);
+        }
+      }
+    });
+  });
+})();
+</script>
