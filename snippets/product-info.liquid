@@ -257,18 +257,24 @@
             {%- assign option_selector_type = 'select' -%}
 
             {%- if section.settings.color_mode != 'block' and section.settings.color_mode != 'dropdown' and color_label contains downcase_option -%}
-              {%- comment -%}NOTE: even if the merchant is using the mode to display variant images, if ALL variant do not have an associated image, we fallback to color{%- endcomment -%}
+              {%- comment -%}Verifica se pelo menos uma variante desta opção tem imagem{%- endcomment -%}
 
-              {%- assign has_image_attached_to_all_variants = true -%}
+              {%- assign has_any_image_for_this_option = false -%}
+              {%- assign option_index = 'option' | append: option.position -%}
 
-              {%- for variant in product.variants -%}
-                {%- unless variant.image -%}
-                  {%- assign has_image_attached_to_all_variants = false -%}
+              {%- for value in option.values -%}
+                {%- for variant in product.variants -%}
+                  {%- if variant[option_index] == value and variant.image -%}
+                    {%- assign has_any_image_for_this_option = true -%}
+                    {%- break -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- if has_any_image_for_this_option -%}
                   {%- break -%}
-                {%- endunless -%}
+                {%- endif -%}
               {%- endfor -%}
 
-              {%- if section.settings.color_mode == 'variant' and has_image_attached_to_all_variants -%}
+              {%- if section.settings.color_mode == 'variant' and has_any_image_for_this_option -%}
                 {%- assign option_selector_type = 'variant' -%}
               {%- else -%}
                 {%- assign option_selector_type = 'color' -%}
@@ -463,24 +469,51 @@
                     
                     {%- for value in option.values -%}
                       {%- capture variant_swatch_id -%}{{ option_name }}-{{ forloop.index }}{%- endcapture -%}
+                      {%- assign variant_has_image = false -%}
+                      {%- assign variant_image_found = blank -%}
 
+                      {%- comment -%}Procura se existe uma variante com imagem para este valor{%- endcomment -%}
                       {%- for variant in product.variants -%}
                         {%- if variant[option_index] == value and variant.image -%}
-                          <div class="variant-swatch">
-                            <input class="variant-swatch__radio product-form__single-selector" type="radio" name="{{ option_name }}" id="{{ variant_swatch_id }}" value="{{ value | escape }}" {% if option.selected_value == value %}checked{% endif %} data-option-position="{{ option.position }}">
-
-                            <label class="variant-swatch__item" for="{{ variant_swatch_id }}" title="{{ value | escape }}">
-                              <div class="aspect-ratio image-border-radius" style="padding-bottom: {{ 100.0 | divided_by: variant.image.aspect_ratio }}%">
-                                <img src="{{ variant.image | img_url: '120x' }}" alt="{{ variant.image.alt | escape }}">
-                              </div>
-
-                              {% render 'icon', icon: 'cross-sold-out' %}
-                            </label>
-                          </div>
-
+                          {%- assign variant_has_image = true -%}
+                          {%- assign variant_image_found = variant.image -%}
                           {%- break -%}
                         {%- endif -%}
                       {%- endfor -%}
+
+                      {%- if variant_has_image -%}
+                        {%- comment -%}Mostra imagem da variante{%- endcomment -%}
+                        <div class="variant-swatch">
+                          <input class="variant-swatch__radio product-form__single-selector" type="radio" name="{{ option_name }}" id="{{ variant_swatch_id }}" value="{{ value | escape }}" {% if option.selected_value == value %}checked{% endif %} data-option-position="{{ option.position }}">
+
+                          <label class="variant-swatch__item" for="{{ variant_swatch_id }}" title="{{ value | escape }}">
+                            <div class="aspect-ratio image-border-radius" style="padding-bottom: {{ 100.0 | divided_by: variant_image_found.aspect_ratio }}%">
+                              <img src="{{ variant_image_found | img_url: '120x' }}" alt="{{ variant_image_found.alt | escape }}">
+                            </div>
+
+                            {% render 'icon', icon: 'cross-sold-out' %}
+                          </label>
+                        </div>
+                      {%- else -%}
+                        {%- comment -%}Fallback: mostra bolinha de cor se não tiver imagem{%- endcomment -%}
+                        {%- assign downcased_value = value | downcase -%}
+                        {%- assign color_swatch_name = value | handle | append: '.png' -%}
+                        {%- assign color_swatch_image = images[color_swatch_name] -%}
+                        
+                        <div class="color-swatch {% if downcased_value == 'white' or downcased_value == 'blanc' %}color-swatch--white{% endif %}" style="display: inline-block;">
+                          <input class="color-swatch__radio product-form__single-selector" type="radio" name="{{ option_name }}" id="{{ variant_swatch_id }}" value="{{ value | escape }}" {% if option.selected_value == value %}checked{% endif %} data-option-position="{{ option.position }}" aria-hidden="true">
+                          
+                          {%- if color_swatch_image != blank -%}
+                            <label class="color-swatch__item lazyload" for="{{ variant_swatch_id }}" data-bg="{{ color_swatch_image | img_url: '64x64' }}" title="{{ value | escape }}">
+                              {%- render 'icon', icon: 'cross-sold-out' -%}
+                            </label>
+                          {%- else -%}
+                            <label class="color-swatch__item" for="{{ variant_swatch_id }}" style="background-color: {{ downcased_value | replace: ' ', '' }}" title="{{ value | escape }}">
+                              {%- render 'icon', icon: 'cross-sold-out' -%}
+                            </label>
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
                     {%- endfor -%}
                   </div>
                 {%- when 'block' -%}
