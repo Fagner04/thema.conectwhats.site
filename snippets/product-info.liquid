@@ -459,26 +459,26 @@
                   <span class="product-form__option-name text--strong">{{ option.name }}: <span class="product-form__selected-value">{{ option.selected_value }}</span></span>
 
                   <div class="variant-swatch-list">
+                    {%- assign option_index = 'option' | append: option.position -%}
+                    
                     {%- for value in option.values -%}
                       {%- capture variant_swatch_id -%}{{ option_name }}-{{ forloop.index }}{%- endcapture -%}
 
                       {%- for variant in product.variants -%}
-                        {%- if variant.option1 == value or variant.option2 == value or variant.option3 == value -%}
-                          {%- if variant.image -%}
-                            <div class="variant-swatch">
-                              <input class="variant-swatch__radio product-form__single-selector" type="radio" name="{{ option_name }}" id="{{ variant_swatch_id }}" value="{{ value | escape }}" {% if option.selected_value == value %}checked{% endif %} data-option-position="{{ option.position }}">
+                        {%- if variant[option_index] == value and variant.image -%}
+                          <div class="variant-swatch">
+                            <input class="variant-swatch__radio product-form__single-selector" type="radio" name="{{ option_name }}" id="{{ variant_swatch_id }}" value="{{ value | escape }}" {% if option.selected_value == value %}checked{% endif %} data-option-position="{{ option.position }}">
 
-                              <label class="variant-swatch__item" for="{{ variant_swatch_id }}" title="{{ value | escape }}">
-                                <div class="aspect-ratio image-border-radius" style="padding-bottom: {{ 100.0 | divided_by: variant.image.aspect_ratio }}%">
-                                  <img src="{{ variant.image | img_url: '120x' }}" alt="{{ variant.image.alt | escape }}">
-                                </div>
+                            <label class="variant-swatch__item" for="{{ variant_swatch_id }}" title="{{ value | escape }}">
+                              <div class="aspect-ratio image-border-radius" style="padding-bottom: {{ 100.0 | divided_by: variant.image.aspect_ratio }}%">
+                                <img src="{{ variant.image | img_url: '120x' }}" alt="{{ variant.image.alt | escape }}">
+                              </div>
 
-                                {% render 'icon', icon: 'cross-sold-out' %}
-                              </label>
-                            </div>
+                              {% render 'icon', icon: 'cross-sold-out' %}
+                            </label>
+                          </div>
 
-                            {%- break -%}
-                          {%- endif -%}
+                          {%- break -%}
                         {%- endif -%}
                       {%- endfor -%}
                     {%- endfor -%}
