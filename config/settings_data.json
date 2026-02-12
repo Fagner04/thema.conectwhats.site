@@ -9,7 +9,7 @@
  */
 {
   "current": {
-    "popup_home": true,
+    "popup_home": false,
     "popup_image": "shopify://shop_images/frete.png",
     "img_popup": "shopify://collections/beachwear",
     "cookie_time": 60,
@@ -578,6 +578,7 @@
           "selector_mode": "block",
           "color_mode": "variant_image",
           "show_payment_button": false,
+          "enable_back_in_stock_notification": true,
           "image_size": "small",
           "enable_image_zoom": true,
           "enable_video_looping": true,
