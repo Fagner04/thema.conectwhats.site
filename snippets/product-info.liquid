@@ -274,7 +274,7 @@
                 {%- endif -%}
               {%- endfor -%}
 
-              {%- if section.settings.color_mode == 'variant' and has_any_image_for_this_option -%}
+              {%- if section.settings.color_mode == 'variant_image' and has_any_image_for_this_option -%}
                 {%- assign option_selector_type = 'variant' -%}
               {%- else -%}
                 {%- assign option_selector_type = 'color' -%}
