@@ -515,7 +515,7 @@
           "default_view_layout": "grid",
           "show_quick_buy": "list",
           "show_quick_view": "list",
-          "quick_links": "inicio",
+          "quick_links": "",
           "quick_links_show_products_count": true,
           "show_filters": false,
           "show_filter_color_swatch": false,
