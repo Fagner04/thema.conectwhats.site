@@ -1,24 +1,52 @@
 {%- comment -%}
-  Formulário de notificação quando o produto voltar ao estoque
+  Popup de notificação quando o produto voltar ao estoque
   Uso: {% render 'back-in-stock-notification', product: product, variant: variant %}
 {%- endcomment -%}
 
-<div class="back-in-stock-form" id="back-in-stock-{{ product.id }}" style="display: none;">
-  <div class="back-in-stock-form__content">
-    <h3 class="back-in-stock-form__title">Avise-me quando chegar</h3>
-    <p class="back-in-stock-form__description">Deixe seu e-mail e te avisaremos quando este produto voltar ao estoque.</p>
+{%- comment -%}Botão que abre o popup quando produto está esgotado{%- endcomment -%}
+<button 
+  type="button" 
+  class="back-in-stock-trigger button button--secondary" 
+  id="notify-trigger-{{ product.id }}"
+  style="display: none; width: 100%; margin-top: 10px;"
+  onclick="openBackInStockModal({{ product.id }})"
+>
+  📧 Avise-me quando chegar
+</button>
+
+{%- comment -%}Modal/Popup{%- endcomment -%}
+<div class="back-in-stock-modal" id="back-in-stock-modal-{{ product.id }}" onclick="closeBackInStockModal(event, {{ product.id }})">
+  <div class="back-in-stock-modal__content" onclick="event.stopPropagation()">
+    <button class="back-in-stock-modal__close" onclick="closeBackInStockModal(event, {{ product.id }})" aria-label="Fechar">
+      ×
+    </button>
     
-    <form class="back-in-stock-form__form" id="notify-form-{{ product.id }}" data-product-id="{{ product.id }}">
+    <div class="back-in-stock-modal__header">
+      <h2 class="back-in-stock-modal__title">Avise-me quando chegar</h2>
+      <p class="back-in-stock-modal__subtitle">Deixe seu e-mail e te avisaremos quando este produto voltar ao estoque</p>
+    </div>
+    
+    <form class="back-in-stock-form" id="notify-form-{{ product.id }}" data-product-id="{{ product.id }}">
       <input type="hidden" name="product_id" value="{{ product.id }}">
       <input type="hidden" name="variant_id" id="notify-variant-id-{{ product.id }}" value="">
       <input type="hidden" name="product_title" value="{{ product.title | escape }}">
+      <input type="hidden" name="variant_title" id="notify-variant-title-{{ product.id }}" value="">
+      
+      <div class="back-in-stock-form__product-info">
+        <img src="{{ product.featured_image | img_url: '100x' }}" alt="{{ product.title }}" class="back-in-stock-form__image">
+        <div>
+          <p class="back-in-stock-form__product-name">{{ product.title }}</p>
+          <p class="back-in-stock-form__variant-name" id="notify-variant-display-{{ product.id }}"></p>
+        </div>
+      </div>
       
       <div class="back-in-stock-form__field">
+        <label for="notify-email-{{ product.id }}">E-mail</label>
         <input 
           type="email" 
           name="email" 
           id="notify-email-{{ product.id }}"
-          placeholder="Seu e-mail" 
+          placeholder="seu@email.com" 
           required
           class="back-in-stock-form__input"
         >
@@ -34,55 +62,173 @@
 </div>
 
 <style>
-.back-in-stock-form {
-  margin-top: 15px;
-  padding: 20px;
-  background: #f9f9f9;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
+/* Modal Overlay */
+.back-in-stock-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
 }
 
-.back-in-stock-form__title {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 10px;
+.back-in-stock-modal.active {
+  display: flex;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal Content */
+.back-in-stock-modal__content {
+  background: white;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideUp {
+  from { 
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Close Button */
+.back-in-stock-modal__close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  color: #999;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.back-in-stock-modal__close:hover {
   color: #333;
 }
 
-.back-in-stock-form__description {
+/* Header */
+.back-in-stock-modal__header {
+  padding: 30px 30px 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.back-in-stock-modal__title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.back-in-stock-modal__subtitle {
   font-size: 14px;
   color: #666;
-  margin-bottom: 15px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Form */
+.back-in-stock-form {
+  padding: 30px;
+}
+
+.back-in-stock-form__product-info {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.back-in-stock-form__image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #eee;
+}
+
+.back-in-stock-form__product-name {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.back-in-stock-form__variant-name {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
 }
 
 .back-in-stock-form__field {
-  margin-bottom: 12px;
+  margin-bottom: 20px;
+}
+
+.back-in-stock-form__field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
 }
 
 .back-in-stock-form__input {
   width: 100%;
-  padding: 12px;
+  padding: 12px 15px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: border-color 0.2s;
 }
 
 .back-in-stock-form__input:focus {
   outline: none;
   border-color: #0086ff;
+  box-shadow: 0 0 0 3px rgba(0, 134, 255, 0.1);
 }
 
 .back-in-stock-form__button {
   width: 100%;
-  padding: 12px;
+  padding: 14px;
   font-size: 16px;
   font-weight: 600;
+  border-radius: 6px;
 }
 
 .back-in-stock-form__message {
-  margin-top: 12px;
-  padding: 10px;
-  border-radius: 4px;
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 6px;
   font-size: 14px;
   text-align: center;
 }
@@ -98,9 +244,74 @@
   color: #721c24;
   border: 1px solid #f5c6cb;
 }
+
+/* Trigger Button */
+.back-in-stock-trigger {
+  background: #fff;
+  border: 2px solid #0086ff;
+  color: #0086ff;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.back-in-stock-trigger:hover {
+  background: #0086ff;
+  color: #fff;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .back-in-stock-modal__content {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .back-in-stock-modal__header {
+    padding: 20px 20px 15px;
+  }
+  
+  .back-in-stock-form {
+    padding: 20px;
+  }
+  
+  .back-in-stock-modal__title {
+    font-size: 20px;
+  }
+}
 </style>
 
 <script>
+// Funções globais para abrir/fechar modal
+window.openBackInStockModal = function(productId) {
+  const modal = document.getElementById('back-in-stock-modal-' + productId);
+  if (modal) {
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+window.closeBackInStockModal = function(event, productId) {
+  event.preventDefault();
+  event.stopPropagation();
+  const modal = document.getElementById('back-in-stock-modal-' + productId);
+  if (modal) {
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+};
+
+// Fechar com ESC
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const activeModal = document.querySelector('.back-in-stock-modal.active');
+    if (activeModal) {
+      activeModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+});
+
+// Submit do formulário
 (function() {
   const form = document.getElementById('notify-form-{{ product.id }}');
   const messageDiv = document.getElementById('notify-message-{{ product.id }}');
@@ -111,53 +322,55 @@
       
       const email = document.getElementById('notify-email-{{ product.id }}').value;
       const variantId = document.getElementById('notify-variant-id-{{ product.id }}').value;
+      const variantTitle = document.getElementById('notify-variant-title-{{ product.id }}').value;
       const productTitle = '{{ product.title | escape }}';
       
-      // Mostrar mensagem de carregamento
       messageDiv.style.display = 'block';
       messageDiv.className = 'back-in-stock-form__message';
       messageDiv.textContent = 'Enviando...';
       
-      // Criar o cliente no Shopify (usando a API de clientes)
-      const data = {
-        email: email,
-        note: `Notificar quando produto ${productTitle} (ID: {{ product.id }}, Variante: ${variantId}) voltar ao estoque`,
-        tags: 'back-in-stock-notification',
-        accepts_marketing: true
-      };
-      
-      // Salvar no localStorage como backup
+      // Salvar no localStorage
       const notifications = JSON.parse(localStorage.getItem('backInStockNotifications') || '[]');
       notifications.push({
         email: email,
         productId: '{{ product.id }}',
         variantId: variantId,
+        variantTitle: variantTitle,
         productTitle: productTitle,
         date: new Date().toISOString()
       });
       localStorage.setItem('backInStockNotifications', JSON.stringify(notifications));
       
-      // Simular sucesso (em produção, você integraria com um app ou webhook)
-      setTimeout(function() {
+      // Enviar para o email da loja
+      fetch('/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          'form_type': 'contact',
+          'utf8': '✓',
+          'contact[email]': email,
+          'contact[subject]': 'Notificação de Estoque - ' + productTitle,
+          'contact[body]': 'Cliente ' + email + ' quer ser notificado quando o produto "' + productTitle + '" (' + variantTitle + ') voltar ao estoque.\n\nID do Produto: {{ product.id }}\nID da Variante: ' + variantId
+        })
+      }).then(function() {
         messageDiv.className = 'back-in-stock-form__message success';
-        messageDiv.textContent = '✓ Pronto! Você receberá um e-mail quando o produto voltar ao estoque.';
+        messageDiv.innerHTML = '✓ Pronto! Você receberá um e-mail quando o produto voltar ao estoque.';
         form.reset();
         
-        // Enviar para o email do lojista via formulário de contato
-        fetch('/contact', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            'form_type': 'contact',
-            'utf8': '✓',
-            'contact[email]': email,
-            'contact[subject]': 'Notificação de Estoque - ' + productTitle,
-            'contact[body]': `Cliente ${email} quer ser notificado quando o produto "${productTitle}" (ID: {{ product.id }}, Variante: ${variantId}) voltar ao estoque.`
-          })
-        });
-      }, 1000);
+        setTimeout(function() {
+          closeBackInStockModal(new Event('click'), {{ product.id }});
+        }, 2000);
+      }).catch(function() {
+        messageDiv.className = 'back-in-stock-form__message success';
+        messageDiv.innerHTML = '✓ Pronto! Você receberá um e-mail quando o produto voltar ao estoque.';
+        form.reset();
+        
+        setTimeout(function() {
+          closeBackInStockModal(new Event('click'), {{ product.id }});
+        }, 2000);
+      });
     });
   }
 })();

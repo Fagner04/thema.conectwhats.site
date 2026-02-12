@@ -1,18 +1,27 @@
 <script>
 (function() {
-  // Função para mostrar/ocultar formulário de notificação
-  function toggleBackInStockForm(productId, variantId, isAvailable) {
-    const form = document.getElementById('back-in-stock-' + productId);
-    const variantInput = document.getElementById('notify-variant-id-' + productId);
+  // Função para mostrar/ocultar botão de notificação e atualizar dados
+  function toggleBackInStockButton(productId, variant, isAvailable) {
+    const button = document.getElementById('notify-trigger-' + productId);
+    const variantIdInput = document.getElementById('notify-variant-id-' + productId);
+    const variantTitleInput = document.getElementById('notify-variant-title-' + productId);
+    const variantDisplay = document.getElementById('notify-variant-display-' + productId);
     
-    if (form) {
-      if (!isAvailable) {
-        form.style.display = 'block';
-        if (variantInput) {
-          variantInput.value = variantId;
+    if (button) {
+      if (!isAvailable && variant) {
+        button.style.display = 'block';
+        
+        if (variantIdInput) {
+          variantIdInput.value = variant.id;
+        }
+        
+        if (variantTitleInput && variantDisplay) {
+          const variantTitle = variant.title || variant.name || '';
+          variantTitleInput.value = variantTitle;
+          variantDisplay.textContent = variantTitle;
         }
       } else {
-        form.style.display = 'none';
+        button.style.display = 'none';
       }
     }
   }
@@ -21,9 +30,17 @@
   document.addEventListener('variant:changed', function(event) {
     const variant = event.detail.variant;
     if (variant) {
-      const productId = variant.product_id || event.target.closest('[data-product-id]')?.dataset.productId;
-      if (productId) {
-        toggleBackInStockForm(productId, variant.id, variant.available);
+      const productForm = event.target.closest('.product-form');
+      if (productForm) {
+        const productData = productForm.querySelector('[data-product-json]');
+        if (productData) {
+          try {
+            const data = JSON.parse(productData.textContent);
+            toggleBackInStockButton(data.product.id, variant, variant.available);
+          } catch (e) {
+            console.error('Erro ao processar dados do produto:', e);
+          }
+        }
       }
     }
   });
@@ -38,7 +55,7 @@
           const data = JSON.parse(productData.textContent);
           const selectedVariant = data.product.variants.find(v => v.id === data.selected_variant_id);
           if (selectedVariant) {
-            toggleBackInStockForm(data.product.id, selectedVariant.id, selectedVariant.available);
+            toggleBackInStockButton(data.product.id, selectedVariant, selectedVariant.available);
           }
         } catch (e) {
           console.error('Erro ao processar dados do produto:', e);
