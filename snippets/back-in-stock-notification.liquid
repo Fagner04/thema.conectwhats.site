@@ -361,12 +361,12 @@ body.modal-open {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  margin-top: 12px;
-  padding: 12px 16px;
-  border-radius: 10px;
+  margin-top: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
   cursor: pointer;
   overflow: hidden;
-  box-shadow: 0 3px 12px rgba(102, 126, 234, 0.35);
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
 }
 
 .back-in-stock-trigger::before {
@@ -387,63 +387,63 @@ body.modal-open {
 }
 
 .back-in-stock-trigger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(102, 126, 234, 0.45);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
 }
 
 .back-in-stock-trigger:active {
   transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.35);
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
 .back-in-stock-trigger__icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  border-radius: 6px;
   flex-shrink: 0;
   transition: all 0.3s;
 }
 
 .back-in-stock-trigger:hover .back-in-stock-trigger__icon {
   background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1) rotate(10deg);
+  transform: scale(1.05) rotate(8deg);
 }
 
 .back-in-stock-trigger__icon svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   animation: bellRing 2s ease-in-out infinite;
 }
 
 @keyframes bellRing {
   0%, 100% { transform: rotate(0deg); }
-  10%, 30% { transform: rotate(-10deg); }
-  20%, 40% { transform: rotate(10deg); }
+  10%, 30% { transform: rotate(-8deg); }
+  20%, 40% { transform: rotate(8deg); }
   50% { transform: rotate(0deg); }
 }
 
 .back-in-stock-trigger__text {
   flex: 1;
   text-align: left;
-  margin: 0 12px;
+  margin: 0 10px;
   display: flex;
   flex-direction: column;
   gap: 1px;
 }
 
 .back-in-stock-trigger__title {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
   line-height: 1.2;
   display: block;
 }
 
 .back-in-stock-trigger__subtitle {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
   opacity: 0.85;
   display: block;
@@ -453,8 +453,8 @@ body.modal-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   flex-shrink: 0;
@@ -462,13 +462,13 @@ body.modal-open {
 }
 
 .back-in-stock-trigger__arrow svg {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
 }
 
 .back-in-stock-trigger:hover .back-in-stock-trigger__arrow {
   background: rgba(255, 255, 255, 0.3);
-  transform: translateX(3px);
+  transform: translateX(2px);
 }
 
 /* Versão alternativa - Estilo outline */
@@ -604,35 +604,40 @@ body.modal-open {
   }
   
   .back-in-stock-trigger {
-    padding: 10px 14px;
+    padding: 8px 12px;
+    margin-top: 8px;
   }
   
   .back-in-stock-trigger__icon {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
   }
   
   .back-in-stock-trigger__icon svg {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
+  }
+  
+  .back-in-stock-trigger__text {
+    margin: 0 8px;
   }
   
   .back-in-stock-trigger__title {
-    font-size: 12px;
+    font-size: 11px;
   }
   
   .back-in-stock-trigger__subtitle {
-    font-size: 10px;
+    font-size: 9px;
   }
   
   .back-in-stock-trigger__arrow {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
   }
   
   .back-in-stock-trigger__arrow svg {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
   }
 }
 
