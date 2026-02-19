@@ -8,6 +8,7 @@
     const variantDisplay = document.getElementById('bisn-variant-display-' + productId);
     
     if (button) {
+      // Mostrar botão se a variante NÃO estiver disponível
       if (!isAvailable && variant) {
         button.style.display = 'block';
         
@@ -26,7 +27,87 @@
     }
   }
   
-  // Preencher dados iniciais
+  // Detectar mudanças nos seletores de variante (radio buttons, selects, etc)
+  function watchVariantSelectors(productId) {
+    // Observar mudanças em radio buttons e selects
+    const productForm = document.querySelector('.product-form[data-product-id="' + productId + '"]') || 
+                        document.querySelector('.product-form');
+    
+    if (!productForm) return;
+    
+    // Escutar mudanças em todos os inputs de variante
+    const variantInputs = productForm.querySelectorAll('input[name^="option"], select[name^="option"]');
+    
+    variantInputs.forEach(function(input) {
+      input.addEventListener('change', function() {
+        // Aguardar um pouco para o tema atualizar a variante selecionada
+        setTimeout(function() {
+          checkCurrentVariant(productId, productForm);
+        }, 100);
+      });
+    });
+    
+    // Verificar estado inicial
+    checkCurrentVariant(productId, productForm);
+  }
+  
+  // Verificar a variante atual e sua disponibilidade
+  function checkCurrentVariant(productId, productForm) {
+    // Tentar pegar dados do produto
+    const productData = productForm.querySelector('[data-product-json]');
+    
+    if (productData) {
+      try {
+        const data = JSON.parse(productData.textContent);
+        const product = data.product || data;
+        
+        // Pegar variante selecionada
+        let selectedVariant = null;
+        
+        // Método 1: Verificar se há um ID de variante selecionado
+        if (data.selected_variant_id) {
+          selectedVariant = product.variants.find(v => v.id === data.selected_variant_id);
+        }
+        
+        // Método 2: Construir a variante baseado nas opções selecionadas
+        if (!selectedVariant) {
+          const selectedOptions = [];
+          const optionInputs = productForm.querySelectorAll('input[name^="option"]:checked, select[name^="option"]');
+          
+          optionInputs.forEach(function(input) {
+            selectedOptions.push(input.value);
+          });
+          
+          // Encontrar variante que corresponde às opções selecionadas
+          if (selectedOptions.length > 0) {
+            selectedVariant = product.variants.find(function(variant) {
+              const variantOptions = [variant.option1, variant.option2, variant.option3].filter(Boolean);
+              return selectedOptions.every(function(opt, idx) {
+                return opt === variantOptions[idx];
+              });
+            });
+          }
+        }
+        
+        // Se encontrou a variante, verificar disponibilidade
+        if (selectedVariant) {
+          const variantIdInput = document.getElementById('bisn-variant-id-' + productId);
+          const variantTitleInput = document.getElementById('bisn-variant-title-' + productId);
+          const variantDisplay = document.getElementById('bisn-variant-display-' + productId);
+          
+          if (variantIdInput) variantIdInput.value = selectedVariant.id;
+          if (variantTitleInput) variantTitleInput.value = selectedVariant.title;
+          if (variantDisplay) variantDisplay.textContent = selectedVariant.title;
+          
+          toggleBackInStockButton(productId, selectedVariant, selectedVariant.available);
+        }
+      } catch (e) {
+        console.error('Erro ao processar dados do produto:', e);
+      }
+    }
+  }
+  
+  // Inicializar para todos os produtos na página
   function initializeBackInStock() {
     const productForms = document.querySelectorAll('.product-form');
     
@@ -35,28 +116,19 @@
       if (productData) {
         try {
           const data = JSON.parse(productData.textContent);
-          const selectedVariant = data.product.variants.find(v => v.id === data.selected_variant_id);
-          if (selectedVariant) {
-            // Preencher dados iniciais mesmo se estiver disponível
-            const variantIdInput = document.getElementById('bisn-variant-id-' + data.product.id);
-            const variantTitleInput = document.getElementById('bisn-variant-title-' + data.product.id);
-            const variantDisplay = document.getElementById('bisn-variant-display-' + data.product.id);
-            
-            if (variantIdInput) variantIdInput.value = selectedVariant.id;
-            if (variantTitleInput) variantTitleInput.value = selectedVariant.title;
-            if (variantDisplay) variantDisplay.textContent = selectedVariant.title;
-            
-            // Controlar visibilidade
-            toggleBackInStockButton(data.product.id, selectedVariant, selectedVariant.available);
-          }
+          const product = data.product || data;
+          const productId = product.id;
+          
+          // Configurar observadores
+          watchVariantSelectors(productId);
         } catch (e) {
-          console.error('Erro ao processar dados do produto:', e);
+          console.error('Erro ao inicializar notificação de estoque:', e);
         }
       }
     });
   }
   
-  // Escutar mudanças de variante
+  // Escutar evento customizado de mudança de variante (se o tema usar)
   document.addEventListener('variant:changed', function(event) {
     const variant = event.detail.variant;
     if (variant) {
@@ -66,9 +138,10 @@
         if (productData) {
           try {
             const data = JSON.parse(productData.textContent);
-            toggleBackInStockButton(data.product.id, variant, variant.available);
+            const product = data.product || data;
+            toggleBackInStockButton(product.id, variant, variant.available);
           } catch (e) {
-            console.error('Erro ao processar dados do produto:', e);
+            console.error('Erro ao processar mudança de variante:', e);
           }
         }
       }
