@@ -1,145 +1,129 @@
 <script>
 (function() {
+  'use strict';
+  
   var productId = null;
-  var button = null;
-  var productData = null;
+  var productVariants = [];
+  var notifyButton = null;
+  
+  function log(msg, data) {
+    console.log('[Back in Stock] ' + msg, data || '');
+  }
   
   // Inicializar
   function init() {
     var form = document.querySelector('.product-form');
     if (!form) {
-      setTimeout(init, 200);
+      log('Form não encontrado, tentando novamente...');
+      setTimeout(init, 300);
       return;
     }
     
-    var dataElement = form.querySelector('[data-product-json]');
-    if (!dataElement) {
-      setTimeout(init, 200);
+    var productJson = form.querySelector('[data-product-json]');
+    if (!productJson) {
+      log('Product JSON não encontrado');
       return;
     }
     
     try {
-      var data = JSON.parse(dataElement.textContent);
-      productData = data.product || data;
-      productId = productData.id;
-      button = document.getElementById('notify-trigger-' + productId);
+      var data = JSON.parse(productJson.textContent);
+      var product = data.product || data;
+      productId = product.id;
+      productVariants = product.variants || [];
       
-      if (!button) {
-        setTimeout(init, 200);
+      log('Produto carregado', {id: productId, variants: productVariants.length});
+      
+      notifyButton = document.getElementById('notify-trigger-' + productId);
+      if (!notifyButton) {
+        log('Botão não encontrado: notify-trigger-' + productId);
         return;
       }
       
-      // Verificar variante inicial
-      checkInitialVariant();
+      log('Botão encontrado');
       
-      // Adicionar listeners em TODOS os seletores de variante
-      addVariantListeners(form);
+      // Verificar estado inicial
+      checkCurrentSelection();
+      
+      // Adicionar listeners
+      setupListeners(form);
       
     } catch (e) {
-      console.error('Erro ao inicializar:', e);
+      log('Erro ao inicializar', e);
     }
   }
   
-  // Verificar variante inicial
-  function checkInitialVariant() {
-    var form = document.querySelector('.product-form');
-    if (!form) return;
+  // Configurar listeners
+  function setupListeners(form) {
+    // Pegar TODOS os seletores de variante
+    var selectors = form.querySelectorAll('.product-form__single-selector');
+    log('Seletores encontrados: ' + selectors.length);
     
-    var selectedOptions = getSelectedOptions(form);
-    var variant = findVariant(selectedOptions);
-    
-    if (variant) {
-      updateButton(variant);
-    }
-  }
-  
-  // Adicionar listeners nos seletores
-  function addVariantListeners(form) {
-    // Radio buttons
-    var radioInputs = form.querySelectorAll('input[type="radio"]');
-    radioInputs.forEach(function(input) {
-      input.addEventListener('click', function() {
-        setTimeout(function() {
-          var selectedOptions = getSelectedOptions(form);
-          var variant = findVariant(selectedOptions);
-          if (variant) {
-            updateButton(variant);
-          }
-        }, 50);
+    selectors.forEach(function(selector) {
+      // Adicionar listener de mudança
+      selector.addEventListener('change', function() {
+        log('Change detectado em: ' + selector.name + ' = ' + selector.value);
+        setTimeout(checkCurrentSelection, 100);
       });
-    });
-    
-    // Selects
-    var selects = form.querySelectorAll('select');
-    selects.forEach(function(select) {
-      select.addEventListener('change', function() {
-        setTimeout(function() {
-          var selectedOptions = getSelectedOptions(form);
-          var variant = findVariant(selectedOptions);
-          if (variant) {
-            updateButton(variant);
-          }
-        }, 50);
-      });
-    });
-    
-    // Swatch buttons (color/variant swatches)
-    var swatchInputs = form.querySelectorAll('.color-swatch__radio, .variant-swatch__radio, .block-swatch__radio, .product-form__single-selector');
-    swatchInputs.forEach(function(input) {
-      input.addEventListener('click', function() {
-        setTimeout(function() {
-          var selectedOptions = getSelectedOptions(form);
-          var variant = findVariant(selectedOptions);
-          if (variant) {
-            updateButton(variant);
-          }
-        }, 50);
-      });
-    });
-  }
-  
-  // Pegar opções selecionadas
-  function getSelectedOptions(form) {
-    var options = [];
-    
-    // Tentar pegar de radio buttons checked
-    var checkedRadios = form.querySelectorAll('input[type="radio"]:checked');
-    checkedRadios.forEach(function(radio) {
-      var name = radio.getAttribute('name');
-      if (name && name.indexOf('option') === 0) {
-        options.push(radio.value);
+      
+      // Adicionar listener de clique (para radio buttons)
+      if (selector.type === 'radio') {
+        selector.addEventListener('click', function() {
+          log('Click detectado em: ' + selector.name + ' = ' + selector.value);
+          setTimeout(checkCurrentSelection, 100);
+        });
       }
     });
     
-    // Se não encontrou, tentar selects
-    if (options.length === 0) {
-      var selects = form.querySelectorAll('select[name^="option"]');
-      selects.forEach(function(select) {
-        if (select.value) {
-          options.push(select.value);
-        }
-      });
-    }
-    
-    // Tentar product-form__single-selector
-    if (options.length === 0) {
-      var singleSelectors = form.querySelectorAll('.product-form__single-selector:checked');
-      singleSelectors.forEach(function(input) {
-        options.push(input.value);
-      });
-    }
-    
-    return options;
+    // Listener no evento do tema
+    document.addEventListener('variant:changed', function(event) {
+      if (event.detail && event.detail.variant) {
+        log('Evento variant:changed', event.detail.variant);
+        updateButtonVisibility(event.detail.variant);
+      }
+    });
   }
   
-  // Encontrar variante baseada nas opções
-  function findVariant(selectedOptions) {
-    if (!productData || !productData.variants || selectedOptions.length === 0) {
-      return null;
-    }
+  // Verificar seleção atual
+  function checkCurrentSelection() {
+    var form = document.querySelector('.product-form');
+    if (!form) return;
     
-    for (var i = 0; i < productData.variants.length; i++) {
-      var variant = productData.variants[i];
+    var selectedOptions = [];
+    
+    // Pegar valores selecionados
+    var selectors = form.querySelectorAll('.product-form__single-selector');
+    selectors.forEach(function(selector) {
+      if (selector.type === 'radio') {
+        if (selector.checked) {
+          var position = selector.getAttribute('data-option-position');
+          selectedOptions[position - 1] = selector.value;
+        }
+      } else if (selector.tagName === 'SELECT') {
+        var position = selector.getAttribute('data-option-position');
+        selectedOptions[position - 1] = selector.value;
+      }
+    });
+    
+    // Remover valores undefined
+    selectedOptions = selectedOptions.filter(function(v) { return v !== undefined; });
+    
+    log('Opções selecionadas', selectedOptions);
+    
+    // Encontrar variante correspondente
+    var variant = findMatchingVariant(selectedOptions);
+    
+    if (variant) {
+      log('Variante encontrada', {title: variant.title, available: variant.available});
+      updateButtonVisibility(variant);
+    } else {
+      log('Nenhuma variante encontrada para as opções selecionadas');
+    }
+  }
+  
+  // Encontrar variante que corresponde às opções
+  function findMatchingVariant(selectedOptions) {
+    for (var i = 0; i < productVariants.length; i++) {
+      var variant = productVariants[i];
       var match = true;
       
       if (selectedOptions[0] && variant.option1 !== selectedOptions[0]) match = false;
@@ -150,46 +134,39 @@
         return variant;
       }
     }
-    
     return null;
   }
   
-  // Atualizar botão
-  function updateButton(variant) {
-    if (!button) return;
+  // Atualizar visibilidade do botão
+  function updateButtonVisibility(variant) {
+    if (!notifyButton) return;
     
     var variantIdInput = document.getElementById('bisn-variant-id-' + productId);
     var variantTitleInput = document.getElementById('bisn-variant-title-' + productId);
     var variantDisplay = document.getElementById('bisn-variant-display-' + productId);
     
-    if (variant && !variant.available) {
-      // Variante esgotada - MOSTRAR botão
-      button.style.display = 'block';
+    if (!variant.available) {
+      log('MOSTRANDO botão - variante esgotada');
+      notifyButton.style.display = 'block';
+      
       if (variantIdInput) variantIdInput.value = variant.id;
       if (variantTitleInput) variantTitleInput.value = variant.title || '';
       if (variantDisplay) variantDisplay.textContent = variant.title || '';
     } else {
-      // Variante disponível - ESCONDER botão
-      button.style.display = 'none';
+      log('ESCONDENDO botão - variante disponível');
+      notifyButton.style.display = 'none';
     }
   }
   
-  // Escutar evento do tema (backup)
-  document.addEventListener('variant:changed', function(event) {
-    if (event.detail && event.detail.variant) {
-      updateButton(event.detail.variant);
-    }
-  });
-  
-  // Inicializar
+  // Inicializar quando pronto
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
   
-  setTimeout(init, 100);
+  // Tentar novamente após delays
   setTimeout(init, 500);
-  setTimeout(init, 1000);
+  setTimeout(init, 1500);
 })();
 </script>
