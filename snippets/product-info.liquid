@@ -774,12 +774,15 @@
         {%- else -%}
           <a href="mailto:{{ shop.email }}" class="button button--primary">{{ 'product.form.contact_us' | t }}</a>
         {%- endif -%}
-        
-        {%- comment -%}Botão e Modal de notificação de estoque (sempre presente){%- endcomment -%}
-        {%- if section.settings.enable_back_in_stock_notification -%}
-          {% render 'back-in-stock-notification', product: product, variant: selected_variant %}
-        {%- endif -%}
       </div>
+      
+      {%- comment -%}Botão e Modal de notificação de estoque (fora do container de pagamento){%- endcomment -%}
+      {%- if section.settings.enable_back_in_stock_notification -%}
+        {%- comment -%}TESTE DE DEBUG - REMOVER DEPOIS{%- endcomment -%}
+        {% render 'back-in-stock-test', product: product, variant: selected_variant %}
+        
+        {% render 'back-in-stock-notification', product: product, variant: selected_variant %}
+      {%- endif -%}
 
 {% if section.settings.mostrar_btn_wtspp %}
 

@@ -1,21 +1,14 @@
 <script>
 (function() {
-  console.log('Back in Stock: Script carregado');
-  
   // Função para mostrar/ocultar botão de notificação e atualizar dados
   function toggleBackInStockButton(productId, variant, isAvailable) {
-    console.log('toggleBackInStockButton chamado:', {productId, variant, isAvailable});
-    
     const button = document.getElementById('notify-trigger-' + productId);
     const variantIdInput = document.getElementById('notify-variant-id-' + productId);
     const variantTitleInput = document.getElementById('notify-variant-title-' + productId);
     const variantDisplay = document.getElementById('notify-variant-display-' + productId);
     
-    console.log('Elementos encontrados:', {button, variantIdInput, variantTitleInput, variantDisplay});
-    
     if (button) {
       if (!isAvailable && variant) {
-        console.log('Mostrando botão - produto esgotado');
         button.style.display = 'block';
         
         if (variantIdInput) {
@@ -28,17 +21,13 @@
           variantDisplay.textContent = variantTitle;
         }
       } else {
-        console.log('Escondendo botão - produto disponível');
         button.style.display = 'none';
       }
-    } else {
-      console.error('Botão não encontrado: notify-trigger-' + productId);
     }
   }
   
   // Escutar mudanças de variante
   document.addEventListener('variant:changed', function(event) {
-    console.log('Evento variant:changed detectado', event.detail);
     const variant = event.detail.variant;
     if (variant) {
       const productForm = event.target.closest('.product-form');
@@ -58,19 +47,15 @@
   
   // Verificar estado inicial ao carregar a página
   document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded - verificando produtos');
     const productForms = document.querySelectorAll('.product-form');
-    console.log('Formulários encontrados:', productForms.length);
     
     productForms.forEach(function(form) {
       const productData = form.querySelector('[data-product-json]');
       if (productData) {
         try {
           const data = JSON.parse(productData.textContent);
-          console.log('Dados do produto:', data);
           const selectedVariant = data.product.variants.find(v => v.id === data.selected_variant_id);
           if (selectedVariant) {
-            console.log('Variante selecionada:', selectedVariant);
             toggleBackInStockButton(data.product.id, selectedVariant, selectedVariant.available);
           }
         } catch (e) {

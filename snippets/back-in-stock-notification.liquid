@@ -75,10 +75,12 @@
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.3s ease;
+  pointer-events: none;
 }
 
 .back-in-stock-modal.active {
   display: flex;
+  pointer-events: auto;
 }
 
 @keyframes fadeIn {
@@ -252,6 +254,8 @@
   color: #0086ff;
   font-weight: 600;
   transition: all 0.3s;
+  position: relative;
+  z-index: 1;
 }
 
 .back-in-stock-trigger:hover {
