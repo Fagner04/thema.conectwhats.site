@@ -6,16 +6,25 @@
 {%- comment -%}Botão que abre o popup quando produto está esgotado{%- endcomment -%}
 <button 
   type="button" 
-  class="back-in-stock-trigger button button--secondary" 
+  class="back-in-stock-trigger" 
   id="notify-trigger-{{ product.id }}"
   style="display: {% if selected_variant.available %}none{% else %}block{% endif %};"
   onclick="openBackInStockModal({{ product.id }})"
 >
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
-    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-    <polyline points="22,6 12,13 2,6"></polyline>
-  </svg>
-  Avise-me quando chegar
+  <span class="back-in-stock-trigger__icon">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path>
+    </svg>
+  </span>
+  <span class="back-in-stock-trigger__text">
+    <span class="back-in-stock-trigger__title">Avise-me quando chegar</span>
+    <span class="back-in-stock-trigger__subtitle">Receba um e-mail grátis</span>
+  </span>
+  <span class="back-in-stock-trigger__arrow">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </span>
 </button>
 
 {%- comment -%}Modal/Popup{%- endcomment -%}
@@ -104,7 +113,7 @@
   height: 100%;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
-  z-index: 9999;
+  z-index: 99999;
   align-items: center;
   justify-content: center;
   animation: fadeIn 0.3s ease;
@@ -132,6 +141,7 @@
   position: relative;
   animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  z-index: 100000;
 }
 
 @keyframes slideUp {
@@ -332,31 +342,151 @@
 
 /* Trigger Button */
 .back-in-stock-trigger {
-  background: white;
-  border: 2px solid #0086ff;
-  color: #0086ff;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
   font-weight: 600;
-  transition: all 0.3s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   z-index: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
   margin-top: 12px;
-  padding: 14px;
-  border-radius: 8px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.back-in-stock-trigger::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+.back-in-stock-trigger:hover::before {
+  opacity: 1;
 }
 
 .back-in-stock-trigger:hover {
-  background: #0086ff;
-  color: white;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 134, 255, 0.3);
+  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5);
 }
 
 .back-in-stock-trigger:active {
   transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+}
+
+.back-in-stock-trigger__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.back-in-stock-trigger:hover .back-in-stock-trigger__icon {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1) rotate(10deg);
+}
+
+.back-in-stock-trigger__icon svg {
+  animation: bellRing 2s ease-in-out infinite;
+}
+
+@keyframes bellRing {
+  0%, 100% { transform: rotate(0deg); }
+  10%, 30% { transform: rotate(-10deg); }
+  20%, 40% { transform: rotate(10deg); }
+  50% { transform: rotate(0deg); }
+}
+
+.back-in-stock-trigger__text {
+  flex: 1;
+  text-align: left;
+  margin: 0 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.back-in-stock-trigger__title {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+  display: block;
+}
+
+.back-in-stock-trigger__subtitle {
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.9;
+  display: block;
+}
+
+.back-in-stock-trigger__arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.back-in-stock-trigger:hover .back-in-stock-trigger__arrow {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateX(4px);
+}
+
+/* Versão alternativa - Estilo outline */
+.back-in-stock-trigger.style-outline {
+  background: white;
+  border: 2px solid #667eea;
+  color: #667eea;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+}
+
+.back-in-stock-trigger.style-outline::before {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.back-in-stock-trigger.style-outline:hover {
+  color: white;
+  border-color: transparent;
+}
+
+.back-in-stock-trigger.style-outline .back-in-stock-trigger__icon {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.back-in-stock-trigger.style-outline:hover .back-in-stock-trigger__icon {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.back-in-stock-trigger.style-outline .back-in-stock-trigger__arrow {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.back-in-stock-trigger.style-outline:hover .back-in-stock-trigger__arrow {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Mobile Responsive */
@@ -385,6 +515,28 @@
   
   .back-in-stock-modal__subtitle {
     font-size: 14px;
+  }
+  
+  .back-in-stock-trigger {
+    padding: 14px 16px;
+  }
+  
+  .back-in-stock-trigger__icon {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .back-in-stock-trigger__title {
+    font-size: 14px;
+  }
+  
+  .back-in-stock-trigger__subtitle {
+    font-size: 11px;
+  }
+  
+  .back-in-stock-trigger__arrow {
+    width: 24px;
+    height: 24px;
   }
 }
 </style>
