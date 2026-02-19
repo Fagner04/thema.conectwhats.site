@@ -358,7 +358,7 @@ body.bisn-open {
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 10px;
   width: 100%;
   margin-top: 10px;
@@ -366,6 +366,22 @@ body.bisn-open {
   border-radius: 50px;
   cursor: pointer;
   font-size: 14px;
+  line-height: 1;
+}
+
+.back-in-stock-trigger svg {
+  flex-shrink: 0;
+  transition: transform 0.3s;
+  display: block;
+}
+
+.back-in-stock-trigger span {
+  flex: 1;
+  text-align: center;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .back-in-stock-trigger:hover {
@@ -377,10 +393,6 @@ body.bisn-open {
 
 .back-in-stock-trigger:active {
   transform: translateY(0);
-}
-
-.back-in-stock-trigger svg {
-  transition: transform 0.3s;
 }
 
 .back-in-stock-trigger:hover svg:last-child {

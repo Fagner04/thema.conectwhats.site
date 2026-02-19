@@ -1,158 +1,154 @@
 <script>
 (function() {
-  // Função para mostrar/ocultar botão de notificação e atualizar dados
-  function toggleBackInStockButton(productId, variant, isAvailable) {
-    const button = document.getElementById('notify-trigger-' + productId);
-    const variantIdInput = document.getElementById('bisn-variant-id-' + productId);
-    const variantTitleInput = document.getElementById('bisn-variant-title-' + productId);
-    const variantDisplay = document.getElementById('bisn-variant-display-' + productId);
+  var productId = null;
+  var productData = null;
+  
+  // Função para mostrar/ocultar botão
+  function toggleButton(variant) {
+    if (!productId) return;
     
-    if (button) {
-      // Mostrar botão se a variante NÃO estiver disponível
-      if (!isAvailable && variant) {
-        button.style.display = 'block';
-        
-        if (variantIdInput) {
-          variantIdInput.value = variant.id;
-        }
-        
-        if (variantTitleInput && variantDisplay) {
-          const variantTitle = variant.title || variant.name || '';
-          variantTitleInput.value = variantTitle;
-          variantDisplay.textContent = variantTitle;
-        }
-      } else {
-        button.style.display = 'none';
-      }
+    var button = document.getElementById('notify-trigger-' + productId);
+    if (!button) return;
+    
+    var variantIdInput = document.getElementById('bisn-variant-id-' + productId);
+    var variantTitleInput = document.getElementById('bisn-variant-title-' + productId);
+    var variantDisplay = document.getElementById('bisn-variant-display-' + productId);
+    
+    if (variant && !variant.available) {
+      // Variante esgotada - mostrar botão
+      button.style.display = 'block';
+      
+      if (variantIdInput) variantIdInput.value = variant.id;
+      if (variantTitleInput) variantTitleInput.value = variant.title || '';
+      if (variantDisplay) variantDisplay.textContent = variant.title || '';
+    } else {
+      // Variante disponível - esconder botão
+      button.style.display = 'none';
     }
   }
   
-  // Detectar mudanças nos seletores de variante (radio buttons, selects, etc)
-  function watchVariantSelectors(productId) {
-    // Observar mudanças em radio buttons e selects
-    const productForm = document.querySelector('.product-form[data-product-id="' + productId + '"]') || 
-                        document.querySelector('.product-form');
+  // Encontrar variante baseada nas opções selecionadas
+  function findSelectedVariant() {
+    if (!productData || !productData.variants) return null;
     
-    if (!productForm) return;
+    var form = document.querySelector('.product-form');
+    if (!form) return null;
     
-    // Escutar mudanças em todos os inputs de variante
-    const variantInputs = productForm.querySelectorAll('input[name^="option"], select[name^="option"]');
+    var selectedOptions = [];
     
-    variantInputs.forEach(function(input) {
-      input.addEventListener('change', function() {
-        // Aguardar um pouco para o tema atualizar a variante selecionada
-        setTimeout(function() {
-          checkCurrentVariant(productId, productForm);
-        }, 100);
+    // Pegar valores dos radio buttons selecionados
+    var radioInputs = form.querySelectorAll('input[type="radio"]:checked[name^="option"]');
+    radioInputs.forEach(function(input) {
+      selectedOptions.push(input.value);
+    });
+    
+    // Pegar valores dos selects
+    var selectInputs = form.querySelectorAll('select[name^="option"]');
+    selectInputs.forEach(function(select) {
+      if (select.value) {
+        selectedOptions.push(select.value);
+      }
+    });
+    
+    // Se não encontrou opções, tentar método alternativo
+    if (selectedOptions.length === 0) {
+      var singleSelectors = form.querySelectorAll('.product-form__single-selector');
+      singleSelectors.forEach(function(input) {
+        if (input.checked || input.selected) {
+          selectedOptions.push(input.value);
+        }
       });
-    });
+    }
     
-    // Verificar estado inicial
-    checkCurrentVariant(productId, productForm);
+    // Encontrar variante que corresponde
+    if (selectedOptions.length > 0) {
+      return productData.variants.find(function(variant) {
+        var match = true;
+        if (selectedOptions[0] && variant.option1 !== selectedOptions[0]) match = false;
+        if (selectedOptions[1] && variant.option2 !== selectedOptions[1]) match = false;
+        if (selectedOptions[2] && variant.option3 !== selectedOptions[2]) match = false;
+        return match;
+      });
+    }
+    
+    return null;
   }
   
-  // Verificar a variante atual e sua disponibilidade
-  function checkCurrentVariant(productId, productForm) {
-    // Tentar pegar dados do produto
-    const productData = productForm.querySelector('[data-product-json]');
-    
-    if (productData) {
-      try {
-        const data = JSON.parse(productData.textContent);
-        const product = data.product || data;
-        
-        // Pegar variante selecionada
-        let selectedVariant = null;
-        
-        // Método 1: Verificar se há um ID de variante selecionado
-        if (data.selected_variant_id) {
-          selectedVariant = product.variants.find(v => v.id === data.selected_variant_id);
-        }
-        
-        // Método 2: Construir a variante baseado nas opções selecionadas
-        if (!selectedVariant) {
-          const selectedOptions = [];
-          const optionInputs = productForm.querySelectorAll('input[name^="option"]:checked, select[name^="option"]');
-          
-          optionInputs.forEach(function(input) {
-            selectedOptions.push(input.value);
-          });
-          
-          // Encontrar variante que corresponde às opções selecionadas
-          if (selectedOptions.length > 0) {
-            selectedVariant = product.variants.find(function(variant) {
-              const variantOptions = [variant.option1, variant.option2, variant.option3].filter(Boolean);
-              return selectedOptions.every(function(opt, idx) {
-                return opt === variantOptions[idx];
-              });
-            });
-          }
-        }
-        
-        // Se encontrou a variante, verificar disponibilidade
-        if (selectedVariant) {
-          const variantIdInput = document.getElementById('bisn-variant-id-' + productId);
-          const variantTitleInput = document.getElementById('bisn-variant-title-' + productId);
-          const variantDisplay = document.getElementById('bisn-variant-display-' + productId);
-          
-          if (variantIdInput) variantIdInput.value = selectedVariant.id;
-          if (variantTitleInput) variantTitleInput.value = selectedVariant.title;
-          if (variantDisplay) variantDisplay.textContent = selectedVariant.title;
-          
-          toggleBackInStockButton(productId, selectedVariant, selectedVariant.available);
-        }
-      } catch (e) {
-        console.error('Erro ao processar dados do produto:', e);
-      }
+  // Atualizar baseado na seleção atual
+  function updateButton() {
+    var variant = findSelectedVariant();
+    if (variant) {
+      toggleButton(variant);
     }
   }
   
-  // Inicializar para todos os produtos na página
-  function initializeBackInStock() {
-    const productForms = document.querySelectorAll('.product-form');
+  // Inicializar
+  function init() {
+    var form = document.querySelector('.product-form');
+    if (!form) return;
     
-    productForms.forEach(function(form) {
-      const productData = form.querySelector('[data-product-json]');
-      if (productData) {
-        try {
-          const data = JSON.parse(productData.textContent);
-          const product = data.product || data;
-          const productId = product.id;
-          
-          // Configurar observadores
-          watchVariantSelectors(productId);
-        } catch (e) {
-          console.error('Erro ao inicializar notificação de estoque:', e);
-        }
-      }
-    });
+    var dataElement = form.querySelector('[data-product-json]');
+    if (!dataElement) return;
+    
+    try {
+      var data = JSON.parse(dataElement.textContent);
+      productData = data.product || data;
+      productId = productData.id;
+      
+      // Verificar estado inicial
+      updateButton();
+      
+      // Observar mudanças em TODOS os inputs de variante
+      var allInputs = form.querySelectorAll('input[name^="option"], select[name^="option"], .product-form__single-selector');
+      
+      allInputs.forEach(function(input) {
+        input.addEventListener('change', function() {
+          setTimeout(updateButton, 50);
+        });
+        
+        input.addEventListener('click', function() {
+          setTimeout(updateButton, 50);
+        });
+      });
+      
+      // Observar mudanças no DOM (para temas que atualizam dinamicamente)
+      var observer = new MutationObserver(function() {
+        setTimeout(updateButton, 100);
+      });
+      
+      observer.observe(form, {
+        attributes: true,
+        attributeFilter: ['class', 'data-variant-id'],
+        subtree: true
+      });
+      
+    } catch (e) {
+      console.error('Erro ao inicializar notificação de estoque:', e);
+    }
   }
   
-  // Escutar evento customizado de mudança de variante (se o tema usar)
+  // Escutar eventos customizados do tema
   document.addEventListener('variant:changed', function(event) {
-    const variant = event.detail.variant;
-    if (variant) {
-      const productForm = event.target.closest('.product-form');
-      if (productForm) {
-        const productData = productForm.querySelector('[data-product-json]');
-        if (productData) {
-          try {
-            const data = JSON.parse(productData.textContent);
-            const product = data.product || data;
-            toggleBackInStockButton(product.id, variant, variant.available);
-          } catch (e) {
-            console.error('Erro ao processar mudança de variante:', e);
-          }
-        }
-      }
+    if (event.detail && event.detail.variant) {
+      toggleButton(event.detail.variant);
     }
   });
   
-  // Inicializar quando DOM estiver pronto
+  // Também escutar evento de mudança de variante (alguns temas usam este)
+  document.addEventListener('variantChange', function(event) {
+    if (event.detail && event.detail.variant) {
+      toggleButton(event.detail.variant);
+    }
+  });
+  
+  // Inicializar
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeBackInStock);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    initializeBackInStock();
+    init();
   }
+  
+  // Re-inicializar após um pequeno delay (para garantir que o tema carregou)
+  setTimeout(init, 500);
 })();
 </script>
