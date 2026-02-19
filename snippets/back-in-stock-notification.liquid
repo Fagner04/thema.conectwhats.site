@@ -350,11 +350,11 @@ body.modal-open {
 
 /* Trigger Button */
 .back-in-stock-trigger {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  color: white;
+  background: white;
+  border: 2px solid #0086ff;
+  color: #0086ff;
   font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   position: relative;
   z-index: 1;
   display: flex;
@@ -363,39 +363,21 @@ body.modal-open {
   gap: 8px;
   width: 100%;
   margin-top: 10px;
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 14px 20px;
+  border-radius: 50px;
   cursor: pointer;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.25);
-  font-size: 13px;
-}
-
-.back-in-stock-trigger::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-  opacity: 0;
-  transition: opacity 0.3s;
-  z-index: -1;
-}
-
-.back-in-stock-trigger:hover::before {
-  opacity: 1;
+  font-size: 14px;
 }
 
 .back-in-stock-trigger:hover {
+  background: #0086ff;
+  color: white;
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 134, 255, 0.3);
 }
 
 .back-in-stock-trigger:active {
   transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
 }
 
 .back-in-stock-trigger__icon {
@@ -403,29 +385,24 @@ body.modal-open {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  order: 1;
 }
 
 .back-in-stock-trigger__icon svg {
-  width: 16px;
-  height: 16px;
-  animation: bellRing 2s ease-in-out infinite;
-}
-
-@keyframes bellRing {
-  0%, 100% { transform: rotate(0deg); }
-  10%, 30% { transform: rotate(-8deg); }
-  20%, 40% { transform: rotate(8deg); }
-  50% { transform: rotate(0deg); }
+  width: 18px;
+  height: 18px;
 }
 
 .back-in-stock-trigger__text {
   display: flex;
   align-items: center;
-  gap: 4px;
+  order: 2;
+  flex: 1;
+  justify-content: center;
 }
 
 .back-in-stock-trigger__title {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1;
 }
@@ -439,16 +416,17 @@ body.modal-open {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  order: 3;
 }
 
 .back-in-stock-trigger__arrow svg {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   transition: transform 0.3s;
 }
 
 .back-in-stock-trigger:hover .back-in-stock-trigger__arrow svg {
-  transform: translateX(2px);
+  transform: translateX(3px);
 }
 
 /* Versão alternativa - Estilo outline */
@@ -584,22 +562,22 @@ body.modal-open {
   }
   
   .back-in-stock-trigger {
-    padding: 11px 14px;
-    font-size: 12px;
+    padding: 13px 18px;
+    font-size: 13px;
   }
   
   .back-in-stock-trigger__icon svg {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
   }
   
   .back-in-stock-trigger__title {
-    font-size: 12px;
+    font-size: 13px;
   }
   
   .back-in-stock-trigger__arrow svg {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
   }
 }
 
