@@ -2,37 +2,156 @@
 (function() {
   var productId = null;
   var button = null;
+  var productData = null;
   
   // Inicializar
   function init() {
     var form = document.querySelector('.product-form');
-    if (!form) return;
+    if (!form) {
+      setTimeout(init, 200);
+      return;
+    }
     
     var dataElement = form.querySelector('[data-product-json]');
-    if (!dataElement) return;
+    if (!dataElement) {
+      setTimeout(init, 200);
+      return;
+    }
     
     try {
       var data = JSON.parse(dataElement.textContent);
-      var product = data.product || data;
-      productId = product.id;
+      productData = data.product || data;
+      productId = productData.id;
       button = document.getElementById('notify-trigger-' + productId);
       
-      if (!button) return;
+      if (!button) {
+        setTimeout(init, 200);
+        return;
+      }
       
       // Verificar variante inicial
-      if (data.selected_variant_id) {
-        var initialVariant = product.variants.find(function(v) {
-          return v.id === data.selected_variant_id;
-        });
-        
-        if (initialVariant) {
-          updateButton(initialVariant);
-        }
-      }
+      checkInitialVariant();
+      
+      // Adicionar listeners em TODOS os seletores de variante
+      addVariantListeners(form);
       
     } catch (e) {
       console.error('Erro ao inicializar:', e);
     }
+  }
+  
+  // Verificar variante inicial
+  function checkInitialVariant() {
+    var form = document.querySelector('.product-form');
+    if (!form) return;
+    
+    var selectedOptions = getSelectedOptions(form);
+    var variant = findVariant(selectedOptions);
+    
+    if (variant) {
+      updateButton(variant);
+    }
+  }
+  
+  // Adicionar listeners nos seletores
+  function addVariantListeners(form) {
+    // Radio buttons
+    var radioInputs = form.querySelectorAll('input[type="radio"]');
+    radioInputs.forEach(function(input) {
+      input.addEventListener('click', function() {
+        setTimeout(function() {
+          var selectedOptions = getSelectedOptions(form);
+          var variant = findVariant(selectedOptions);
+          if (variant) {
+            updateButton(variant);
+          }
+        }, 50);
+      });
+    });
+    
+    // Selects
+    var selects = form.querySelectorAll('select');
+    selects.forEach(function(select) {
+      select.addEventListener('change', function() {
+        setTimeout(function() {
+          var selectedOptions = getSelectedOptions(form);
+          var variant = findVariant(selectedOptions);
+          if (variant) {
+            updateButton(variant);
+          }
+        }, 50);
+      });
+    });
+    
+    // Swatch buttons (color/variant swatches)
+    var swatchInputs = form.querySelectorAll('.color-swatch__radio, .variant-swatch__radio, .block-swatch__radio, .product-form__single-selector');
+    swatchInputs.forEach(function(input) {
+      input.addEventListener('click', function() {
+        setTimeout(function() {
+          var selectedOptions = getSelectedOptions(form);
+          var variant = findVariant(selectedOptions);
+          if (variant) {
+            updateButton(variant);
+          }
+        }, 50);
+      });
+    });
+  }
+  
+  // Pegar opções selecionadas
+  function getSelectedOptions(form) {
+    var options = [];
+    
+    // Tentar pegar de radio buttons checked
+    var checkedRadios = form.querySelectorAll('input[type="radio"]:checked');
+    checkedRadios.forEach(function(radio) {
+      var name = radio.getAttribute('name');
+      if (name && name.indexOf('option') === 0) {
+        options.push(radio.value);
+      }
+    });
+    
+    // Se não encontrou, tentar selects
+    if (options.length === 0) {
+      var selects = form.querySelectorAll('select[name^="option"]');
+      selects.forEach(function(select) {
+        if (select.value) {
+          options.push(select.value);
+        }
+      });
+    }
+    
+    // Tentar product-form__single-selector
+    if (options.length === 0) {
+      var singleSelectors = form.querySelectorAll('.product-form__single-selector:checked');
+      singleSelectors.forEach(function(input) {
+        options.push(input.value);
+      });
+    }
+    
+    return options;
+  }
+  
+  // Encontrar variante baseada nas opções
+  function findVariant(selectedOptions) {
+    if (!productData || !productData.variants || selectedOptions.length === 0) {
+      return null;
+    }
+    
+    for (var i = 0; i < productData.variants.length; i++) {
+      var variant = productData.variants[i];
+      var match = true;
+      
+      if (selectedOptions[0] && variant.option1 !== selectedOptions[0]) match = false;
+      if (selectedOptions[1] && variant.option2 !== selectedOptions[1]) match = false;
+      if (selectedOptions[2] && variant.option3 !== selectedOptions[2]) match = false;
+      
+      if (match) {
+        return variant;
+      }
+    }
+    
+    return null;
   }
   
   // Atualizar botão
@@ -44,16 +163,18 @@
     var variantDisplay = document.getElementById('bisn-variant-display-' + productId);
     
     if (variant && !variant.available) {
+      // Variante esgotada - MOSTRAR botão
       button.style.display = 'block';
       if (variantIdInput) variantIdInput.value = variant.id;
       if (variantTitleInput) variantTitleInput.value = variant.title || '';
       if (variantDisplay) variantDisplay.textContent = variant.title || '';
     } else {
+      // Variante disponível - ESCONDER botão
       button.style.display = 'none';
     }
   }
   
-  // Escutar evento do tema
+  // Escutar evento do tema (backup)
   document.addEventListener('variant:changed', function(event) {
     if (event.detail && event.detail.variant) {
       updateButton(event.detail.variant);
@@ -67,6 +188,8 @@
     init();
   }
   
+  setTimeout(init, 100);
   setTimeout(init, 500);
+  setTimeout(init, 1000);
 })();
 </script>
