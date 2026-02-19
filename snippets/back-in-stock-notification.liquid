@@ -4,17 +4,25 @@
 {%- endcomment -%}
 
 {%- assign current_variant = variant | default: product.selected_or_first_available_variant -%}
+{%- assign has_unavailable_variant = false -%}
+{%- for v in product.variants -%}
+  {%- unless v.available -%}
+    {%- assign has_unavailable_variant = true -%}
+    {%- break -%}
+  {%- endunless -%}
+{%- endfor -%}
 
-{%- comment -%}Botão que abre o popup quando produto está esgotado{%- endcomment -%}
+{%- comment -%}Botão que abre o popup - aparece se QUALQUER variante estiver esgotada{%- endcomment -%}
+{%- if has_unavailable_variant -%}
 <button 
   type="button" 
   class="back-in-stock-trigger" 
   id="notify-trigger-{{ product.id }}"
-  style="display: {% if current_variant.available %}none{% else %}block{% endif %};"
   onclick="openBackInStockModal({{ product.id }})"
 >
   Avise-me quando chegar
 </button>
+{%- endif -%}
 
 {%- comment -%}Template do Modal - será movido para o body via JavaScript{%- endcomment -%}
 <template id="back-in-stock-modal-template-{{ product.id }}">
