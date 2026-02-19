@@ -750,7 +750,7 @@
             {%- if product.template_suffix == 'pre-order' -%}
               <button type="submit" class="product-form__add-button button button--primary btn-primary-buy" data-action="add-to-cart">{{ 'product.form.pre_order' | t }}</button>
             {%- else -%}
-              <button type="submit" class="product-form__add-button button button--primary btn-primary-buy" onclick="window.location.href='#anc_add'" data-action="add-to-cart">{{ 'product.form.add_to_cart' | t }}</button>
+              <button type="submit" class="product-form__add-button button button--primary btn-primary-buy" data-action="add-to-cart">{{ 'product.form.add_to_cart' | t }}</button>
             
             <div class="display-align-btn-add-qty">
               {%- if product.template_suffix != 'contact' -%}
@@ -758,7 +758,7 @@
               {%- endif -%}
               
               {%- if section.settings.mostrar_addtocart -%}
-              <button type="submit" onclick="window.location.href='#anc_add'" class="add-to-cart-style product-form__add-button button button--primary-add" data-action="add-to-cart">Adicionar ao carrinho</button>
+              <button type="submit" class="add-to-cart-style product-form__add-button button button--primary-add" data-action="add-to-cart">Adicionar ao carrinho</button>
               {% render 'style-modify-btn-qty' %}
               {%- endif -%}
             </div>

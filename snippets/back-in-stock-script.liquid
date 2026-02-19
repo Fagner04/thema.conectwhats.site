@@ -26,6 +26,36 @@
     }
   }
   
+  // Preencher dados iniciais
+  function initializeBackInStock() {
+    const productForms = document.querySelectorAll('.product-form');
+    
+    productForms.forEach(function(form) {
+      const productData = form.querySelector('[data-product-json]');
+      if (productData) {
+        try {
+          const data = JSON.parse(productData.textContent);
+          const selectedVariant = data.product.variants.find(v => v.id === data.selected_variant_id);
+          if (selectedVariant) {
+            // Preencher dados iniciais mesmo se estiver disponível
+            const variantIdInput = document.getElementById('notify-variant-id-' + data.product.id);
+            const variantTitleInput = document.getElementById('notify-variant-title-' + data.product.id);
+            const variantDisplay = document.getElementById('notify-variant-display-' + data.product.id);
+            
+            if (variantIdInput) variantIdInput.value = selectedVariant.id;
+            if (variantTitleInput) variantTitleInput.value = selectedVariant.title;
+            if (variantDisplay) variantDisplay.textContent = selectedVariant.title;
+            
+            // Controlar visibilidade
+            toggleBackInStockButton(data.product.id, selectedVariant, selectedVariant.available);
+          }
+        } catch (e) {
+          console.error('Erro ao processar dados do produto:', e);
+        }
+      }
+    });
+  }
+  
   // Escutar mudanças de variante
   document.addEventListener('variant:changed', function(event) {
     const variant = event.detail.variant;
@@ -45,24 +75,11 @@
     }
   });
   
-  // Verificar estado inicial ao carregar a página
-  document.addEventListener('DOMContentLoaded', function() {
-    const productForms = document.querySelectorAll('.product-form');
-    
-    productForms.forEach(function(form) {
-      const productData = form.querySelector('[data-product-json]');
-      if (productData) {
-        try {
-          const data = JSON.parse(productData.textContent);
-          const selectedVariant = data.product.variants.find(v => v.id === data.selected_variant_id);
-          if (selectedVariant) {
-            toggleBackInStockButton(data.product.id, selectedVariant, selectedVariant.available);
-          }
-        } catch (e) {
-          console.error('Erro ao processar dados do produto:', e);
-        }
-      }
-    });
-  });
+  // Inicializar quando DOM estiver pronto
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeBackInStock);
+  } else {
+    initializeBackInStock();
+  }
 })();
 </script>

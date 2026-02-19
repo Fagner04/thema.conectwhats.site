@@ -8,7 +8,7 @@
   type="button" 
   class="back-in-stock-trigger button button--secondary" 
   id="notify-trigger-{{ product.id }}"
-  style="display: none;"
+  style="display: {% if selected_variant.available %}none{% else %}block{% endif %};"
   onclick="openBackInStockModal({{ product.id }})"
 >
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
