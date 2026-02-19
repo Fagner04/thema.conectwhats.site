@@ -11,20 +11,13 @@
   style="display: {% if selected_variant.available %}none{% else %}block{% endif %};"
   onclick="openBackInStockModal({{ product.id }})"
 >
-  <span class="back-in-stock-trigger__icon">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-      <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path>
-    </svg>
-  </span>
-  <span class="back-in-stock-trigger__text">
-    <span class="back-in-stock-trigger__title">Avise-me quando chegar</span>
-    <span class="back-in-stock-trigger__subtitle">Receba um e-mail grátis</span>
-  </span>
-  <span class="back-in-stock-trigger__arrow">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-      <polyline points="9 18 15 12 9 6"></polyline>
-    </svg>
-  </span>
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;">
+    <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path>
+  </svg>
+  <span style="flex: 1; text-align: center;">Avise-me quando chegar</span>
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;">
+    <polyline points="9 18 15 12 9 6"></polyline>
+  </svg>
 </button>
 
 {%- comment -%}Modal/Popup{%- endcomment -%}
@@ -355,15 +348,13 @@ body.modal-open {
   color: #0086ff;
   font-weight: 600;
   transition: all 0.3s ease;
-  position: relative;
-  z-index: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  justify-content: space-between;
+  gap: 10px;
   width: 100%;
   margin-top: 10px;
-  padding: 14px 20px;
+  padding: 12px 20px;
   border-radius: 50px;
   cursor: pointer;
   font-size: 14px;
@@ -380,52 +371,11 @@ body.modal-open {
   transform: translateY(0);
 }
 
-.back-in-stock-trigger__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  order: 1;
-}
-
-.back-in-stock-trigger__icon svg {
-  width: 18px;
-  height: 18px;
-}
-
-.back-in-stock-trigger__text {
-  display: flex;
-  align-items: center;
-  order: 2;
-  flex: 1;
-  justify-content: center;
-}
-
-.back-in-stock-trigger__title {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1;
-}
-
-.back-in-stock-trigger__subtitle {
-  display: none;
-}
-
-.back-in-stock-trigger__arrow {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  order: 3;
-}
-
-.back-in-stock-trigger__arrow svg {
-  width: 16px;
-  height: 16px;
+.back-in-stock-trigger svg {
   transition: transform 0.3s;
 }
 
-.back-in-stock-trigger:hover .back-in-stock-trigger__arrow svg {
+.back-in-stock-trigger:hover svg:last-child {
   transform: translateX(3px);
 }
 
@@ -562,20 +512,16 @@ body.modal-open {
   }
   
   .back-in-stock-trigger {
-    padding: 13px 18px;
+    padding: 11px 18px;
     font-size: 13px;
   }
   
-  .back-in-stock-trigger__icon svg {
+  .back-in-stock-trigger svg:first-child {
     width: 16px;
     height: 16px;
   }
   
-  .back-in-stock-trigger__title {
-    font-size: 13px;
-  }
-  
-  .back-in-stock-trigger__arrow svg {
+  .back-in-stock-trigger svg:last-child {
     width: 14px;
     height: 14px;
   }
