@@ -1,9 +1,9 @@
 <script>
 (function() {
-  var checkTimer = null;
   var productId = null;
   var variants = [];
   var button = null;
+  var lastCheck = '';
   
   function checkVariant() {
     if (!button) return;
@@ -29,6 +29,11 @@
     });
     
     options = options.filter(function(v) { return v; });
+    var checkKey = options.join('|');
+    
+    // Só processar se mudou
+    if (checkKey === lastCheck) return;
+    lastCheck = checkKey;
     
     // Encontrar variante
     for (var i = 0; i < variants.length; i++) {
@@ -60,13 +65,13 @@
   function init() {
     var form = document.querySelector('.product-form');
     if (!form) {
-      setTimeout(init, 500);
+      setTimeout(init, 300);
       return;
     }
     
     var json = form.querySelector('[data-product-json]');
     if (!json) {
-      setTimeout(init, 500);
+      setTimeout(init, 300);
       return;
     }
     
@@ -78,39 +83,42 @@
       button = document.getElementById('notify-trigger-' + productId);
       
       if (!button) {
-        setTimeout(init, 500);
+        setTimeout(init, 300);
         return;
       }
       
       // Verificar inicial
       checkVariant();
       
-      // Verificar a cada 500ms
-      if (checkTimer) clearInterval(checkTimer);
-      checkTimer = setInterval(checkVariant, 500);
+      // Verificar a cada 200ms (mais rápido)
+      setInterval(checkVariant, 200);
       
-      // Observer no form
-      var observer = new MutationObserver(checkVariant);
-      observer.observe(form, {
-        attributes: true,
-        attributeFilter: ['checked', 'selected'],
-        subtree: true
+      // Capturar TODOS os cliques no documento
+      document.addEventListener('click', function() {
+        setTimeout(checkVariant, 10);
+        setTimeout(checkVariant, 50);
+        setTimeout(checkVariant, 150);
+        setTimeout(checkVariant, 300);
+      }, true);
+      
+      // Capturar mudanças
+      document.addEventListener('change', function() {
+        setTimeout(checkVariant, 10);
+        setTimeout(checkVariant, 50);
+        setTimeout(checkVariant, 150);
+      }, true);
+      
+      // Observer
+      var observer = new MutationObserver(function() {
+        checkVariant();
       });
       
-      // Listener no body para capturar todos os cliques
-      document.body.addEventListener('click', function(e) {
-        var target = e.target;
-        if (target.classList && (
-          target.classList.contains('product-form__single-selector') ||
-          target.classList.contains('block-swatch__item') ||
-          target.classList.contains('color-swatch__item') ||
-          target.classList.contains('variant-swatch__item')
-        )) {
-          setTimeout(checkVariant, 50);
-          setTimeout(checkVariant, 200);
-          setTimeout(checkVariant, 500);
-        }
-      }, true);
+      observer.observe(form, {
+        attributes: true,
+        attributeFilter: ['checked', 'selected', 'class'],
+        subtree: true,
+        childList: true
+      });
       
       // Evento do tema
       document.addEventListener('variant:changed', function(e) {
@@ -132,7 +140,7 @@
       });
       
     } catch (e) {
-      setTimeout(init, 500);
+      setTimeout(init, 300);
     }
   }
   
@@ -142,7 +150,8 @@
     init();
   }
   
+  setTimeout(init, 100);
   setTimeout(init, 500);
-  setTimeout(init, 1500);
+  setTimeout(init, 1000);
 })();
 </script>
