@@ -2,6 +2,7 @@
 (function() {
   var productId = null;
   var productData = null;
+  var checkInterval = null;
   
   // Função para mostrar/ocultar botão
   function toggleButton(variant) {
@@ -36,39 +37,47 @@
     
     var selectedOptions = [];
     
-    // Pegar valores dos radio buttons selecionados
-    var radioInputs = form.querySelectorAll('input[type="radio"]:checked[name^="option"]');
+    // Método 1: Radio buttons checked
+    var radioInputs = form.querySelectorAll('input[type="radio"]:checked');
     radioInputs.forEach(function(input) {
-      selectedOptions.push(input.value);
-    });
-    
-    // Pegar valores dos selects
-    var selectInputs = form.querySelectorAll('select[name^="option"]');
-    selectInputs.forEach(function(select) {
-      if (select.value) {
-        selectedOptions.push(select.value);
+      var name = input.getAttribute('name');
+      if (name && name.indexOf('option') === 0) {
+        selectedOptions.push(input.value);
       }
     });
     
-    // Se não encontrou opções, tentar método alternativo
+    // Método 2: Selects
     if (selectedOptions.length === 0) {
-      var singleSelectors = form.querySelectorAll('.product-form__single-selector');
-      singleSelectors.forEach(function(input) {
-        if (input.checked || input.selected) {
-          selectedOptions.push(input.value);
+      var selectInputs = form.querySelectorAll('select[name^="option"]');
+      selectInputs.forEach(function(select) {
+        if (select.value) {
+          selectedOptions.push(select.value);
         }
+      });
+    }
+    
+    // Método 3: Classe .product-form__single-selector
+    if (selectedOptions.length === 0) {
+      var singleSelectors = form.querySelectorAll('.product-form__single-selector:checked');
+      singleSelectors.forEach(function(input) {
+        selectedOptions.push(input.value);
       });
     }
     
     // Encontrar variante que corresponde
     if (selectedOptions.length > 0) {
-      return productData.variants.find(function(variant) {
+      for (var i = 0; i < productData.variants.length; i++) {
+        var variant = productData.variants[i];
         var match = true;
+        
         if (selectedOptions[0] && variant.option1 !== selectedOptions[0]) match = false;
         if (selectedOptions[1] && variant.option2 !== selectedOptions[1]) match = false;
         if (selectedOptions[2] && variant.option3 !== selectedOptions[2]) match = false;
-        return match;
-      });
+        
+        if (match) {
+          return variant;
+        }
+      }
     }
     
     return null;
@@ -85,10 +94,16 @@
   // Inicializar
   function init() {
     var form = document.querySelector('.product-form');
-    if (!form) return;
+    if (!form) {
+      setTimeout(init, 200);
+      return;
+    }
     
     var dataElement = form.querySelector('[data-product-json]');
-    if (!dataElement) return;
+    if (!dataElement) {
+      setTimeout(init, 200);
+      return;
+    }
     
     try {
       var data = JSON.parse(dataElement.textContent);
@@ -98,28 +113,37 @@
       // Verificar estado inicial
       updateButton();
       
-      // Observar mudanças em TODOS os inputs de variante
-      var allInputs = form.querySelectorAll('input[name^="option"], select[name^="option"], .product-form__single-selector');
+      // Limpar intervalo anterior se existir
+      if (checkInterval) {
+        clearInterval(checkInterval);
+      }
       
-      allInputs.forEach(function(input) {
-        input.addEventListener('change', function() {
-          setTimeout(updateButton, 50);
-        });
-        
-        input.addEventListener('click', function() {
-          setTimeout(updateButton, 50);
-        });
-      });
+      // Verificar a cada 300ms (mais agressivo)
+      checkInterval = setInterval(updateButton, 300);
       
-      // Observar mudanças no DOM (para temas que atualizam dinamicamente)
+      // Observar TODOS os cliques no formulário
+      form.addEventListener('click', function() {
+        setTimeout(updateButton, 50);
+        setTimeout(updateButton, 150);
+        setTimeout(updateButton, 300);
+      }, true);
+      
+      // Observar mudanças
+      form.addEventListener('change', function() {
+        setTimeout(updateButton, 50);
+        setTimeout(updateButton, 150);
+      }, true);
+      
+      // Observar mudanças no DOM
       var observer = new MutationObserver(function() {
-        setTimeout(updateButton, 100);
+        updateButton();
       });
       
       observer.observe(form, {
         attributes: true,
-        attributeFilter: ['class', 'data-variant-id'],
-        subtree: true
+        attributeFilter: ['class', 'data-variant-id', 'checked', 'selected'],
+        subtree: true,
+        childList: true
       });
       
     } catch (e) {
@@ -134,21 +158,21 @@
     }
   });
   
-  // Também escutar evento de mudança de variante (alguns temas usam este)
   document.addEventListener('variantChange', function(event) {
     if (event.detail && event.detail.variant) {
       toggleButton(event.detail.variant);
     }
   });
   
-  // Inicializar
+  // Inicializar múltiplas vezes para garantir
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
   
-  // Re-inicializar após um pequeno delay (para garantir que o tema carregou)
+  setTimeout(init, 100);
   setTimeout(init, 500);
+  setTimeout(init, 1000);
 })();
 </script>
