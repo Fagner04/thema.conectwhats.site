@@ -107,7 +107,7 @@
     "search_mode": "product",
     "cart_type": "page",
     "cart_empty_button_link": "shopify://collections/all",
-    "cart_show_free_shipping_threshold": true,
+    "cart_show_free_shipping_threshold": false,
     "cart_free_shipping_threshold": "0",
     "cart_warning_enable": true,
     "cart_warning_message": "Antes de finalizar saiba que não estamos recebendo  trocas e nem devoluções de produtos da promoção, a não ser  defeitos,\nQualquer duvida chama no chat",
