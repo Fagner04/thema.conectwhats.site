@@ -20,149 +20,127 @@
   </svg>
 </button>
 
-{%- comment -%}Modal/Popup{%- endcomment -%}
-<div class="back-in-stock-modal" id="back-in-stock-modal-{{ product.id }}" onclick="closeBackInStockModal(event, {{ product.id }})">
-  <div class="back-in-stock-modal__content" onclick="event.stopPropagation()">
-    <button class="back-in-stock-modal__close" onclick="closeBackInStockModal(event, {{ product.id }})" aria-label="Fechar">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </button>
-    
-    <div class="back-in-stock-modal__icon">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path>
-      </svg>
-    </div>
-    
-    <div class="back-in-stock-modal__header">
-      <h2 class="back-in-stock-modal__title">Produto Esgotado</h2>
-      <p class="back-in-stock-modal__subtitle">Deixe seu e-mail e avisaremos assim que este produto voltar ao estoque</p>
-    </div>
-    
-    <form class="back-in-stock-form" id="notify-form-{{ product.id }}" data-product-id="{{ product.id }}">
-      <input type="hidden" name="product_id" value="{{ product.id }}">
-      <input type="hidden" name="variant_id" id="notify-variant-id-{{ product.id }}" value="">
-      <input type="hidden" name="product_title" value="{{ product.title | escape }}">
-      <input type="hidden" name="variant_title" id="notify-variant-title-{{ product.id }}" value="">
-      
-      <div class="back-in-stock-form__product-info">
-        {%- if product.featured_image -%}
-          <img src="{{ product.featured_image | img_url: '120x' }}" alt="{{ product.title }}" class="back-in-stock-form__image">
-        {%- endif -%}
-        <div class="back-in-stock-form__product-details">
-          <p class="back-in-stock-form__product-name">{{ product.title }}</p>
-          <p class="back-in-stock-form__variant-name" id="notify-variant-display-{{ product.id }}"></p>
-        </div>
-      </div>
-      
-      <div class="back-in-stock-form__field">
-        <label for="notify-email-{{ product.id }}">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 5px;">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-            <polyline points="22,6 12,13 2,6"></polyline>
-          </svg>
-          Seu melhor e-mail
-        </label>
-        <input 
-          type="email" 
-          name="email" 
-          id="notify-email-{{ product.id }}"
-          placeholder="exemplo@email.com" 
-          required
-          class="back-in-stock-form__input"
-        >
-      </div>
-      
-      <button type="submit" class="back-in-stock-form__button button button--primary">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
-          <polyline points="20 6 9 17 4 12"></polyline>
+{%- comment -%}Template do Modal - será movido para o body via JavaScript{%- endcomment -%}
+<template id="back-in-stock-modal-template-{{ product.id }}">
+  <div class="bisn-modal-overlay" id="bisn-modal-{{ product.id }}">
+    <div class="bisn-modal-content">
+      <button class="bisn-modal-close" onclick="closeBackInStockModal(event, {{ product.id }})" aria-label="Fechar">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
         </svg>
-        Notificar-me gratuitamente
       </button>
       
-      <p class="back-in-stock-form__privacy">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+      <div class="bisn-modal-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"></path>
         </svg>
-        Seus dados estão seguros conosco
-      </p>
+      </div>
       
-      <div class="back-in-stock-form__message" id="notify-message-{{ product.id }}" style="display: none;"></div>
-    </form>
+      <div class="bisn-modal-header">
+        <h2 class="bisn-modal-title">Produto Esgotado</h2>
+        <p class="bisn-modal-subtitle">Deixe seu e-mail e avisaremos assim que este produto voltar ao estoque</p>
+      </div>
+      
+      <form class="bisn-form" id="bisn-form-{{ product.id }}">
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <input type="hidden" name="variant_id" id="bisn-variant-id-{{ product.id }}">
+        <input type="hidden" name="product_title" value="{{ product.title | escape }}">
+        <input type="hidden" name="variant_title" id="bisn-variant-title-{{ product.id }}">
+        
+        <div class="bisn-product-info">
+          {%- if product.featured_image -%}
+            <img src="{{ product.featured_image | img_url: '120x' }}" alt="{{ product.title }}" class="bisn-product-image">
+          {%- endif -%}
+          <div class="bisn-product-details">
+            <p class="bisn-product-name">{{ product.title }}</p>
+            <p class="bisn-variant-name" id="bisn-variant-display-{{ product.id }}"></p>
+          </div>
+        </div>
+        
+        <div class="bisn-field">
+          <label for="bisn-email-{{ product.id }}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 5px;">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+            Seu melhor e-mail
+          </label>
+          <input 
+            type="email" 
+            name="email" 
+            id="bisn-email-{{ product.id }}"
+            placeholder="exemplo@email.com" 
+            required
+            class="bisn-input"
+          >
+        </div>
+        
+        <button type="submit" class="bisn-button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Notificar-me gratuitamente
+        </button>
+        
+        <p class="bisn-privacy">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 4px;">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          Seus dados estão seguros conosco
+        </p>
+        
+        <div class="bisn-message" id="bisn-message-{{ product.id }}" style="display: none;"></div>
+      </form>
+    </div>
   </div>
-</div>
+</template>
 
 <style>
-/* Prevenir scroll do body quando modal está aberto */
-body.modal-open {
+/* Prevenir scroll do body */
+body.bisn-open {
   overflow: hidden !important;
-  position: fixed !important;
-  width: 100% !important;
 }
 
-/* Modal Overlay - SEMPRE NO TOPO */
-.back-in-stock-modal {
+/* Modal Overlay - Z-INDEX MÁXIMO */
+.bisn-modal-overlay {
   display: none;
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  width: 100% !important;
-  height: 100% !important;
-  background: rgba(0, 0, 0, 0.75) !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(5px);
   -webkit-backdrop-filter: blur(5px);
-  z-index: 2147483647 !important;
+  z-index: 999999999;
   align-items: center;
   justify-content: center;
-  animation: fadeIn 0.3s ease;
-  pointer-events: none;
   padding: 20px;
-  margin: 0 !important;
-  transform: none !important;
-  filter: none !important;
-  perspective: none !important;
-  will-change: auto !important;
-  contain: none !important;
-  isolation: isolate !important;
+  box-sizing: border-box;
 }
 
-.back-in-stock-modal.active {
+.bisn-modal-overlay.bisn-active {
   display: flex !important;
-  pointer-events: auto !important;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Modal Content - SEMPRE NO TOPO */
-.back-in-stock-modal__content {
-  background: white !important;
+/* Modal Content */
+.bisn-modal-content {
+  background: white;
   border-radius: 16px;
   max-width: 480px;
   width: 100%;
   max-height: calc(100vh - 40px);
   overflow-y: auto;
-  position: relative !important;
-  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4) !important;
-  z-index: 2147483647 !important;
-  margin: auto;
-  transform: none !important;
-  filter: none !important;
-  perspective: none !important;
-  will-change: auto !important;
-  contain: none !important;
-  isolation: isolate !important;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  animation: bisnSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes slideUp {
+@keyframes bisnSlideUp {
   from { 
     transform: translateY(60px) scale(0.95);
     opacity: 0;
@@ -174,14 +152,12 @@ body.modal-open {
 }
 
 /* Close Button */
-.back-in-stock-modal__close {
+.bisn-modal-close {
   position: absolute;
   top: 20px;
   right: 20px;
   background: #f5f5f5;
   border: none;
-  font-size: 24px;
-  line-height: 1;
   cursor: pointer;
   color: #666;
   padding: 8px;
@@ -192,32 +168,33 @@ body.modal-open {
   justify-content: center;
   border-radius: 50%;
   transition: all 0.2s;
+  z-index: 10;
 }
 
-.back-in-stock-modal__close:hover {
+.bisn-modal-close:hover {
   background: #e0e0e0;
   color: #333;
   transform: rotate(90deg);
 }
 
 /* Icon */
-.back-in-stock-modal__icon {
+.bisn-modal-icon {
   text-align: center;
   padding: 40px 30px 20px;
 }
 
-.back-in-stock-modal__icon svg {
+.bisn-modal-icon svg {
   color: #0086ff;
   filter: drop-shadow(0 4px 12px rgba(0, 134, 255, 0.2));
 }
 
 /* Header */
-.back-in-stock-modal__header {
+.bisn-modal-header {
   padding: 0 40px 30px;
   text-align: center;
 }
 
-.back-in-stock-modal__title {
+.bisn-modal-title {
   font-size: 26px;
   font-weight: 700;
   margin: 0 0 12px 0;
@@ -225,7 +202,7 @@ body.modal-open {
   letter-spacing: -0.5px;
 }
 
-.back-in-stock-modal__subtitle {
+.bisn-modal-subtitle {
   font-size: 15px;
   color: #666;
   margin: 0;
@@ -233,11 +210,11 @@ body.modal-open {
 }
 
 /* Form */
-.back-in-stock-form {
+.bisn-form {
   padding: 0 40px 40px;
 }
 
-.back-in-stock-form__product-info {
+.bisn-product-info {
   display: flex;
   gap: 15px;
   align-items: center;
@@ -248,7 +225,7 @@ body.modal-open {
   border: 1px solid #e0e0e0;
 }
 
-.back-in-stock-form__image {
+.bisn-product-image {
   width: 70px;
   height: 70px;
   object-fit: cover;
@@ -257,11 +234,11 @@ body.modal-open {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.back-in-stock-form__product-details {
+.bisn-product-details {
   flex: 1;
 }
 
-.back-in-stock-form__product-name {
+.bisn-product-name {
   font-weight: 600;
   font-size: 15px;
   margin: 0 0 6px 0;
@@ -269,18 +246,18 @@ body.modal-open {
   line-height: 1.3;
 }
 
-.back-in-stock-form__variant-name {
+.bisn-variant-name {
   font-size: 13px;
   color: #666;
   margin: 0;
   font-weight: 500;
 }
 
-.back-in-stock-form__field {
+.bisn-field {
   margin-bottom: 24px;
 }
 
-.back-in-stock-form__field label {
+.bisn-field label {
   display: block;
   font-size: 14px;
   font-weight: 600;
@@ -288,7 +265,7 @@ body.modal-open {
   color: #1a1a1a;
 }
 
-.back-in-stock-form__input {
+.bisn-input {
   width: 100%;
   padding: 14px 16px;
   border: 2px solid #e0e0e0;
@@ -296,16 +273,17 @@ body.modal-open {
   font-size: 15px;
   transition: all 0.2s;
   background: #fafafa;
+  box-sizing: border-box;
 }
 
-.back-in-stock-form__input:focus {
+.bisn-input:focus {
   outline: none;
   border-color: #0086ff;
   background: white;
   box-shadow: 0 0 0 4px rgba(0, 134, 255, 0.1);
 }
 
-.back-in-stock-form__button {
+.bisn-button {
   width: 100%;
   padding: 16px;
   font-size: 16px;
@@ -316,18 +294,22 @@ body.modal-open {
   justify-content: center;
   transition: all 0.3s;
   box-shadow: 0 4px 14px rgba(0, 134, 255, 0.3);
+  background: #0086ff;
+  color: white;
+  border: none;
+  cursor: pointer;
 }
 
-.back-in-stock-form__button:hover {
+.bisn-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 134, 255, 0.4);
 }
 
-.back-in-stock-form__button:active {
+.bisn-button:active {
   transform: translateY(0);
 }
 
-.back-in-stock-form__privacy {
+.bisn-privacy {
   text-align: center;
   font-size: 12px;
   color: #999;
@@ -337,7 +319,7 @@ body.modal-open {
   justify-content: center;
 }
 
-.back-in-stock-form__message {
+.bisn-message {
   margin-top: 20px;
   padding: 14px;
   border-radius: 10px;
@@ -346,13 +328,13 @@ body.modal-open {
   font-weight: 600;
 }
 
-.back-in-stock-form__message.success {
+.bisn-message.bisn-success {
   background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
   color: #155724;
   border: 2px solid #b1dfbb;
 }
 
-.back-in-stock-form__message.error {
+.bisn-message.bisn-error {
   background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
   color: #721c24;
   border: 2px solid #f1b0b7;
@@ -396,134 +378,87 @@ body.modal-open {
   transform: translateX(3px);
 }
 
-/* Versão alternativa - Estilo outline */
-.back-in-stock-trigger.style-outline {
-  background: white;
-  border: 2px solid #667eea;
-  color: #667eea;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
-}
-
-.back-in-stock-trigger.style-outline::before {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.back-in-stock-trigger.style-outline:hover {
-  color: white;
-  border-color: transparent;
-}
-
-.back-in-stock-trigger.style-outline .back-in-stock-trigger__icon {
-  background: rgba(102, 126, 234, 0.1);
-}
-
-.back-in-stock-trigger.style-outline:hover .back-in-stock-trigger__icon {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.back-in-stock-trigger.style-outline .back-in-stock-trigger__arrow {
-  background: rgba(102, 126, 234, 0.1);
-}
-
-.back-in-stock-trigger.style-outline:hover .back-in-stock-trigger__arrow {
-  background: rgba(255, 255, 255, 0.2);
-}
-
 /* Mobile Responsive */
 @media (max-width: 768px) {
-  .back-in-stock-modal {
+  .bisn-modal-overlay {
     padding: 15px;
     align-items: flex-end;
   }
   
-  .back-in-stock-modal__content {
-    width: 100%;
-    max-width: 100%;
+  .bisn-modal-content {
     max-height: calc(100vh - 30px);
     border-radius: 20px 20px 0 0;
-    animation: slideUpMobile 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
   
-  @keyframes slideUpMobile {
-    from { 
-      transform: translateY(100%);
-      opacity: 0;
-    }
-    to { 
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-  
-  .back-in-stock-modal__icon {
+  .bisn-modal-icon {
     padding: 25px 20px 15px;
   }
   
-  .back-in-stock-modal__icon svg {
+  .bisn-modal-icon svg {
     width: 40px;
     height: 40px;
   }
   
-  .back-in-stock-modal__header {
+  .bisn-modal-header {
     padding: 0 25px 20px;
   }
   
-  .back-in-stock-form {
+  .bisn-form {
     padding: 0 25px 25px;
   }
   
-  .back-in-stock-modal__title {
+  .bisn-modal-title {
     font-size: 20px;
   }
   
-  .back-in-stock-modal__subtitle {
+  .bisn-modal-subtitle {
     font-size: 13px;
   }
   
-  .back-in-stock-form__product-info {
+  .bisn-product-info {
     padding: 12px;
     gap: 12px;
   }
   
-  .back-in-stock-form__image {
+  .bisn-product-image {
     width: 60px;
     height: 60px;
   }
   
-  .back-in-stock-form__product-name {
+  .bisn-product-name {
     font-size: 14px;
   }
   
-  .back-in-stock-form__variant-name {
+  .bisn-variant-name {
     font-size: 12px;
   }
   
-  .back-in-stock-form__field label {
+  .bisn-field label {
     font-size: 13px;
   }
   
-  .back-in-stock-form__input {
+  .bisn-input {
     padding: 12px 14px;
     font-size: 14px;
   }
   
-  .back-in-stock-form__button {
+  .bisn-button {
     padding: 14px;
     font-size: 15px;
   }
   
-  .back-in-stock-form__privacy {
+  .bisn-privacy {
     font-size: 11px;
   }
   
-  .back-in-stock-modal__close {
+  .bisn-modal-close {
     top: 15px;
     right: 15px;
     width: 36px;
     height: 36px;
   }
   
-  .back-in-stock-modal__close svg {
+  .bisn-modal-close svg {
     width: 20px;
     height: 20px;
   }
@@ -543,98 +478,107 @@ body.modal-open {
     height: 14px;
   }
 }
-
-/* Tablets */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .back-in-stock-modal__content {
-    max-width: 420px;
-  }
-}
-
-/* Landscape mobile */
-@media (max-width: 768px) and (orientation: landscape) {
-  .back-in-stock-modal {
-    align-items: center;
-  }
-  
-  .back-in-stock-modal__content {
-    border-radius: 16px;
-    max-height: calc(100vh - 40px);
-  }
-  
-  .back-in-stock-modal__icon {
-    padding: 20px 20px 10px;
-  }
-  
-  .back-in-stock-modal__icon svg {
-    width: 36px;
-    height: 36px;
-  }
-}
 </style>
 
 <script>
-// Mover modal para o body (fora de qualquer container) para garantir z-index correto
 (function() {
-  const modal = document.getElementById('back-in-stock-modal-{{ product.id }}');
-  if (modal && modal.parentElement.tagName !== 'BODY') {
-    document.body.appendChild(modal);
-  }
-})();
-
-// Funções globais para abrir/fechar modal
-window.openBackInStockModal = function(productId) {
-  const modal = document.getElementById('back-in-stock-modal-' + productId);
-  if (modal) {
-    modal.classList.add('active');
-    document.body.classList.add('modal-open');
-  }
-};
-
-window.closeBackInStockModal = function(event, productId) {
-  event.preventDefault();
-  event.stopPropagation();
-  const modal = document.getElementById('back-in-stock-modal-' + productId);
-  if (modal) {
-    modal.classList.remove('active');
-    document.body.classList.remove('modal-open');
-  }
-};
-
-// Fechar com ESC
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    const activeModal = document.querySelector('.back-in-stock-modal.active');
-    if (activeModal) {
-      activeModal.classList.remove('active');
-      document.body.classList.remove('modal-open');
-    }
-  }
-});
-
-// Submit do formulário
-(function() {
-  const form = document.getElementById('notify-form-{{ product.id }}');
-  const messageDiv = document.getElementById('notify-message-{{ product.id }}');
+  var productId = {{ product.id }};
+  var modalRendered = false;
   
-  if (form) {
+  // Função para renderizar o modal no body
+  function renderModal() {
+    if (modalRendered) return;
+    
+    var template = document.getElementById('back-in-stock-modal-template-' + productId);
+    if (!template) return;
+    
+    var modalHTML = template.innerHTML;
+    var div = document.createElement('div');
+    div.innerHTML = modalHTML;
+    var modal = div.firstElementChild;
+    
+    // Adicionar ao final do body
+    document.body.appendChild(modal);
+    modalRendered = true;
+    
+    // Adicionar event listener para fechar ao clicar no overlay
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeBackInStockModal(e, productId);
+      }
+    });
+    
+    // Setup do formulário
+    setupForm();
+  }
+  
+  // Renderizar modal quando a página carregar
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', renderModal);
+  } else {
+    renderModal();
+  }
+  
+  // Função global para abrir modal
+  window.openBackInStockModal = function(pid) {
+    if (!modalRendered) renderModal();
+    
+    var modal = document.getElementById('bisn-modal-' + pid);
+    if (modal) {
+      modal.classList.add('bisn-active');
+      document.body.classList.add('bisn-open');
+    }
+  };
+  
+  // Função global para fechar modal
+  window.closeBackInStockModal = function(event, pid) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    var modal = document.getElementById('bisn-modal-' + pid);
+    if (modal) {
+      modal.classList.remove('bisn-active');
+      document.body.classList.remove('bisn-open');
+    }
+  };
+  
+  // Fechar com ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      var activeModal = document.querySelector('.bisn-modal-overlay.bisn-active');
+      if (activeModal) {
+        activeModal.classList.remove('bisn-active');
+        document.body.classList.remove('bisn-open');
+      }
+    }
+  });
+  
+  // Setup do formulário
+  function setupForm() {
+    var form = document.getElementById('bisn-form-' + productId);
+    var messageDiv = document.getElementById('bisn-message-' + productId);
+    
+    if (!form) return;
+    
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       
-      const email = document.getElementById('notify-email-{{ product.id }}').value;
-      const variantId = document.getElementById('notify-variant-id-{{ product.id }}').value;
-      const variantTitle = document.getElementById('notify-variant-title-{{ product.id }}').value;
-      const productTitle = '{{ product.title | escape }}';
+      var email = document.getElementById('bisn-email-' + productId).value;
+      var variantId = document.getElementById('bisn-variant-id-' + productId).value;
+      var variantTitle = document.getElementById('bisn-variant-title-' + productId).value;
+      var productTitle = '{{ product.title | escape }}';
       
       messageDiv.style.display = 'block';
-      messageDiv.className = 'back-in-stock-form__message';
+      messageDiv.className = 'bisn-message';
       messageDiv.textContent = 'Enviando...';
       
       // Salvar no localStorage
-      const notifications = JSON.parse(localStorage.getItem('backInStockNotifications') || '[]');
+      var notifications = JSON.parse(localStorage.getItem('backInStockNotifications') || '[]');
       notifications.push({
         email: email,
-        productId: '{{ product.id }}',
+        productId: productId,
         variantId: variantId,
         variantTitle: variantTitle,
         productTitle: productTitle,
@@ -653,23 +597,23 @@ document.addEventListener('keydown', function(e) {
           'utf8': '✓',
           'contact[email]': email,
           'contact[subject]': 'Notificação de Estoque - ' + productTitle,
-          'contact[body]': 'Cliente ' + email + ' quer ser notificado quando o produto "' + productTitle + '" (' + variantTitle + ') voltar ao estoque.\n\nID do Produto: {{ product.id }}\nID da Variante: ' + variantId
+          'contact[body]': 'Cliente ' + email + ' quer ser notificado quando o produto "' + productTitle + '" (' + variantTitle + ') voltar ao estoque.\n\nID do Produto: ' + productId + '\nID da Variante: ' + variantId
         })
       }).then(function() {
-        messageDiv.className = 'back-in-stock-form__message success';
+        messageDiv.className = 'bisn-message bisn-success';
         messageDiv.innerHTML = '✓ Pronto! Você receberá um e-mail quando o produto voltar ao estoque.';
         form.reset();
         
         setTimeout(function() {
-          closeBackInStockModal(new Event('click'), {{ product.id }});
+          closeBackInStockModal(null, productId);
         }, 2500);
       }).catch(function() {
-        messageDiv.className = 'back-in-stock-form__message success';
+        messageDiv.className = 'bisn-message bisn-success';
         messageDiv.innerHTML = '✓ Pronto! Você receberá um e-mail quando o produto voltar ao estoque.';
         form.reset();
         
         setTimeout(function() {
-          closeBackInStockModal(new Event('click'), {{ product.id }});
+          closeBackInStockModal(null, productId);
         }, 2500);
       });
     });
