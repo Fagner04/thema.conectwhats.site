@@ -3,12 +3,14 @@
   Uso: {% render 'back-in-stock-notification', product: product, variant: variant %}
 {%- endcomment -%}
 
+{%- assign current_variant = variant | default: product.selected_or_first_available_variant -%}
+
 {%- comment -%}Botão que abre o popup quando produto está esgotado{%- endcomment -%}
 <button 
   type="button" 
   class="back-in-stock-trigger" 
   id="notify-trigger-{{ product.id }}"
-  style="display: {% if selected_variant.available %}none{% else %}block{% endif %};"
+  style="display: {% if current_variant.available %}none{% else %}block{% endif %};"
   onclick="openBackInStockModal({{ product.id }})"
 >
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;">

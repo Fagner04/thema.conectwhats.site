@@ -3,9 +3,9 @@
   // Função para mostrar/ocultar botão de notificação e atualizar dados
   function toggleBackInStockButton(productId, variant, isAvailable) {
     const button = document.getElementById('notify-trigger-' + productId);
-    const variantIdInput = document.getElementById('notify-variant-id-' + productId);
-    const variantTitleInput = document.getElementById('notify-variant-title-' + productId);
-    const variantDisplay = document.getElementById('notify-variant-display-' + productId);
+    const variantIdInput = document.getElementById('bisn-variant-id-' + productId);
+    const variantTitleInput = document.getElementById('bisn-variant-title-' + productId);
+    const variantDisplay = document.getElementById('bisn-variant-display-' + productId);
     
     if (button) {
       if (!isAvailable && variant) {
@@ -38,9 +38,9 @@
           const selectedVariant = data.product.variants.find(v => v.id === data.selected_variant_id);
           if (selectedVariant) {
             // Preencher dados iniciais mesmo se estiver disponível
-            const variantIdInput = document.getElementById('notify-variant-id-' + data.product.id);
-            const variantTitleInput = document.getElementById('notify-variant-title-' + data.product.id);
-            const variantDisplay = document.getElementById('notify-variant-display-' + data.product.id);
+            const variantIdInput = document.getElementById('bisn-variant-id-' + data.product.id);
+            const variantTitleInput = document.getElementById('bisn-variant-title-' + data.product.id);
+            const variantDisplay = document.getElementById('bisn-variant-display-' + data.product.id);
             
             if (variantIdInput) variantIdInput.value = selectedVariant.id;
             if (variantTitleInput) variantTitleInput.value = selectedVariant.title;
