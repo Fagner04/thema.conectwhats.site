@@ -1,172 +1,102 @@
 <script>
-(function() {
-  'use strict';
-  
-  var productId = null;
-  var productVariants = [];
-  var notifyButton = null;
-  
-  function log(msg, data) {
-    console.log('[Back in Stock] ' + msg, data || '');
-  }
-  
-  // Inicializar
-  function init() {
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(function() {
     var form = document.querySelector('.product-form');
-    if (!form) {
-      log('Form não encontrado, tentando novamente...');
-      setTimeout(init, 300);
-      return;
-    }
+    if (!form) return;
     
     var productJson = form.querySelector('[data-product-json]');
-    if (!productJson) {
-      log('Product JSON não encontrado');
-      return;
-    }
+    if (!productJson) return;
     
-    try {
-      var data = JSON.parse(productJson.textContent);
-      var product = data.product || data;
-      productId = product.id;
-      productVariants = product.variants || [];
-      
-      log('Produto carregado', {id: productId, variants: productVariants.length});
-      
-      notifyButton = document.getElementById('notify-trigger-' + productId);
-      if (!notifyButton) {
-        log('Botão não encontrado: notify-trigger-' + productId);
-        return;
-      }
-      
-      log('Botão encontrado');
-      
-      // Verificar estado inicial
-      checkCurrentSelection();
-      
-      // Adicionar listeners
-      setupListeners(form);
-      
-    } catch (e) {
-      log('Erro ao inicializar', e);
-    }
-  }
-  
-  // Configurar listeners
-  function setupListeners(form) {
-    // Pegar TODOS os seletores de variante
-    var selectors = form.querySelectorAll('.product-form__single-selector');
-    log('Seletores encontrados: ' + selectors.length);
+    var data = JSON.parse(productJson.textContent);
+    var product = data.product || data;
+    var productId = product.id;
+    var variants = product.variants || [];
+    var button = document.getElementById('notify-trigger-' + productId);
     
-    selectors.forEach(function(selector) {
-      // Adicionar listener de mudança
-      selector.addEventListener('change', function() {
-        log('Change detectado em: ' + selector.name + ' = ' + selector.value);
-        setTimeout(checkCurrentSelection, 100);
+    if (!button) return;
+    
+    // Função para atualizar botão
+    function updateButton() {
+      var selectedOptions = [];
+      var selectors = form.querySelectorAll('.product-form__single-selector');
+      
+      selectors.forEach(function(sel) {
+        if (sel.type === 'radio' && sel.checked) {
+          var pos = sel.getAttribute('data-option-position');
+          selectedOptions[pos - 1] = sel.value;
+        } else if (sel.tagName === 'SELECT') {
+          var pos = sel.getAttribute('data-option-position');
+          selectedOptions[pos - 1] = sel.value;
+        }
       });
       
-      // Adicionar listener de clique (para radio buttons)
-      if (selector.type === 'radio') {
-        selector.addEventListener('click', function() {
-          log('Click detectado em: ' + selector.name + ' = ' + selector.value);
-          setTimeout(checkCurrentSelection, 100);
+      selectedOptions = selectedOptions.filter(function(v) { return v; });
+      
+      // Encontrar variante
+      var variant = null;
+      for (var i = 0; i < variants.length; i++) {
+        var v = variants[i];
+        var match = true;
+        if (selectedOptions[0] && v.option1 !== selectedOptions[0]) match = false;
+        if (selectedOptions[1] && v.option2 !== selectedOptions[1]) match = false;
+        if (selectedOptions[2] && v.option3 !== selectedOptions[2]) match = false;
+        if (match) {
+          variant = v;
+          break;
+        }
+      }
+      
+      if (variant) {
+        var vid = document.getElementById('bisn-variant-id-' + productId);
+        var vtitle = document.getElementById('bisn-variant-title-' + productId);
+        var vdisplay = document.getElementById('bisn-variant-display-' + productId);
+        
+        if (!variant.available) {
+          button.style.display = 'block';
+          if (vid) vid.value = variant.id;
+          if (vtitle) vtitle.value = variant.title || '';
+          if (vdisplay) vdisplay.textContent = variant.title || '';
+        } else {
+          button.style.display = 'none';
+        }
+      }
+    }
+    
+    // Adicionar listeners
+    var selectors = form.querySelectorAll('.product-form__single-selector');
+    selectors.forEach(function(sel) {
+      sel.addEventListener('change', function() {
+        setTimeout(updateButton, 100);
+      });
+      if (sel.type === 'radio') {
+        sel.addEventListener('click', function() {
+          setTimeout(updateButton, 100);
         });
       }
     });
     
-    // Listener no evento do tema
-    document.addEventListener('variant:changed', function(event) {
-      if (event.detail && event.detail.variant) {
-        log('Evento variant:changed', event.detail.variant);
-        updateButtonVisibility(event.detail.variant);
-      }
-    });
-  }
-  
-  // Verificar seleção atual
-  function checkCurrentSelection() {
-    var form = document.querySelector('.product-form');
-    if (!form) return;
-    
-    var selectedOptions = [];
-    
-    // Pegar valores selecionados
-    var selectors = form.querySelectorAll('.product-form__single-selector');
-    selectors.forEach(function(selector) {
-      if (selector.type === 'radio') {
-        if (selector.checked) {
-          var position = selector.getAttribute('data-option-position');
-          selectedOptions[position - 1] = selector.value;
+    // Evento do tema
+    document.addEventListener('variant:changed', function(e) {
+      if (e.detail && e.detail.variant) {
+        var v = e.detail.variant;
+        var vid = document.getElementById('bisn-variant-id-' + productId);
+        var vtitle = document.getElementById('bisn-variant-title-' + productId);
+        var vdisplay = document.getElementById('bisn-variant-display-' + productId);
+        
+        if (!v.available) {
+          button.style.display = 'block';
+          if (vid) vid.value = v.id;
+          if (vtitle) vtitle.value = v.title || '';
+          if (vdisplay) vdisplay.textContent = v.title || '';
+        } else {
+          button.style.display = 'none';
         }
-      } else if (selector.tagName === 'SELECT') {
-        var position = selector.getAttribute('data-option-position');
-        selectedOptions[position - 1] = selector.value;
       }
     });
     
-    // Remover valores undefined
-    selectedOptions = selectedOptions.filter(function(v) { return v !== undefined; });
+    // Verificar inicial
+    updateButton();
     
-    log('Opções selecionadas', selectedOptions);
-    
-    // Encontrar variante correspondente
-    var variant = findMatchingVariant(selectedOptions);
-    
-    if (variant) {
-      log('Variante encontrada', {title: variant.title, available: variant.available});
-      updateButtonVisibility(variant);
-    } else {
-      log('Nenhuma variante encontrada para as opções selecionadas');
-    }
-  }
-  
-  // Encontrar variante que corresponde às opções
-  function findMatchingVariant(selectedOptions) {
-    for (var i = 0; i < productVariants.length; i++) {
-      var variant = productVariants[i];
-      var match = true;
-      
-      if (selectedOptions[0] && variant.option1 !== selectedOptions[0]) match = false;
-      if (selectedOptions[1] && variant.option2 !== selectedOptions[1]) match = false;
-      if (selectedOptions[2] && variant.option3 !== selectedOptions[2]) match = false;
-      
-      if (match) {
-        return variant;
-      }
-    }
-    return null;
-  }
-  
-  // Atualizar visibilidade do botão
-  function updateButtonVisibility(variant) {
-    if (!notifyButton) return;
-    
-    var variantIdInput = document.getElementById('bisn-variant-id-' + productId);
-    var variantTitleInput = document.getElementById('bisn-variant-title-' + productId);
-    var variantDisplay = document.getElementById('bisn-variant-display-' + productId);
-    
-    if (!variant.available) {
-      log('MOSTRANDO botão - variante esgotada');
-      notifyButton.style.display = 'block';
-      
-      if (variantIdInput) variantIdInput.value = variant.id;
-      if (variantTitleInput) variantTitleInput.value = variant.title || '';
-      if (variantDisplay) variantDisplay.textContent = variant.title || '';
-    } else {
-      log('ESCONDENDO botão - variante disponível');
-      notifyButton.style.display = 'none';
-    }
-  }
-  
-  // Inicializar quando pronto
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
-  
-  // Tentar novamente após delays
-  setTimeout(init, 500);
-  setTimeout(init, 1500);
-})();
+  }, 1000);
+});
 </script>
