@@ -1,14 +1,42 @@
 <script>
 (function() {
   var productId = null;
-  var productData = null;
-  var checkInterval = null;
+  var button = null;
   
-  // Função para mostrar/ocultar botão
-  function toggleButton(variant) {
-    if (!productId) return;
+  // Inicializar
+  function init() {
+    var form = document.querySelector('.product-form');
+    if (!form) return;
     
-    var button = document.getElementById('notify-trigger-' + productId);
+    var dataElement = form.querySelector('[data-product-json]');
+    if (!dataElement) return;
+    
+    try {
+      var data = JSON.parse(dataElement.textContent);
+      var product = data.product || data;
+      productId = product.id;
+      button = document.getElementById('notify-trigger-' + productId);
+      
+      if (!button) return;
+      
+      // Verificar variante inicial
+      if (data.selected_variant_id) {
+        var initialVariant = product.variants.find(function(v) {
+          return v.id === data.selected_variant_id;
+        });
+        
+        if (initialVariant) {
+          updateButton(initialVariant);
+        }
+      }
+      
+    } catch (e) {
+      console.error('Erro ao inicializar:', e);
+    }
+  }
+  
+  // Atualizar botão
+  function updateButton(variant) {
     if (!button) return;
     
     var variantIdInput = document.getElementById('bisn-variant-id-' + productId);
@@ -16,163 +44,29 @@
     var variantDisplay = document.getElementById('bisn-variant-display-' + productId);
     
     if (variant && !variant.available) {
-      // Variante esgotada - mostrar botão
       button.style.display = 'block';
-      
       if (variantIdInput) variantIdInput.value = variant.id;
       if (variantTitleInput) variantTitleInput.value = variant.title || '';
       if (variantDisplay) variantDisplay.textContent = variant.title || '';
     } else {
-      // Variante disponível - esconder botão
       button.style.display = 'none';
     }
   }
   
-  // Encontrar variante baseada nas opções selecionadas
-  function findSelectedVariant() {
-    if (!productData || !productData.variants) return null;
-    
-    var form = document.querySelector('.product-form');
-    if (!form) return null;
-    
-    var selectedOptions = [];
-    
-    // Método 1: Radio buttons checked
-    var radioInputs = form.querySelectorAll('input[type="radio"]:checked');
-    radioInputs.forEach(function(input) {
-      var name = input.getAttribute('name');
-      if (name && name.indexOf('option') === 0) {
-        selectedOptions.push(input.value);
-      }
-    });
-    
-    // Método 2: Selects
-    if (selectedOptions.length === 0) {
-      var selectInputs = form.querySelectorAll('select[name^="option"]');
-      selectInputs.forEach(function(select) {
-        if (select.value) {
-          selectedOptions.push(select.value);
-        }
-      });
-    }
-    
-    // Método 3: Classe .product-form__single-selector
-    if (selectedOptions.length === 0) {
-      var singleSelectors = form.querySelectorAll('.product-form__single-selector:checked');
-      singleSelectors.forEach(function(input) {
-        selectedOptions.push(input.value);
-      });
-    }
-    
-    // Encontrar variante que corresponde
-    if (selectedOptions.length > 0) {
-      for (var i = 0; i < productData.variants.length; i++) {
-        var variant = productData.variants[i];
-        var match = true;
-        
-        if (selectedOptions[0] && variant.option1 !== selectedOptions[0]) match = false;
-        if (selectedOptions[1] && variant.option2 !== selectedOptions[1]) match = false;
-        if (selectedOptions[2] && variant.option3 !== selectedOptions[2]) match = false;
-        
-        if (match) {
-          return variant;
-        }
-      }
-    }
-    
-    return null;
-  }
-  
-  // Atualizar baseado na seleção atual
-  function updateButton() {
-    var variant = findSelectedVariant();
-    if (variant) {
-      toggleButton(variant);
-    }
-  }
-  
-  // Inicializar
-  function init() {
-    var form = document.querySelector('.product-form');
-    if (!form) {
-      setTimeout(init, 200);
-      return;
-    }
-    
-    var dataElement = form.querySelector('[data-product-json]');
-    if (!dataElement) {
-      setTimeout(init, 200);
-      return;
-    }
-    
-    try {
-      var data = JSON.parse(dataElement.textContent);
-      productData = data.product || data;
-      productId = productData.id;
-      
-      // Verificar estado inicial
-      updateButton();
-      
-      // Limpar intervalo anterior se existir
-      if (checkInterval) {
-        clearInterval(checkInterval);
-      }
-      
-      // Verificar a cada 300ms (mais agressivo)
-      checkInterval = setInterval(updateButton, 300);
-      
-      // Observar TODOS os cliques no formulário
-      form.addEventListener('click', function() {
-        setTimeout(updateButton, 50);
-        setTimeout(updateButton, 150);
-        setTimeout(updateButton, 300);
-      }, true);
-      
-      // Observar mudanças
-      form.addEventListener('change', function() {
-        setTimeout(updateButton, 50);
-        setTimeout(updateButton, 150);
-      }, true);
-      
-      // Observar mudanças no DOM
-      var observer = new MutationObserver(function() {
-        updateButton();
-      });
-      
-      observer.observe(form, {
-        attributes: true,
-        attributeFilter: ['class', 'data-variant-id', 'checked', 'selected'],
-        subtree: true,
-        childList: true
-      });
-      
-    } catch (e) {
-      console.error('Erro ao inicializar notificação de estoque:', e);
-    }
-  }
-  
-  // Escutar eventos customizados do tema
+  // Escutar evento do tema
   document.addEventListener('variant:changed', function(event) {
     if (event.detail && event.detail.variant) {
-      toggleButton(event.detail.variant);
+      updateButton(event.detail.variant);
     }
   });
   
-  document.addEventListener('variantChange', function(event) {
-    if (event.detail && event.detail.variant) {
-      toggleButton(event.detail.variant);
-    }
-  });
-  
-  // Inicializar múltiplas vezes para garantir
+  // Inicializar
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
   
-  setTimeout(init, 100);
   setTimeout(init, 500);
-  setTimeout(init, 1000);
 })();
 </script>
