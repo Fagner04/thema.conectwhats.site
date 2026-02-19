@@ -1,84 +1,45 @@
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(function() {
+(function() {
+  var checkTimer = null;
+  var productId = null;
+  var variants = [];
+  var button = null;
+  
+  function checkVariant() {
+    if (!button) return;
+    
     var form = document.querySelector('.product-form');
     if (!form) return;
     
-    var productJson = form.querySelector('[data-product-json]');
-    if (!productJson) return;
+    var options = [];
     
-    var data = JSON.parse(productJson.textContent);
-    var product = data.product || data;
-    var productId = product.id;
-    var variants = product.variants || [];
-    var button = document.getElementById('notify-trigger-' + productId);
+    // Pegar opções selecionadas
+    var radios = form.querySelectorAll('.product-form__single-selector[type="radio"]:checked');
+    radios.forEach(function(r) {
+      var pos = parseInt(r.getAttribute('data-option-position'));
+      options[pos - 1] = r.value;
+    });
     
-    if (!button) return;
-    
-    // Função para atualizar botão
-    function updateButton() {
-      var selectedOptions = [];
-      var selectors = form.querySelectorAll('.product-form__single-selector');
-      
-      selectors.forEach(function(sel) {
-        if (sel.type === 'radio' && sel.checked) {
-          var pos = sel.getAttribute('data-option-position');
-          selectedOptions[pos - 1] = sel.value;
-        } else if (sel.tagName === 'SELECT') {
-          var pos = sel.getAttribute('data-option-position');
-          selectedOptions[pos - 1] = sel.value;
-        }
-      });
-      
-      selectedOptions = selectedOptions.filter(function(v) { return v; });
-      
-      // Encontrar variante
-      var variant = null;
-      for (var i = 0; i < variants.length; i++) {
-        var v = variants[i];
-        var match = true;
-        if (selectedOptions[0] && v.option1 !== selectedOptions[0]) match = false;
-        if (selectedOptions[1] && v.option2 !== selectedOptions[1]) match = false;
-        if (selectedOptions[2] && v.option3 !== selectedOptions[2]) match = false;
-        if (match) {
-          variant = v;
-          break;
-        }
-      }
-      
-      if (variant) {
-        var vid = document.getElementById('bisn-variant-id-' + productId);
-        var vtitle = document.getElementById('bisn-variant-title-' + productId);
-        var vdisplay = document.getElementById('bisn-variant-display-' + productId);
-        
-        if (!variant.available) {
-          button.style.display = 'block';
-          if (vid) vid.value = variant.id;
-          if (vtitle) vtitle.value = variant.title || '';
-          if (vdisplay) vdisplay.textContent = variant.title || '';
-        } else {
-          button.style.display = 'none';
-        }
-      }
-    }
-    
-    // Adicionar listeners
-    var selectors = form.querySelectorAll('.product-form__single-selector');
-    selectors.forEach(function(sel) {
-      sel.addEventListener('change', function() {
-        setTimeout(updateButton, 100);
-      });
-      if (sel.type === 'radio') {
-        sel.addEventListener('click', function() {
-          setTimeout(updateButton, 100);
-        });
+    var selects = form.querySelectorAll('.product-form__single-selector[data-option-position]');
+    selects.forEach(function(s) {
+      if (s.tagName === 'SELECT') {
+        var pos = parseInt(s.getAttribute('data-option-position'));
+        options[pos - 1] = s.value;
       }
     });
     
-    // Evento do tema
-    document.addEventListener('variant:changed', function(e) {
-      if (e.detail && e.detail.variant) {
-        var v = e.detail.variant;
+    options = options.filter(function(v) { return v; });
+    
+    // Encontrar variante
+    for (var i = 0; i < variants.length; i++) {
+      var v = variants[i];
+      var match = true;
+      
+      if (options[0] && v.option1 !== options[0]) match = false;
+      if (options[1] && v.option2 !== options[1]) match = false;
+      if (options[2] && v.option3 !== options[2]) match = false;
+      
+      if (match) {
         var vid = document.getElementById('bisn-variant-id-' + productId);
         var vtitle = document.getElementById('bisn-variant-title-' + productId);
         var vdisplay = document.getElementById('bisn-variant-display-' + productId);
@@ -91,12 +52,97 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
           button.style.display = 'none';
         }
+        return;
       }
-    });
+    }
+  }
+  
+  function init() {
+    var form = document.querySelector('.product-form');
+    if (!form) {
+      setTimeout(init, 500);
+      return;
+    }
     
-    // Verificar inicial
-    updateButton();
+    var json = form.querySelector('[data-product-json]');
+    if (!json) {
+      setTimeout(init, 500);
+      return;
+    }
     
-  }, 1000);
-});
+    try {
+      var data = JSON.parse(json.textContent);
+      var product = data.product || data;
+      productId = product.id;
+      variants = product.variants || [];
+      button = document.getElementById('notify-trigger-' + productId);
+      
+      if (!button) {
+        setTimeout(init, 500);
+        return;
+      }
+      
+      // Verificar inicial
+      checkVariant();
+      
+      // Verificar a cada 500ms
+      if (checkTimer) clearInterval(checkTimer);
+      checkTimer = setInterval(checkVariant, 500);
+      
+      // Observer no form
+      var observer = new MutationObserver(checkVariant);
+      observer.observe(form, {
+        attributes: true,
+        attributeFilter: ['checked', 'selected'],
+        subtree: true
+      });
+      
+      // Listener no body para capturar todos os cliques
+      document.body.addEventListener('click', function(e) {
+        var target = e.target;
+        if (target.classList && (
+          target.classList.contains('product-form__single-selector') ||
+          target.classList.contains('block-swatch__item') ||
+          target.classList.contains('color-swatch__item') ||
+          target.classList.contains('variant-swatch__item')
+        )) {
+          setTimeout(checkVariant, 50);
+          setTimeout(checkVariant, 200);
+          setTimeout(checkVariant, 500);
+        }
+      }, true);
+      
+      // Evento do tema
+      document.addEventListener('variant:changed', function(e) {
+        if (e.detail && e.detail.variant) {
+          var v = e.detail.variant;
+          var vid = document.getElementById('bisn-variant-id-' + productId);
+          var vtitle = document.getElementById('bisn-variant-title-' + productId);
+          var vdisplay = document.getElementById('bisn-variant-display-' + productId);
+          
+          if (!v.available) {
+            button.style.display = 'block';
+            if (vid) vid.value = v.id;
+            if (vtitle) vtitle.value = v.title || '';
+            if (vdisplay) vdisplay.textContent = v.title || '';
+          } else {
+            button.style.display = 'none';
+          }
+        }
+      });
+      
+    } catch (e) {
+      setTimeout(init, 500);
+    }
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  
+  setTimeout(init, 500);
+  setTimeout(init, 1500);
+})();
 </script>
