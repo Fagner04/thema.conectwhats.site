@@ -366,8 +366,51 @@
                     </div>
 
                     <button type="button" class="form__submit button button--primary" data-action="estimate-shipping">{{ 'cart.shipping_estimator.estimate' | t }}</button>
+                    
+                    <button type="button" class="form__submit button button--secondary" style="margin-left: 10px;" onclick="calcularFreteCorreios()">Calcular com Correios</button>
 
                     <div class="shipping-estimator__results rte" style="display: none;"></div>
+                    <div id="correios-results" class="shipping-estimator__results rte" style="display: none; margin-top: 15px;"></div>
+                    
+                    <script>
+                    function calcularFreteCorreios() {
+                      const cep = document.getElementById('shipping-estimator-zip').value.replace(/\D/g, '');
+                      const resultsDiv = document.getElementById('correios-results');
+                      
+                      if (cep.length !== 8) {
+                        resultsDiv.innerHTML = '<p style="color: #c00;">Por favor, digite um CEP válido com 8 dígitos.</p>';
+                        resultsDiv.style.display = 'block';
+                        return;
+                      }
+                      
+                      resultsDiv.innerHTML = '<p>Calculando frete...</p>';
+                      resultsDiv.style.display = 'block';
+                      
+                      const url = '{{ settings.sheets_frete_url }}?destination_cep=' + cep + '&cart_weight=0.5';
+                      
+                      fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                          if (data.success && data.options && data.options.length > 0) {
+                            let html = '<ul style="list-style: none; padding: 0; margin: 10px 0;">';
+                            data.options.forEach(opcao => {
+                              html += '<li style="padding: 8px 0; border-bottom: 1px solid #eee;">';
+                              html += '<strong>' + opcao.name + ':</strong> R$ ' + opcao.price.toFixed(2).replace('.', ',');
+                              html += ' - ' + opcao.estimated_days;
+                              html += '</li>';
+                            });
+                            html += '</ul>';
+                            resultsDiv.innerHTML = html;
+                          } else {
+                            resultsDiv.innerHTML = '<p style="color: #c00;">Nenhuma opção de frete disponível.</p>';
+                          }
+                        })
+                        .catch(error => {
+                          resultsDiv.innerHTML = '<p style="color: #c00;">Erro ao calcular frete. Tente novamente.</p>';
+                        });
+                    }
+                    </script>
+                    
                     <div class="shipping-estimator__results rte" style="display: flex;">  
                       <ul> <li>Moto boy somente em Goiânia R$:19,00</li></ul> 
             
@@ -375,8 +418,8 @@
                   </div>
                 </div>
                 
-                {%- comment -%}Calculadora de frete via planilha Google Sheets{%- endcomment -%}
-                {% render 'frete-planilha-debug' %}
+                {%- comment -%}Calculadora de frete via API dos Correios{%- endcomment -%}
+                {% render 'frete-planilha' %}
 
                 {%- if section.settings.show_refunds_policy and shop.refund_policy != blank -%}
                   <div class="card__section card__section--tight">
