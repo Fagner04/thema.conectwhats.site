@@ -655,8 +655,8 @@
                   {%- if section.settings.mostrar_pix -%}
                     {%- assign hide_pix = false -%}
                     {%- for tag in product.tags -%}
-                      {%- assign tag_lower = tag | downcase -%}
-                      {%- if tag_lower contains 'promo' or tag_lower contains 'promocao' or tag_lower contains 'promoção' -%}
+                      {%- assign tag_lower = tag | downcase | strip -%}
+                      {%- if tag_lower contains 'promo' or tag_lower contains 'promocao' or tag_lower contains 'promoção' or tag_lower contains 'oferta' or tag_lower contains 'cupom' or tag_lower contains 'emporio' or tag_lower contains 'relampago' or tag_lower contains 'relámpago' -%}
                         {%- assign hide_pix = true -%}
                         {%- break -%}
                       {%- endif -%}
