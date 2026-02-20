@@ -149,16 +149,6 @@
           promoInterestRate: {{ settings.promo_porcentagem_de_juros | json }},
           promoDisplayMode: {{ settings.promo_mostrar_parcelascomo | json }}
         },
-        wholesale: {
-          enabled: {% if settings.enable_wholesale_discount %}true{% else %}false{% endif %},
-          minQuantity: {{ settings.wholesale_min_quantity | default: 5 | json }},
-          discountPercent: {{ settings.wholesale_discount_percent | default: 50 | json }},
-          showProgressBar: {% if settings.wholesale_show_progress_bar %}true{% else %}false{% endif %},
-          progressColor: {{ settings.wholesale_progress_color | default: "#00d864" | json }},
-          messageIncomplete: {{ settings.wholesale_message_incomplete | default: "Adicione mais {remaining} itens e ganhe {discount}% de desconto!" | json }},
-          messageComplete: {{ settings.wholesale_message_complete | default: "🎉 Parabéns! Você ganhou {discount}% de desconto no atacado!" | json }},
-          collections: {{ settings.wholesale_collections | default: "" | json }}
-        },
         freeShipping: {
           enabled: {% if settings.free_shipping_enable %}true{% else %}false{% endif %},
           minValue: {{ settings.free_shipping_min_value | plus: 0 | json }},
