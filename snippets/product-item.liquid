@@ -366,17 +366,46 @@
       {%- endif -%}
 
             {% if settings.show_parcelamento %}
-      {% assign divididopor = settings.qty_vezes %}
-      {% assign percentual = settings.porcentagem_de_juros %}
-      {%- if settings.mostrar_parcelascomo == 'info_juros' -%}
+      {% comment %} Verifica se o produto está em coleção promocional {% endcomment %}
+      {% assign is_promo = false %}
+      {% assign promo_collections_list = settings.promo_collections | default: "promocao,outlet,liquidacao,black-friday,oferta" | split: "," %}
+      
+      {% if settings.enable_category_installments %}
+        {% for product_collection in product.collections %}
+          {% assign product_handle = product_collection.handle | downcase %}
+          {% for promo_handle in promo_collections_list %}
+            {% assign promo_clean = promo_handle | strip | downcase %}
+            {% if product_handle == promo_clean %}
+              {% assign is_promo = true %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+          {% if is_promo %}
+            {% break %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      
+      {% comment %} Define parcelas e juros baseado se é promo ou não {% endcomment %}
+      {% if is_promo %}
+        {% assign divididopor = settings.promo_qty_vezes | default: 3 %}
+        {% assign percentual = settings.promo_porcentagem_de_juros | default: "1" %}
+        {% assign modo_exibicao = settings.promo_mostrar_parcelascomo | default: "info_sem_juros" %}
+      {% else %}
+        {% assign divididopor = settings.qty_vezes %}
+        {% assign percentual = settings.porcentagem_de_juros %}
+        {% assign modo_exibicao = settings.mostrar_parcelascomo %}
+      {% endif %}
+      
+      {%- if modo_exibicao == 'info_juros' -%}
       <p class="parcelas-home"><b>{{ divididopor }}x</b> de <b style="color: var(--product-on-sale-accent)">{{- product.price | times: percentual | divided_by: divididopor | round: 2 | money -}}</b><b style="color: #b1b5c3;font-weight: bold;font-size: 10px;margin-left: 4px;">COM JUROS</b></p>
       {%- endif -%}
 
-      {%- if settings.mostrar_parcelascomo == 'info_sem_juros' -%}
+      {%- if modo_exibicao == 'info_sem_juros' -%}
       <p class="parcelas-home"><b>{{ divididopor }}x</b> de <b style="color: var(--product-on-sale-accent)">{{- product.price | times: 1.0000 | divided_by: divididopor | money -}}</b><b style="color: var(--product-on-sale-accent);font-weight: bold;font-size: 10px;margin-left: 4px;">SEM JUROS</b></p>
       {%- endif -%}
 
-      {%- if settings.mostrar_parcelascomo == 'no_info_juros' -%}
+      {%- if modo_exibicao == 'no_info_juros' -%}
       <p class="parcelas-home">em até <b>{{ divididopor }}x</b> de <b style="color: var(--product-on-sale-accent)">{{- product.price | times: percentual | divided_by: divididopor | round: 2 | money -}}</b></p>
       {%- endif -%}
             {% endif %}
