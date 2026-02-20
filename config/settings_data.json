@@ -743,7 +743,7 @@
           "gift_wrap_product": "",
           "gift_wrap_text": "Deseja embrulhar seu pedido?",
           "gift_wrap_button": "Adicionar agora",
-          "show_shipping_estimator": true,
+          "show_shipping_estimator": false,
           "shipping_estimator_default_country": "Brasil",
           "trust_heading": "Nossas garantias",
           "upsell_heading": "Aproveite e leve também",
