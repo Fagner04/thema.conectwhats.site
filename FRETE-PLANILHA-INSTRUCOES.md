@@ -81,6 +81,7 @@ const CONFIG = {
   senha: 'SUA_SENHA_AQUI',               // Senha do contrato
   codigoAdministrativo: 'SEU_CODIGO',    // Código administrativo (se tiver)
   cartaoPostagem: 'SEU_CARTAO',          // Número do cartão de postagem
+  apiToken: 'SEU_TOKEN_AQUI',            // Token da API (se tiver)
   
   // CEP de origem (seu endereço)
   cepOrigem: '74000000',                 // CEP sem hífen

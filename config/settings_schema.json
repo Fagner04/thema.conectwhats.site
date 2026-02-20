@@ -731,6 +731,12 @@
         "default": "00000-000"
       },
       {
+        "type": "text",
+        "id": "correios_api_token",
+        "label": "Chave API (Token)",
+        "info": "Token de autenticação da API dos Correios (se aplicável)"
+      },
+      {
         "type": "paragraph",
         "content": "⚠️ IMPORTANTE: Para usar a API dos Correios, você precisa ter um contrato ativo com os Correios. As credenciais acima serão usadas para calcular o frete real. Consulte os Correios para obter suas credenciais."
       },
