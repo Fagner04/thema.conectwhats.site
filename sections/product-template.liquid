@@ -374,7 +374,7 @@
                     {% endif %}
 
                     <div class="shipping-estimator__results rte" style="display: none;"></div>
-                    <div id="correios-results" class="shipping-estimator__results rte" style="display: none; margin-top: 15px;"></div>
+                    <div id="correios-results" class="shipping-estimator__results rte" style="display: none; margin-top: 15px; text-align: center;"></div>
                     
                     <script>
                     function calcularFreteCorreios() {
@@ -396,9 +396,9 @@
                         .then(response => response.json())
                         .then(data => {
                           if (data.success && data.options && data.options.length > 0) {
-                            let html = '<ul style="list-style: none; padding: 0; margin: 10px 0;">';
+                            let html = '<ul style="list-style: none; padding: 0; margin: 10px 0; text-align: center;">';
                             data.options.forEach(opcao => {
-                              html += '<li style="padding: 8px 0; border-bottom: 1px solid #eee;">';
+                              html += '<li style="padding: 8px 0;">';
                               html += '<strong>' + opcao.name + ':</strong> R$ ' + opcao.price.toFixed(2).replace('.', ',');
                               html += ' - ' + opcao.estimated_days;
                               html += '</li>';
@@ -414,11 +414,6 @@
                         });
                     }
                     </script>
-                    
-                    <div class="shipping-estimator__results rte" style="display: flex;">  
-                      <ul> <li>Moto boy somente em Goiânia R$:19,00</li></ul> 
-            
-                   </div>
                   </div>
                 </div>
                 
