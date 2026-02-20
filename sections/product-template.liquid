@@ -422,9 +422,6 @@
                   </div>
                 </div>
                 
-                {%- comment -%}Calculadora de frete via API dos Correios{%- endcomment -%}
-                {% render 'frete-planilha' %}
-
                 {%- if section.settings.show_refunds_policy and shop.refund_policy != blank -%}
                   <div class="card__section card__section--tight">
                     <button class="product__refund-policy-link link link--accented" data-action="open-modal" aria-controls="modal-refunds-policy">{{ 'product.general.refund_policy' | t }} {%- render 'icon', icon: 'arrow-right' -%}</button>
