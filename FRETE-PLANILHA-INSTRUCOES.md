@@ -165,10 +165,19 @@ function consultarCorreios(cepDestino, peso, valorDeclarado) {
         '&sCdAvisoRecebimento=' + CONFIG.avisoRecebimento +
         '&StrRetorno=xml';
       
-      // Fazer requisição
-      const response = UrlFetchApp.fetch(url, {
+      // Configurar headers (incluir token se disponível)
+      const fetchOptions = {
         muteHttpExceptions: true
-      });
+      };
+      
+      if (CONFIG.apiToken && CONFIG.apiToken !== 'SEU_TOKEN_AQUI') {
+        fetchOptions.headers = {
+          'Authorization': 'Bearer ' + CONFIG.apiToken
+        };
+      }
+      
+      // Fazer requisição
+      const response = UrlFetchApp.fetch(url, fetchOptions);
       
       const xml = response.getContentText();
       

@@ -126,6 +126,7 @@ const CONFIG = {
   senha: 'sua_senha',
   codigoAdministrativo: '12345678',
   cartaoPostagem: '0123456789',
+  apiToken: 'seu_token_api',  // Token de autenticação (opcional)
   
   // Origem
   cepOrigem: '74000000',

@@ -81,6 +81,7 @@ const CONFIG = {
   senha: 'sua_senha_correios',
   codigoAdministrativo: 'seu_codigo',
   cartaoPostagem: 'seu_cartao',
+  apiToken: 'seu_token_api',        // Token de autenticação (se tiver)
   cepOrigem: '74000000',
   
   servicos: [
@@ -97,6 +98,7 @@ const CONFIG = {
   senha: '',
   codigoAdministrativo: '',
   cartaoPostagem: '',
+  apiToken: '',                     // Deixe vazio para testes
   cepOrigem: '74000000',
   
   servicos: [
