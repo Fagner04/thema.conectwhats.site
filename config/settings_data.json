@@ -606,7 +606,7 @@
           "show_reviews_badge": false,
           "trust_title": "Pagamento Seguro",
           "show_payment_icons": true,
-          "show_shipping_estimator": true,
+          "show_shipping_estimator": false,
           "shipping_estimator_default_country": "Brasil",
           "show_refunds_policy": false
         }
