@@ -1,0 +1,134 @@
+{% comment %}
+  Sistema de Desconto por Atacado
+  Configuração: 5 itens = 50% desconto
+{% endcomment %}
+
+<div id="atacado-progress" style="display: none; margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+  <div id="atacado-message" style="margin-bottom: 10px; font-weight: 600; font-size: 14px; text-align: center; color: #333;"></div>
+  
+  <div style="position: relative; height: 30px; background: #e0e0e0; border-radius: 15px; overflow: hidden;">
+    <div id="atacado-fill" style="height: 100%; background: #00d864; border-radius: 15px; transition: width 0.3s ease; width: 0%; display: flex; align-items: center; justify-content: center;">
+      <span id="atacado-text" style="color: white; font-weight: bold; font-size: 12px; position: absolute; left: 50%; transform: translateX(-50%); z-index: 2;"></span>
+    </div>
+  </div>
+  
+  <div id="atacado-info" style="margin-top: 10px; text-align: center; font-size: 12px; color: #666;"></div>
+</div>
+
+<style>
+  #atacado-progress.complete {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border: 2px solid #00d864;
+  }
+  
+  #atacado-progress.complete #atacado-message {
+    color: #00d864;
+    font-size: 16px;
+  }
+</style>
+
+<script>
+(function() {
+  'use strict';
+  
+  // CONFIGURAÇÕES (edite aqui)
+  var CONFIG = {
+    minQuantity: 5,        // Quantidade mínima de itens
+    discountPercent: 50,   // Porcentagem de desconto
+    enabled: true          // Ativar/desativar
+  };
+  
+  function updateAtacadoProgress() {
+    if (!CONFIG.enabled) return;
+    
+    var container = document.getElementById('atacado-progress');
+    if (!container) return;
+    
+    // Pega quantidade total de itens no carrinho
+    var totalItems = 0;
+    var cartForm = document.querySelector('form[action*="cart"]');
+    
+    if (cartForm) {
+      var qtyInputs = cartForm.querySelectorAll('input[name*="quantity"], input.quantity-selector__value');
+      qtyInputs.forEach(function(input) {
+        var qty = parseInt(input.value) || 0;
+        totalItems += qty;
+      });
+    }
+    
+    // Fallback: usa window.theme.cartCount
+    if (totalItems === 0 && window.theme && window.theme.cartCount) {
+      totalItems = window.theme.cartCount;
+    }
+    
+    console.log('Atacado - Total itens:', totalItems, 'Mínimo:', CONFIG.minQuantity);
+    
+    if (totalItems === 0) {
+      container.style.display = 'none';
+      return;
+    }
+    
+    container.style.display = 'block';
+    
+    var fill = document.getElementById('atacado-fill');
+    var text = document.getElementById('atacado-text');
+    var message = document.getElementById('atacado-message');
+    var info = document.getElementById('atacado-info');
+    
+    var percentage = Math.min((totalItems / CONFIG.minQuantity) * 100, 100);
+    var remaining = Math.max(CONFIG.minQuantity - totalItems, 0);
+    
+    fill.style.width = percentage + '%';
+    text.textContent = totalItems + ' / ' + CONFIG.minQuantity + ' itens';
+    
+    if (totalItems >= CONFIG.minQuantity) {
+      // Atingiu o mínimo
+      container.classList.add('complete');
+      message.innerHTML = '🎉 Parabéns! Você ganhou ' + CONFIG.discountPercent + '% de desconto no atacado!';
+      info.innerHTML = '<strong>Desconto de ' + CONFIG.discountPercent + '% aplicado!</strong>';
+    } else {
+      // Ainda não atingiu
+      container.classList.remove('complete');
+      message.innerHTML = 'Adicione mais ' + remaining + ' itens e ganhe ' + CONFIG.discountPercent + '% de desconto!';
+      info.innerHTML = 'Faltam apenas ' + remaining + ' itens para ganhar ' + CONFIG.discountPercent + '% de desconto!';
+    }
+  }
+  
+  // Atualiza quando a página carrega
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateAtacadoProgress);
+  } else {
+    setTimeout(updateAtacadoProgress, 500);
+  }
+  
+  // Atualiza quando o carrinho muda
+  document.addEventListener('cart:refresh', function() {
+    setTimeout(updateAtacadoProgress, 300);
+  });
+  
+  document.addEventListener('product:added', function() {
+    setTimeout(updateAtacadoProgress, 500);
+  });
+  
+  // Observa mudanças nos inputs de quantidade
+  var observer = new MutationObserver(function() {
+    updateAtacadoProgress();
+  });
+  
+  setTimeout(function() {
+    var cartForm = document.querySelector('form[action*="cart"]');
+    if (cartForm) {
+      observer.observe(cartForm, { 
+        childList: true, 
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['value']
+      });
+    }
+  }, 1000);
+  
+  // Atualiza a cada 3 segundos (fallback)
+  setInterval(updateAtacadoProgress, 3000);
+  
+})();
+</script>
