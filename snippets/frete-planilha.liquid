@@ -176,13 +176,10 @@
     resultsDiv.innerHTML = '<div class="frete-planilha-loading">Consultando opções de frete...</div>';
     resultsDiv.classList.add('show');
     
-    // Montar URL com parâmetros
-    let url = SHEETS_API_URL + '?cep=' + cep;
+    // Montar URL com parâmetros (formato novo da API)
+    let url = SHEETS_API_URL + '?destination_cep=' + cep;
     if (PRODUTO_PESO > 0) {
-      url += '&peso=' + PRODUTO_PESO;
-    }
-    if (PRODUTO_VALOR > 0) {
-      url += '&valor=' + PRODUTO_VALOR;
+      url += '&cart_weight=' + PRODUTO_PESO;
     }
     
     fetch(url)
@@ -190,8 +187,8 @@
       .then(data => {
         if (data.error) {
           mostrarErro(data.error);
-        } else if (data.opcoes && data.opcoes.length > 0) {
-          mostrarOpcoes(data.opcoes);
+        } else if (data.success && data.options && data.options.length > 0) {
+          mostrarOpcoes(data.options);
         } else {
           mostrarErro('Nenhuma opção de frete disponível para este CEP');
         }
@@ -212,10 +209,10 @@
       html += `
         <div class="frete-option">
           <div class="frete-option-info">
-            <div class="frete-option-name">${opcao.nome}</div>
-            <div class="frete-option-prazo">Entrega em ${opcao.prazo} ${opcao.prazo == 1 ? 'dia útil' : 'dias úteis'}</div>
+            <div class="frete-option-name">${opcao.name}</div>
+            <div class="frete-option-prazo">${opcao.estimated_days}</div>
           </div>
-          <div class="frete-option-price">R$ ${opcao.valor.toFixed(2).replace('.', ',')}</div>
+          <div class="frete-option-price">R$ ${opcao.price.toFixed(2).replace('.', ',')}</div>
         </div>
       `;
     });

@@ -69,7 +69,7 @@ Exemplo de dados (adicione suas próprias faixas de CEP):
 2. Apague o código padrão
 3. Cole o código abaixo:
 
-### OPÇÃO 1: Usando API dos Correios (Recomendado)
+### OPÇÃO 1: Usando API dos Correios v3 (Recomendado)
 
 ```javascript
 // ========================================
@@ -77,33 +77,29 @@ Exemplo de dados (adicione suas próprias faixas de CEP):
 // ========================================
 const CONFIG = {
   // Credenciais do contrato dos Correios
-  usuario: 'SEU_USUARIO_AQUI',           // Ex: 'sigepweb'
-  senha: 'SUA_SENHA_AQUI',               // Senha do contrato
-  codigoAdministrativo: 'SEU_CODIGO',    // Código administrativo (se tiver)
-  cartaoPostagem: 'SEU_CARTAO',          // Número do cartão de postagem
-  apiToken: 'SEU_TOKEN_AQUI',            // Token da API (se tiver)
+  cnpj: '45688532000100',                // CNPJ da empresa
+  contrato: '9912592268',                // Número do contrato
+  cartaoPostagem: '0077411030',          // Número do cartão de postagem
+  codigoAdministrativo: '22294287',      // Código administrativo
+  usuario: '45688532000100',             // Usuário (geralmente o CNPJ)
+  apiToken: 'DNSn5cCfYG5Xd9qlMofFivcQFhHEGLSRmoQIeeCT', // Token da API
   
   // CEP de origem (seu endereço)
-  cepOrigem: '74000000',                 // CEP sem hífen
+  cepOrigem: '74550050',                 // CEP sem hífen
   
-  // Serviços a consultar (códigos dos Correios)
+  // Serviços a consultar (códigos da API v3)
   servicos: [
-    { codigo: '04014', nome: 'SEDEX' },
-    { codigo: '04510', nome: 'PAC' },
-    { codigo: '04782', nome: 'SEDEX 10' },
-    { codigo: '04790', nome: 'SEDEX Hoje' }
+    { codigo: '03298', nome: 'PAC' },
+    { codigo: '03220', nome: 'SEDEX' }
   ],
   
   // Configurações do produto (valores padrão)
-  pesoKg: 1,        // Peso em kg
-  formato: 1,       // 1=caixa/pacote, 2=rolo/prisma, 3=envelope
-  comprimento: 20,  // em cm
-  altura: 10,       // em cm
-  largura: 15,      // em cm
-  diametro: 0,      // em cm (para formato cilíndrico)
-  maoPropria: 'N', // S ou N
-  valorDeclarado: 0, // Valor declarado (0 = sem seguro)
-  avisoRecebimento: 'N' // S ou N
+  pesoGramas: 1000,  // Peso em gramas (1kg = 1000g)
+  formato: 2,        // 1=envelope, 2=caixa/pacote, 3=rolo/prisma
+  comprimento: 20,   // em cm
+  altura: 10,        // em cm
+  largura: 15,       // em cm
+  diametro: 0        // em cm (para formato cilíndrico)
 };
 
 // ========================================
@@ -112,8 +108,8 @@ const CONFIG = {
 function doGet(e) {
   try {
     const cep = e.parameter.cep;
-    const peso = e.parameter.peso || CONFIG.pesoKg;
-    const valor = e.parameter.valor || CONFIG.valorDeclarado;
+    const debug = e.parameter.debug === '1';
+    const peso = e.parameter.peso ? parseFloat(e.parameter.peso) * 1000 : CONFIG.pesoGramas;
     
     if (!cep || cep.length !== 8) {
       return retornarJSON({
@@ -121,103 +117,223 @@ function doGet(e) {
       });
     }
     
-    // Consultar API dos Correios
-    const opcoes = consultarCorreios(cep, peso, valor);
+    // Consultar API dos Correios v3
+    const resultado = consultarCorreiosV3(cep, peso, debug);
     
-    return retornarJSON({
-      cep: cep,
-      opcoes: opcoes
-    });
+    return retornarJSON(resultado);
     
   } catch (error) {
     Logger.log('Erro: ' + error.message);
     return retornarJSON({
+      cep: e.parameter.cep || '',
+      opcoes: [],
       error: 'Erro ao consultar frete: ' + error.message
     });
   }
 }
 
 // ========================================
-// CONSULTAR API DOS CORREIOS
+// OBTER TOKEN DE AUTENTICAÇÃO (API v3)
 // ========================================
-function consultarCorreios(cepDestino, peso, valorDeclarado) {
+function obterTokenV3() {
+  try {
+    const url = 'https://api.correios.com.br/token/v3/autentica/cartaopostagem';
+    
+    const payload = {
+      numero: CONFIG.cartaoPostagem
+    };
+    
+    const options = {
+      method: 'post',
+      contentType: 'application/json',
+      headers: {
+        'Authorization': 'Bearer ' + CONFIG.apiToken
+      },
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    };
+    
+    const response = UrlFetchApp.fetch(url, options);
+    const statusCode = response.getResponseCode();
+    const responseText = response.getContentText();
+    
+    if (statusCode === 201) {
+      const data = JSON.parse(responseText);
+      return {
+        success: true,
+        token: data.token,
+        expiraEm: data.expiraEm
+      };
+    } else {
+      Logger.log('Erro ao obter token: ' + statusCode + ' - ' + responseText);
+      return {
+        success: false,
+        error: 'Status ' + statusCode,
+        response: responseText
+      };
+    }
+  } catch (error) {
+    Logger.log('Exceção ao obter token: ' + error.message);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+// ========================================
+// CONSULTAR API DOS CORREIOS V3
+// ========================================
+function consultarCorreiosV3(cepDestino, pesoGramas, debug) {
   const opcoes = [];
+  const debugInfo = [];
   
+  // Obter token de autenticação
+  const authResult = obterTokenV3();
+  
+  if (!authResult.success) {
+    if (debug) {
+      return {
+        cep: cepDestino,
+        opcoes: [],
+        debug: [{
+          erro: 'Falha na autenticação',
+          detalhes: authResult
+        }]
+      };
+    }
+    // Retornar valores fallback
+    return {
+      cep: cepDestino,
+      opcoes: [
+        { nome: 'PAC', valor: 25, prazo: 7 },
+        { nome: 'SEDEX', valor: 40, prazo: 3 }
+      ]
+    };
+  }
+  
+  const token = authResult.token;
+  
+  // Extrair DR (Diretoria Regional) do CEP de origem
+  const dr = CONFIG.cepOrigem.substring(0, 2);
+  
+  // Consultar cada serviço
   for (let i = 0; i < CONFIG.servicos.length; i++) {
     const servico = CONFIG.servicos[i];
     
     try {
-      // Montar URL da API dos Correios
-      const url = 'http://ws.correios.com.br/calculador/CalcPrecoPrazo.aspx?' + 
-        'nCdEmpresa=' + CONFIG.codigoAdministrativo +
-        '&sDsSenha=' + CONFIG.senha +
-        '&nCdServico=' + servico.codigo +
-        '&sCepOrigem=' + CONFIG.cepOrigem +
-        '&sCepDestino=' + cepDestino +
-        '&nVlPeso=' + peso +
-        '&nCdFormato=' + CONFIG.formato +
-        '&nVlComprimento=' + CONFIG.comprimento +
-        '&nVlAltura=' + CONFIG.altura +
-        '&nVlLargura=' + CONFIG.largura +
-        '&nVlDiametro=' + CONFIG.diametro +
-        '&sCdMaoPropria=' + CONFIG.maoPropria +
-        '&nVlValorDeclarado=' + valorDeclarado +
-        '&sCdAvisoRecebimento=' + CONFIG.avisoRecebimento +
-        '&StrRetorno=xml';
+      const url = 'https://api.correios.com.br/preco/v1/nacional/' + servico.codigo;
       
-      // Configurar headers (incluir token se disponível)
-      const fetchOptions = {
+      const payload = {
+        idLote: '1',
+        parametrosProduto: [{
+          coProduto: servico.codigo,
+          nuContrato: CONFIG.contrato,
+          nuDR: dr,
+          cepOrigem: CONFIG.cepOrigem,
+          cepDestino: cepDestino,
+          psObjeto: pesoGramas.toString(),
+          tpObjeto: CONFIG.formato.toString(),
+          comprimento: CONFIG.comprimento.toString(),
+          largura: CONFIG.largura.toString(),
+          altura: CONFIG.altura.toString(),
+          diametro: CONFIG.diametro.toString()
+        }]
+      };
+      
+      const options = {
+        method: 'post',
+        contentType: 'application/json',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Accept': 'application/json'
+        },
+        payload: JSON.stringify(payload),
         muteHttpExceptions: true
       };
       
-      if (CONFIG.apiToken && CONFIG.apiToken !== 'SEU_TOKEN_AQUI') {
-        fetchOptions.headers = {
-          'Authorization': 'Bearer ' + CONFIG.apiToken
-        };
+      if (debug) {
+        debugInfo.push({
+          servico: servico.nome,
+          url: url,
+          request: payload
+        });
       }
       
-      // Fazer requisição
-      const response = UrlFetchApp.fetch(url, fetchOptions);
+      const response = UrlFetchApp.fetch(url, options);
+      const statusCode = response.getResponseCode();
+      const responseText = response.getContentText();
       
-      const xml = response.getContentText();
+      if (debug) {
+        debugInfo[debugInfo.length - 1].statusCode = statusCode;
+        debugInfo[debugInfo.length - 1].response = responseText;
+      }
       
-      // Parsear XML
-      const valor = extrairValorXML(xml, 'Valor');
-      const prazo = extrairValorXML(xml, 'PrazoEntrega');
-      const erro = extrairValorXML(xml, 'Erro');
-      const msgErro = extrairValorXML(xml, 'MsgErro');
-      
-      // Se não houver erro, adicionar opção
-      if (erro === '0' && valor) {
-        opcoes.push({
-          nome: servico.nome,
-          valor: parseFloat(valor.replace(',', '.')),
-          prazo: parseInt(prazo) || 0
-        });
-      } else if (msgErro) {
-        Logger.log('Erro ' + servico.nome + ': ' + msgErro);
+      if (statusCode === 200) {
+        const data = JSON.parse(responseText);
+        
+        if (data.parametrosProduto && data.parametrosProduto.length > 0) {
+          const produto = data.parametrosProduto[0];
+          
+          if (produto.pcFinal) {
+            opcoes.push({
+              nome: servico.nome,
+              valor: parseFloat(produto.pcFinal),
+              prazo: parseInt(produto.prazoEntrega) || 0
+            });
+          }
+        }
+      } else {
+        Logger.log('Erro ' + servico.nome + ': ' + statusCode + ' - ' + responseText);
+        if (debug) {
+          debugInfo.push({
+            erro: 'Status ' + statusCode,
+            resposta: responseText
+          });
+        }
       }
       
     } catch (error) {
       Logger.log('Erro ao consultar ' + servico.nome + ': ' + error.message);
+      if (debug) {
+        debugInfo.push({
+          servico: servico.nome,
+          erro: error.message
+        });
+      }
     }
   }
   
   // Ordenar por valor (mais barato primeiro)
   opcoes.sort((a, b) => a.valor - b.valor);
   
-  return opcoes;
+  // Se não conseguiu nenhuma opção, retornar fallback
+  if (opcoes.length === 0 && !debug) {
+    opcoes.push(
+      { nome: 'PAC', valor: 25, prazo: 7 },
+      { nome: 'SEDEX', valor: 40, prazo: 3 }
+    );
+  }
+  
+  const resultado = {
+    cep: cepDestino,
+    opcoes: opcoes
+  };
+  
+  if (debug) {
+    resultado.debug = debugInfo;
+    resultado.auth = {
+      success: authResult.success,
+      tokenLength: token ? token.length : 0
+    };
+  }
+  
+  return resultado;
 }
 
 // ========================================
 // FUNÇÕES AUXILIARES
 // ========================================
-function extrairValorXML(xml, tag) {
-  const regex = new RegExp('<' + tag + '>(.*?)<\/' + tag + '>', 'i');
-  const match = xml.match(regex);
-  return match ? match[1] : null;
-}
-
 function retornarJSON(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
@@ -228,7 +344,7 @@ function retornarJSON(obj) {
 // FUNÇÃO DE TESTE (opcional)
 // ========================================
 function testar() {
-  const resultado = doGet({ parameter: { cep: '01310100' } });
+  const resultado = doGet({ parameter: { cep: '74605120', debug: '1' } });
   Logger.log(resultado.getContent());
 }
 ```
