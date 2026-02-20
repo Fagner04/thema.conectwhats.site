@@ -731,7 +731,7 @@
         "default": "00000-000"
       },
       {
-        "type": "text",
+        "type": "textarea",
         "id": "correios_api_token",
         "label": "Chave API (Token)",
         "info": "Token de autenticação da API dos Correios (se aplicável)"
