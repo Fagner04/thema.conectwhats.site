@@ -690,6 +690,27 @@
     "settings": [
       {
         "type": "header",
+        "content": "Escolha o Calculador de Frete"
+      },
+      {
+        "type": "select",
+        "id": "shipping_calculator_type",
+        "label": "Tipo de calculador",
+        "options": [
+          {
+            "value": "shopify",
+            "label": "Calculador Nativo Shopify"
+          },
+          {
+            "value": "correios_api",
+            "label": "API dos Correios (Google Apps Script)"
+          }
+        ],
+        "default": "correios_api",
+        "info": "Escolha qual calculador de frete será exibido na página do produto"
+      },
+      {
+        "type": "header",
         "content": "API dos Correios",
         "info": "Configure as credenciais do contrato dos Correios para cálculo de frete"
       },

@@ -365,9 +365,13 @@
                       </div>
                     </div>
 
-                    <button type="button" class="form__submit button button--primary" data-action="estimate-shipping">{{ 'cart.shipping_estimator.estimate' | t }}</button>
-                    
-                    <button type="button" class="form__submit button button--secondary" style="margin-left: 10px;" onclick="calcularFreteCorreios()">Calcular com Correios</button>
+                    {% if settings.shipping_calculator_type == 'shopify' %}
+                      {%- comment -%}Botão Shopify Nativo{%- endcomment -%}
+                      <button type="button" class="form__submit button button--primary" data-action="estimate-shipping">{{ 'cart.shipping_estimator.estimate' | t }}</button>
+                    {% else %}
+                      {%- comment -%}Botão API Correios{%- endcomment -%}
+                      <button type="button" class="form__submit button button--primary" onclick="calcularFreteCorreios()">Calcular Frete</button>
+                    {% endif %}
 
                     <div class="shipping-estimator__results rte" style="display: none;"></div>
                     <div id="correios-results" class="shipping-estimator__results rte" style="display: none; margin-top: 15px;"></div>
