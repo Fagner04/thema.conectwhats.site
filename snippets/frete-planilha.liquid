@@ -1,0 +1,214 @@
+{% comment %}
+  Snippet: Cálculo de Frete via Google Sheets
+  
+  Como usar:
+  {% render 'frete-planilha' %}
+{% endcomment %}
+
+{% if settings.sheets_frete_enable and settings.sheets_frete_url != blank %}
+<style>
+.frete-planilha-container {
+  margin: 15px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.frete-planilha-input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.frete-planilha-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.frete-planilha-btn {
+  padding: 10px 20px;
+  background: #0086ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.frete-planilha-btn:hover {
+  background: #0070d9;
+}
+
+.frete-planilha-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.frete-planilha-results {
+  display: none;
+  margin-top: 15px;
+}
+
+.frete-planilha-results.show {
+  display: block;
+}
+
+.frete-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+}
+
+.frete-option-info {
+  flex: 1;
+}
+
+.frete-option-name {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.frete-option-prazo {
+  font-size: 13px;
+  color: #666;
+}
+
+.frete-option-price {
+  font-size: 18px;
+  font-weight: bold;
+  color: #00c851;
+}
+
+.frete-planilha-error {
+  padding: 12px;
+  background: #ffebee;
+  color: #c62828;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.frete-planilha-loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+</style>
+
+<div class="frete-planilha-container">
+  <div class="frete-planilha-input-group">
+    <input 
+      type="text" 
+      id="frete-planilha-cep" 
+      class="frete-planilha-input" 
+      placeholder="Digite seu CEP (ex: 74000-000)"
+      maxlength="9"
+    >
+    <button 
+      type="button" 
+      id="frete-planilha-calcular" 
+      class="frete-planilha-btn"
+    >
+      Calcular Frete
+    </button>
+  </div>
+  
+  <div id="frete-planilha-results" class="frete-planilha-results"></div>
+</div>
+
+<script>
+(function() {
+  const SHEETS_API_URL = {{ settings.sheets_frete_url | json }};
+  
+  const cepInput = document.getElementById('frete-planilha-cep');
+  const calcularBtn = document.getElementById('frete-planilha-calcular');
+  const resultsDiv = document.getElementById('frete-planilha-results');
+  
+  // Formatar CEP enquanto digita
+  cepInput.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 5) {
+      value = value.slice(0, 5) + '-' + value.slice(5, 8);
+    }
+    e.target.value = value;
+  });
+  
+  // Calcular frete
+  calcularBtn.addEventListener('click', function() {
+    const cep = cepInput.value.replace(/\D/g, '');
+    
+    if (cep.length !== 8) {
+      mostrarErro('Por favor, digite um CEP válido com 8 dígitos');
+      return;
+    }
+    
+    calcularFrete(cep);
+  });
+  
+  // Enter no input
+  cepInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      calcularBtn.click();
+    }
+  });
+  
+  function calcularFrete(cep) {
+    calcularBtn.disabled = true;
+    calcularBtn.textContent = 'Calculando...';
+    resultsDiv.innerHTML = '<div class="frete-planilha-loading">Consultando opções de frete...</div>';
+    resultsDiv.classList.add('show');
+    
+    fetch(SHEETS_API_URL + '?cep=' + cep)
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          mostrarErro(data.error);
+        } else if (data.opcoes && data.opcoes.length > 0) {
+          mostrarOpcoes(data.opcoes);
+        } else {
+          mostrarErro('Nenhuma opção de frete disponível para este CEP');
+        }
+      })
+      .catch(error => {
+        console.error('Erro ao calcular frete:', error);
+        mostrarErro('Erro ao consultar frete. Tente novamente.');
+      })
+      .finally(() => {
+        calcularBtn.disabled = false;
+        calcularBtn.textContent = 'Calcular Frete';
+      });
+  }
+  
+  function mostrarOpcoes(opcoes) {
+    let html = '';
+    opcoes.forEach(opcao => {
+      html += `
+        <div class="frete-option">
+          <div class="frete-option-info">
+            <div class="frete-option-name">${opcao.nome}</div>
+            <div class="frete-option-prazo">Entrega em ${opcao.prazo} ${opcao.prazo == 1 ? 'dia útil' : 'dias úteis'}</div>
+          </div>
+          <div class="frete-option-price">R$ ${opcao.valor.toFixed(2).replace('.', ',')}</div>
+        </div>
+      `;
+    });
+    resultsDiv.innerHTML = html;
+    resultsDiv.classList.add('show');
+  }
+  
+  function mostrarErro(mensagem) {
+    resultsDiv.innerHTML = `<div class="frete-planilha-error">${mensagem}</div>`;
+    resultsDiv.classList.add('show');
+  }
+})();
+</script>
+{% endif %}

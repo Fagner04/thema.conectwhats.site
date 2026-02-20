@@ -511,6 +511,73 @@
       },
       {
         "type": "header",
+        "content": "API dos Correios",
+        "info": "Configure as credenciais do contrato dos Correios para cálculo de frete"
+      },
+      {
+        "type": "checkbox",
+        "id": "correios_api_enable",
+        "label": "Ativar integração com API dos Correios",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "correios_usuario",
+        "label": "Usuário do Contrato",
+        "info": "Código de usuário fornecido pelos Correios"
+      },
+      {
+        "type": "text",
+        "id": "correios_senha",
+        "label": "Senha do Contrato",
+        "info": "Senha fornecida pelos Correios"
+      },
+      {
+        "type": "text",
+        "id": "correios_codigo_administrativo",
+        "label": "Código Administrativo",
+        "info": "Código administrativo do contrato (se aplicável)"
+      },
+      {
+        "type": "text",
+        "id": "correios_cartao_postagem",
+        "label": "Cartão de Postagem",
+        "info": "Número do cartão de postagem"
+      },
+      {
+        "type": "text",
+        "id": "correios_cep_origem",
+        "label": "CEP de Origem",
+        "info": "CEP do local de onde os produtos serão enviados",
+        "default": "00000-000"
+      },
+      {
+        "type": "paragraph",
+        "content": "⚠️ IMPORTANTE: Para usar a API dos Correios, você precisa ter um contrato ativo com os Correios. As credenciais acima serão usadas para calcular o frete real. Consulte os Correios para obter suas credenciais."
+      },
+      {
+        "type": "header",
+        "content": "Frete via Planilha Google Sheets",
+        "info": "Configure uma planilha do Google Sheets como banco de dados de frete"
+      },
+      {
+        "type": "checkbox",
+        "id": "sheets_frete_enable",
+        "label": "Ativar cálculo de frete via planilha",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "sheets_frete_url",
+        "label": "URL da API do Google Sheets",
+        "info": "Cole aqui a URL do Google Apps Script que você criou (veja instruções abaixo)"
+      },
+      {
+        "type": "paragraph",
+        "content": "📋 COMO CONFIGURAR:\n\n1. Crie uma planilha no Google Sheets com as colunas: CEP_INICIO | CEP_FIM | VALOR | PRAZO | NOME_SERVICO\n\n2. Exemplo de dados:\n   74000-000 | 74999-999 | 15.00 | 3 | PAC\n   74000-000 | 74999-999 | 25.00 | 1 | SEDEX\n\n3. Vá em Extensões > Apps Script\n\n4. Cole o código fornecido e publique como Web App\n\n5. Cole a URL gerada no campo acima"
+      },
+      {
+        "type": "header",
         "content": "Estrelas"
       },
       {
