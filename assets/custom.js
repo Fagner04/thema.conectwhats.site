@@ -45,175 +45,72 @@ if (window.matchMedia("(max-width: 768px)").matches) {
 } 
 
 function parcelamento() {
-  console.log('=== Função parcelamento() iniciada ===');
+  console.log('=== Parcelamento iniciado ===');
   
-  // Tenta múltiplas formas de pegar o preço
+  // Busca o preço de múltiplas formas
   var preco = 0;
-  var precoText = '';
   
-  // Método 1: Tenta pegar do window.theme.product (mais confiável)
   if (window.theme && window.theme.product && window.theme.product.price) {
-    preco = parseFloat(window.theme.product.price) / 100; // Shopify retorna em centavos
-    console.log('Método 1 - Preço do window.theme.product.price:', preco);
+    preco = parseFloat(window.theme.product.price) / 100;
+  } else {
+    var precoText = $('.product-form__info-item .price--highlight').text().replace(/[^\d,]/g, '').replace(',', '.');
+    preco = parseFloat(precoText);
   }
   
-  // Método 2: Tenta pegar do elemento .price--highlight
   if (isNaN(preco) || preco <= 0) {
-    if ($('.product-form__info-item .price--highlight').length > 0) {
-      precoText = $('.product-form__info-item .price--highlight').text().split('                  ')[0].replace('R$ ','').replace('R$','').replace(',', '.').trim();
-      preco = parseFloat(precoText);
-      console.log('Método 2 - Preço do .price--highlight:', precoText, '=', preco);
-    }
-  }
-  
-  // Método 3: Tenta pegar de qualquer elemento com classe price
-  if (isNaN(preco) || preco <= 0) {
-    var priceElements = $('.price__current .price-item--regular, .price__current .price-item--sale, .price-item--sale, .price-item--regular');
-    if (priceElements.length > 0) {
-      precoText = priceElements.first().text().replace('R$ ','').replace('R$','').replace(',', '.').trim();
-      preco = parseFloat(precoText);
-      console.log('Método 3 - Preço de elementos .price:', precoText, '=', preco);
-    }
-  }
-  
-  // Método 4: Busca qualquer texto que pareça um preço em reais
-  if (isNaN(preco) || preco <= 0) {
-    $('.product-form__info-item, .product-meta__price').find('*').each(function() {
-      var text = $(this).text();
-      var match = text.match(/R\$\s*(\d+[.,]\d+)/);
-      if (match) {
-        precoText = match[1].replace(',', '.');
-        preco = parseFloat(precoText);
-        if (!isNaN(preco) && preco > 0) {
-          console.log('Método 4 - Preço encontrado por regex:', precoText, '=', preco);
-          return false; // Para o loop
-        }
-      }
-    });
-  }
-  
-  console.log('Preço final detectado:', preco);
-  
-  // Validação para evitar NaN
-  if (isNaN(preco) || preco <= 0) {
-    console.warn('❌ Preço inválido para parcelamento. Tentou:', precoText);
-    console.log('Elementos .price--highlight encontrados:', $('.product-form__info-item .price--highlight').length);
-    console.log('Texto do elemento .price--highlight:', $('.product-form__info-item .price--highlight').text());
-    console.log('window.theme.product:', window.theme ? window.theme.product : 'window.theme não existe');
+    console.log('Preço não encontrado');
     return;
   }
   
-  var compare = $('.product-form__info-item .price--compare').text().replace('R$ ', '').replace(',','.');
-  var compare = parseFloat(compare);
+  console.log('Preço:', preco);
   
-  if (!isNaN(compare) && compare > preco) {
-    var precompare = (compare - preco).toFixed(2).replace('.', ',');
-    $('.product-label.product-label--on-sale span').text('R$ '+ precompare);
-    var porcent = ((compare - preco) * 100 / compare).toFixed(2).split('.')[0];
-    $('.price--highlight .product-label.product-label--on-sale').append('-' + porcent + '%');
-  }
-  
-  // Verifica se o parcelamento está ativado
   if (!window.theme || !window.theme.installments || !window.theme.installments.show) {
-    console.warn('Parcelamento não está ativado nas configurações');
     return;
   }
   
-  console.log('Configurações de parcelamento:', window.theme.installments);
-  
-  // Verifica se o produto está em uma categoria promocional
-  var isPromoCategory = false;
-  var qtdParcelas = parseInt(window.theme.installments.maxInstallments) || 4;
+  // Configurações padrão
+  var qtdParcelas = parseInt(window.theme.installments.maxInstallments) || 6;
   var percentualJuros = parseFloat(window.theme.installments.interestRate) || 1;
-  var displayMode = window.theme.installments.displayMode || 'no_info_juros';
+  var displayMode = window.theme.installments.displayMode || 'info_sem_juros';
   
-  console.log('Configurações padrão - Parcelas:', qtdParcelas, 'Juros:', percentualJuros, 'Modo:', displayMode);
+  // VERIFICA SE É CATEGORIA PROMOCIONAL
+  // Lista de coleções que terão 3x sem juros (handles em minúsculas)
+  var colecoesProm = ['promocao', 'outlet', 'liquidacao', 'black-friday', 'oferta'];
   
-  // Verifica configurações de categoria promocional
-  if (window.theme.installments.categoryEnabled && 
-      window.theme.installments.promoCollections && 
-      window.theme.product && 
-      window.theme.product.collections) {
-    
-    console.log('Sistema de categoria ativado!');
-    console.log('Coleções promocionais configuradas:', window.theme.installments.promoCollections);
-    console.log('Coleções do produto:', window.theme.product.collections);
-    
-    var promoCollections = window.theme.installments.promoCollections.split(',').map(function(c) { 
-      return c.trim().toLowerCase(); 
-    });
-    
-    var productCollections = window.theme.product.collections.map(function(c) { 
+  if (window.theme.product && window.theme.product.collections) {
+    var produtoColecoes = window.theme.product.collections.map(function(c) { 
       return c.toLowerCase(); 
     });
     
-    console.log('Coleções promo (processadas):', promoCollections);
-    console.log('Coleções produto (processadas):', productCollections);
-    
-    // Verifica se alguma coleção do produto está na lista de promoções
-    isPromoCategory = promoCollections.some(function(promo) {
-      return productCollections.indexOf(promo) !== -1;
+    var isPromo = colecoesProm.some(function(promo) {
+      return produtoColecoes.indexOf(promo) !== -1;
     });
     
-    console.log('Produto está em categoria promocional?', isPromoCategory);
-    
-    // Se for categoria promocional, usa as configurações específicas
-    if (isPromoCategory) {
-      qtdParcelas = parseInt(window.theme.installments.promoMaxInstallments) || 3;
-      percentualJuros = parseFloat(window.theme.installments.promoInterestRate) || 1;
-      displayMode = window.theme.installments.promoDisplayMode || 'info_sem_juros';
-      
-      console.log('Usando configurações promocionais - Parcelas:', qtdParcelas, 'Juros:', percentualJuros, 'Modo:', displayMode);
+    if (isPromo) {
+      console.log('✅ PRODUTO EM PROMOÇÃO - Aplicando 3x sem juros');
+      qtdParcelas = 3;
+      percentualJuros = 1;
+      displayMode = 'info_sem_juros';
+    } else {
+      console.log('Produto normal - usando configuração padrão');
     }
-  } else {
-    console.log('Sistema de categoria NÃO está ativado ou faltam dados');
-    if (!window.theme.installments.categoryEnabled) console.log('- categoryEnabled:', window.theme.installments.categoryEnabled);
-    if (!window.theme.installments.promoCollections) console.log('- promoCollections:', window.theme.installments.promoCollections);
-    if (!window.theme.product) console.log('- window.theme.product não existe');
-    if (window.theme.product && !window.theme.product.collections) console.log('- window.theme.product.collections não existe');
   }
   
-  // Validações adicionais
-  if (qtdParcelas <= 0) qtdParcelas = 1;
-  if (isNaN(percentualJuros) || percentualJuros <= 0) percentualJuros = 1;
+  // Calcula parcela
+  var multiplicador = percentualJuros > 2 ? (percentualJuros / 100) + 1 : percentualJuros;
+  var valorParcela = (preco * multiplicador) / qtdParcelas;
   
-  // Converte porcentagem para multiplicador se necessário
-  var multiplicadorJuros = percentualJuros;
-  if (percentualJuros > 2) {
-    // Se o valor é maior que 2, trata como porcentagem e converte
-    multiplicadorJuros = (percentualJuros / 100) + 1;
-  }
-  
-  // Calcula o valor da parcela
-  var valorComJuros = preco * multiplicadorJuros;
-  var valorParcela = valorComJuros / qtdParcelas;
-  
-  // Verifica se o resultado é válido
   if (isNaN(valorParcela) || valorParcela <= 0) {
-    console.warn('Valor de parcela inválido:', valorParcela);
     return;
   }
   
-  var calculo = valorParcela.toFixed(2).replace('.', ',');
-  var calculoFormatado = 'R$ ' + calculo;
+  var valorFormatado = 'R$ ' + valorParcela.toFixed(2).replace('.', ',');
+  var textoJuros = displayMode === 'info_sem_juros' ? ' sem juros' : (displayMode === 'info_juros' && multiplicador > 1 ? ' com juros' : '');
   
-  // Monta o texto baseado no modo de exibição
-  var textoJuros = '';
-  if (displayMode === 'info_juros' && multiplicadorJuros > 1) {
-    textoJuros = ' com juros';
-  } else if (displayMode === 'info_sem_juros') {
-    textoJuros = ' sem juros';
-  }
+  var textoFinal = 'em até ' + qtdParcelas + 'x de <span><b>' + valorFormatado + '</b></span>' + textoJuros;
   
-  var textoFinal = 'em até ' + qtdParcelas + 'x de <span><b>' + calculoFormatado + '</b></span>' + textoJuros;
-  
-  console.log('Texto final do parcelamento:', textoFinal);
-  console.log('Elemento .parcelamento-style encontrado:', $('.parcelamento-style').length);
-  
-  // Atualiza o elemento correto do parcelamento
+  console.log('Texto:', textoFinal);
   $('.parcelamento-style').html(textoFinal);
-  
-  console.log('=== Função parcelamento() finalizada ===');
 }
 
 

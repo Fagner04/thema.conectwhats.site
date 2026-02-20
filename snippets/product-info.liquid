@@ -642,7 +642,6 @@
             {% endif %}
             
             <script>
-              // Adiciona informações do produto para parcelamento por categoria
               (function() {
                 if (!window.theme) window.theme = {};
                 window.theme.product = {
@@ -654,12 +653,8 @@
                     {%- endfor -%}
                   ]
                 };
-                
-                // Debug: mostra as informações do produto
-                console.log('Produto ID:', window.theme.product.id);
-                console.log('Preço (centavos):', window.theme.product.price);
-                console.log('Preço (reais):', window.theme.product.price / 100);
-                console.log('Produto pertence às coleções:', window.theme.product.collections);
+                console.log('Produto:', window.theme.product.id);
+                console.log('Coleções:', window.theme.product.collections);
               })();
             </script>
             
