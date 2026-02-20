@@ -45,75 +45,128 @@ if (window.matchMedia("(max-width: 768px)").matches) {
 } 
 
 function parcelamento() {
-  // Atualiza labels de desconto
-  var precoText = $('.product-form__info-item .price--highlight').text().split('                  ')[0].replace('R$ ','').replace(',', '.').trim();
-  var preco = parseFloat(precoText);
+  console.log('=== Parcelamento iniciado ===');
   
-  // Validação para evitar NaN
+  // Busca o preço de múltiplas formas
+  var preco = 0;
+  
+  if (window.theme && window.theme.product && window.theme.product.price) {
+    preco = parseFloat(window.theme.product.price) / 100;
+  } else {
+    var precoText = $('.product-form__info-item .price--highlight').text().replace(/[^\d,]/g, '').replace(',', '.');
+    preco = parseFloat(precoText);
+  }
+  
   if (isNaN(preco) || preco <= 0) {
-    console.warn('Preço inválido para parcelamento:', precoText);
+    console.log('Preço não encontrado');
     return;
   }
   
-  var compare = $('.product-form__info-item .price--compare').text().replace('R$ ', '').replace(',','.');
-  var compare = parseFloat(compare);
+  console.log('Preço:', preco);
   
-  if (!isNaN(compare) && compare > preco) {
-    var precompare = (compare - preco).toFixed(2).replace('.', ',');
-    $('.product-label.product-label--on-sale span').text('R$ '+ precompare);
-    var porcent = ((compare - preco) * 100 / compare).toFixed(2).split('.')[0];
-    $('.price--highlight .product-label.product-label--on-sale').append('-' + porcent + '%');
-  }
-  
-  // Verifica se o parcelamento está ativado
   if (!window.theme || !window.theme.installments || !window.theme.installments.show) {
     return;
   }
   
-  // Pega as configurações do tema
-  var qtdParcelas = parseInt(window.theme.installments.maxInstallments) || 4;
+  // Configurações padrão
+  var qtdParcelas = parseInt(window.theme.installments.maxInstallments) || 6;
   var percentualJuros = parseFloat(window.theme.installments.interestRate) || 1;
-  var displayMode = window.theme.installments.displayMode || 'no_info_juros';
+  var displayMode = window.theme.installments.displayMode || 'info_sem_juros';
   
-  // Validações adicionais
-  if (qtdParcelas <= 0) qtdParcelas = 1;
-  if (isNaN(percentualJuros) || percentualJuros <= 0) percentualJuros = 1;
+  // VERIFICA SE É CATEGORIA PROMOCIONAL
+  var colecoesProm = [];
+  var usarSistemaCategoria = false;
   
-  // Converte porcentagem para multiplicador se necessário
-  var multiplicadorJuros = percentualJuros;
-  if (percentualJuros > 2) {
-    // Se o valor é maior que 2, trata como porcentagem e converte
-    multiplicadorJuros = (percentualJuros / 100) + 1;
+  // Verifica se tem configurações do painel
+  if (window.theme.installments.categoryEnabled && window.theme.installments.promoCollections) {
+    // Usa configurações do painel
+    colecoesProm = window.theme.installments.promoCollections.split(',').map(function(c) { 
+      return c.trim().toLowerCase(); 
+    });
+    usarSistemaCategoria = true;
+    console.log('Usando configurações do painel:', colecoesProm);
+  } else {
+    // Usa lista padrão hardcoded
+    colecoesProm = ['promocao', 'outlet', 'liquidacao', 'black-friday', 'oferta'];
+    usarSistemaCategoria = true;
+    console.log('Usando lista padrão:', colecoesProm);
   }
   
-  // Calcula o valor da parcela
-  var valorComJuros = preco * multiplicadorJuros;
-  var valorParcela = valorComJuros / qtdParcelas;
+  if (usarSistemaCategoria && window.theme.product && window.theme.product.collections) {
+    var produtoColecoes = window.theme.product.collections.map(function(c) { 
+      return c.toLowerCase(); 
+    });
+    
+    var isPromo = colecoesProm.some(function(promo) {
+      return produtoColecoes.indexOf(promo) !== -1;
+    });
+    
+    if (isPromo) {
+      console.log('✅ PRODUTO EM PROMOÇÃO');
+      
+      // Usa configurações do painel se disponíveis
+      if (window.theme.installments.promoMaxInstallments) {
+        qtdParcelas = parseInt(window.theme.installments.promoMaxInstallments);
+        percentualJuros = parseFloat(window.theme.installments.promoInterestRate) || 1;
+        displayMode = window.theme.installments.promoDisplayMode || 'info_sem_juros';
+        console.log('Configurações do painel - Parcelas:', qtdParcelas);
+      } else {
+        // Usa padrão: 3x sem juros
+        qtdParcelas = 3;
+        percentualJuros = 1;
+        displayMode = 'info_sem_juros';
+        console.log('Configurações padrão - 3x sem juros');
+      }
+    } else {
+      console.log('Produto normal - usando configuração padrão');
+    }
+  }
   
-  // Verifica se o resultado é válido
+  // Calcula parcela
+  var multiplicador = percentualJuros > 2 ? (percentualJuros / 100) + 1 : percentualJuros;
+  var valorParcela = (preco * multiplicador) / qtdParcelas;
+  
   if (isNaN(valorParcela) || valorParcela <= 0) {
-    console.warn('Valor de parcela inválido:', valorParcela);
     return;
   }
   
-  var calculo = valorParcela.toFixed(2).replace('.', ',');
-  var calculoFormatado = 'R$ ' + calculo;
+  var valorFormatado = 'R$ ' + valorParcela.toFixed(2).replace('.', ',');
+  var textoJuros = displayMode === 'info_sem_juros' ? ' sem juros' : (displayMode === 'info_juros' && multiplicador > 1 ? ' com juros' : '');
   
-  // Monta o texto baseado no modo de exibição
-  var textoJuros = '';
-  if (displayMode === 'info_juros' && multiplicadorJuros > 1) {
-    textoJuros = ' com juros';
-  } else if (displayMode === 'info_sem_juros') {
-    textoJuros = ' sem juros';
-  }
+  var textoFinal = 'em até ' + qtdParcelas + 'x de <span><b>' + valorFormatado + '</b></span>' + textoJuros;
   
-  // Atualiza o elemento correto do parcelamento
-  $('.parcelamento-style').html('em até ' + qtdParcelas + 'x de <span><b>' + calculoFormatado + '</b></span>' + textoJuros);
+  console.log('Texto:', textoFinal);
+  $('.parcelamento-style').html(textoFinal);
 }
 
 
+// Chama parcelamento quando a página carrega
+$(document).ready(function() {
+  setTimeout(function() { 
+    parcelamento(); 
+  }, 300);
+});
+
+// Chama parcelamento quando muda a variante
 $(".block-swatch__radio").change(function () {
   setTimeout(function () { parcelamento(); }, 150);
+});
+
+// Chama parcelamento quando o evento variant:changed é disparado
+document.addEventListener('variant:changed', function(event) {
+  console.log('Variante mudou:', event.detail.variant);
+  
+  // Atualiza o preço no window.theme.product
+  if (event.detail.variant && event.detail.variant.price) {
+    if (!window.theme) window.theme = {};
+    if (!window.theme.product) window.theme.product = {};
+    window.theme.product.price = event.detail.variant.price;
+    console.log('Preço atualizado para:', event.detail.variant.price);
+  }
+  
+  setTimeout(function() { 
+    parcelamento(); 
+  }, 150);
 });
 
 // Funcionalidade do popup de aviso do carrinho

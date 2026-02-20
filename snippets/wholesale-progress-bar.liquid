@@ -1,0 +1,101 @@
+{% if settings.enable_wholesale_discount and settings.wholesale_show_progress_bar %}
+<div id="wholesale-progress-container" style="display: none; margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+  <div id="wholesale-message" style="margin-bottom: 10px; font-weight: 600; font-size: 14px; text-align: center;"></div>
+  
+  <div style="position: relative; height: 30px; background: #e0e0e0; border-radius: 15px; overflow: hidden;">
+    <div id="wholesale-progress-fill" style="height: 100%; background: {{ settings.wholesale_progress_color | default: '#00d864' }}; border-radius: 15px; transition: width 0.3s ease; width: 0%; display: flex; align-items: center; justify-content: center;">
+      <span id="wholesale-progress-text" style="color: white; font-weight: bold; font-size: 12px; position: absolute; left: 50%; transform: translateX(-50%);"></span>
+    </div>
+  </div>
+  
+  <div id="wholesale-discount-info" style="margin-top: 10px; text-align: center; font-size: 12px; color: #666;"></div>
+</div>
+
+<style>
+  #wholesale-progress-container.complete {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border: 2px solid {{ settings.wholesale_progress_color | default: '#00d864' }};
+  }
+  
+  #wholesale-progress-container.complete #wholesale-message {
+    color: {{ settings.wholesale_progress_color | default: '#00d864' }};
+    font-size: 16px;
+  }
+</style>
+
+<script>
+(function() {
+  'use strict';
+  
+  function updateWholesaleProgress() {
+    if (!window.theme || !window.theme.wholesale || !window.theme.wholesale.enabled) {
+      return;
+    }
+    
+    var container = document.getElementById('wholesale-progress-container');
+    if (!container) return;
+    
+    var config = window.theme.wholesale;
+    var minQty = parseInt(config.minQuantity) || 5;
+    var discount = parseInt(config.discountPercent) || 50;
+    
+    // Pega quantidade total de itens no carrinho
+    var totalItems = window.theme.cartCount || 0;
+    
+    console.log('Atacado - Total itens:', totalItems, 'Mínimo:', minQty);
+    
+    if (totalItems === 0) {
+      container.style.display = 'none';
+      return;
+    }
+    
+    container.style.display = 'block';
+    
+    var progressFill = document.getElementById('wholesale-progress-fill');
+    var progressText = document.getElementById('wholesale-progress-text');
+    var message = document.getElementById('wholesale-message');
+    var discountInfo = document.getElementById('wholesale-discount-info');
+    
+    var percentage = Math.min((totalItems / minQty) * 100, 100);
+    var remaining = Math.max(minQty - totalItems, 0);
+    
+    progressFill.style.width = percentage + '%';
+    progressText.textContent = totalItems + ' / ' + minQty + ' itens';
+    
+    if (totalItems >= minQty) {
+      // Atingiu o mínimo
+      container.classList.add('complete');
+      var msgComplete = config.messageComplete.replace('{discount}', discount);
+      message.innerHTML = msgComplete;
+      discountInfo.innerHTML = '<strong>Desconto de ' + discount + '% aplicado!</strong>';
+    } else {
+      // Ainda não atingiu
+      container.classList.remove('complete');
+      var msgIncomplete = config.messageIncomplete
+        .replace('{remaining}', remaining)
+        .replace('{min}', minQty)
+        .replace('{discount}', discount);
+      message.innerHTML = msgIncomplete;
+      discountInfo.innerHTML = 'Faltam apenas ' + remaining + ' itens para ganhar ' + discount + '% de desconto!';
+    }
+  }
+  
+  // Atualiza quando a página carrega
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateWholesaleProgress);
+  } else {
+    updateWholesaleProgress();
+  }
+  
+  // Atualiza quando o carrinho muda
+  document.addEventListener('cart:refresh', updateWholesaleProgress);
+  document.addEventListener('product:added', function() {
+    setTimeout(updateWholesaleProgress, 500);
+  });
+  
+  // Atualiza a cada 2 segundos (fallback)
+  setInterval(updateWholesaleProgress, 2000);
+  
+})();
+</script>
+{% endif %}

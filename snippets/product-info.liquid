@@ -641,6 +641,23 @@
              {% endif %}
             {% endif %}
             
+            <script>
+              (function() {
+                if (!window.theme) window.theme = {};
+                window.theme.product = {
+                  id: {{ product.id | json }},
+                  price: {{ selected_variant.price | json }},
+                  collections: [
+                    {%- for collection in product.collections -%}
+                      {{ collection.handle | json }}{% unless forloop.last %},{% endunless %}
+                    {%- endfor -%}
+                  ]
+                };
+                console.log('Produto:', window.theme.product.id);
+                console.log('Coleções:', window.theme.product.collections);
+              })();
+            </script>
+            
             {% comment %} Frete Grátis Personalizado {% endcomment %}
             {% render 'free-shipping-badge', product: product, context: 'product' %}
               

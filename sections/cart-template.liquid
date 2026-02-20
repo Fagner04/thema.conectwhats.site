@@ -30,6 +30,9 @@
     <div class="container">
         <header class="page__header page__header--stack">
           <h1 class="page__title heading h1">{{ 'cart.general.title' | t }}</h1>
+          
+          {% render 'atacado-progress' %}
+          
           <!-- <h1 class="page__title heading h4">Obs; Cupom não funciona para produtos ja com desconto em ofertas, <br> ☺️ CUPOM <B> EMPORIO10</B></h1> -->
           {%- if settings.cart_show_free_shipping_threshold -%}
             {%- assign threshold_in_cents = settings.cart_free_shipping_threshold | times: 100 -%}
@@ -399,8 +402,20 @@
 
                     <div class="cart-recap__price-line text--pull">
                       <span class="cart-recap__price-line-label">{{ 'cart.general.total' | t }}</span>
-                      <span class="cart-recap__price-line-price">{{ cart.total_price | money }}</span>
+                      <span class="cart-recap__price-line-price" id="cart-total-original">{{ cart.total_price | money }}</span>
                     </div>
+                    
+                    {% if settings.atacado_enabled %}
+                    <div id="atacado-discount-line" class="cart-recap__price-line cart-recap__price-line--highlight text--pull" style="display: none;">
+                      <span class="cart-recap__price-line-label">Desconto Atacado (<span id="atacado-percent">50</span>%)</span>
+                      <span class="cart-recap__price-line-price" id="atacado-discount-value" style="color: #00d864;">-R$ 0,00</span>
+                    </div>
+                    
+                    <div id="atacado-total-line" class="cart-recap__price-line text--pull" style="display: none; font-size: 1.2em; font-weight: bold;">
+                      <span class="cart-recap__price-line-label">Total com Desconto</span>
+                      <span class="cart-recap__price-line-price" id="atacado-total-final" style="color: #00d864;">R$ 0,00</span>
+                    </div>
+                    {% endif %}
 
                     {%- comment -%}
                     To calculate the total discount, we take into account the Shopify Script (for Plus merchants), but we also add the compare at price as

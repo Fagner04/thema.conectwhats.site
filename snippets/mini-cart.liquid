@@ -19,6 +19,8 @@
 
   {%- if cart.item_count == 0 -%}
     <div class="mini-cart__content mini-cart__content--empty">
+      {% render 'atacado-progress' %}
+      
       {%- if shipping_alert != blank -%}
         {{- shipping_alert -}}
       {%- endif -%}
@@ -33,6 +35,8 @@
   {%- else -%}
     <div class="mini-cart__inner">
       <div class="mini-cart__content">
+        {% render 'atacado-progress' %}
+        
         {%- if shipping_alert != blank -%}
           <div class="mini-cart__alert-wrapper">
             {{- shipping_alert -}}

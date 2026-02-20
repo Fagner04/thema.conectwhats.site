@@ -1,0 +1,186 @@
+{% comment %}
+  Sistema de Desconto por Atacado
+  Configuravel via: Configuracoes do tema > Desconto Atacado
+{% endcomment %}
+
+{% if settings.atacado_enabled %}
+<div id="atacado-progress" style="display: none; margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 8px;">
+  <div id="atacado-message" style="margin-bottom: 10px; font-weight: 600; font-size: 14px; text-align: center; color: #333;"></div>
+  
+  <div style="position: relative; height: 30px; background: #e0e0e0; border-radius: 15px; overflow: hidden;">
+    <div id="atacado-fill" style="height: 100%; background: {{ settings.atacado_color | default: '#00d864' }}; border-radius: 15px; transition: width 0.3s ease; width: 0%; display: flex; align-items: center; justify-content: center;">
+      <span id="atacado-text" style="color: white; font-weight: bold; font-size: 12px; position: absolute; left: 50%; transform: translateX(-50%); z-index: 2;"></span>
+    </div>
+  </div>
+  
+  <div id="atacado-info" style="margin-top: 10px; text-align: center; font-size: 12px; color: #666;"></div>
+</div>
+
+<style>
+  #atacado-progress.complete {
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    border: 2px solid {{ settings.atacado_color | default: '#00d864' }};
+  }
+  
+  #atacado-progress.complete #atacado-message {
+    color: {{ settings.atacado_color | default: '#00d864' }};
+    font-size: 16px;
+  }
+</style>
+
+<script>
+(function() {
+  'use strict';
+  
+  // Configuracoes do painel
+  var CONFIG = {
+    minQuantity: {{ settings.atacado_min_qty | default: 5 }},
+    discountPercent: {{ settings.atacado_discount | default: 50 }},
+    enabled: true
+  };
+  
+  function updateAtacadoProgress() {
+    if (!CONFIG.enabled) return;
+    
+    var container = document.getElementById('atacado-progress');
+    if (!container) return;
+    
+    // Pega quantidade total de itens no carrinho
+    var totalItems = 0;
+    var cartForm = document.querySelector('form[action*="cart"]');
+    
+    if (cartForm) {
+      var qtyInputs = cartForm.querySelectorAll('input[name*="quantity"], input.quantity-selector__value');
+      qtyInputs.forEach(function(input) {
+        var qty = parseInt(input.value) || 0;
+        totalItems += qty;
+      });
+    }
+    
+    // Fallback: usa window.theme.cartCount
+    if (totalItems === 0 && window.theme && window.theme.cartCount) {
+      totalItems = window.theme.cartCount;
+    }
+    
+    console.log('Atacado - Total itens:', totalItems, 'Minimo:', CONFIG.minQuantity);
+    
+    if (totalItems === 0) {
+      container.style.display = 'none';
+      hideDiscountLines();
+      return;
+    }
+    
+    container.style.display = 'block';
+    
+    var fill = document.getElementById('atacado-fill');
+    var text = document.getElementById('atacado-text');
+    var message = document.getElementById('atacado-message');
+    var info = document.getElementById('atacado-info');
+    
+    var percentage = Math.min((totalItems / CONFIG.minQuantity) * 100, 100);
+    var remaining = Math.max(CONFIG.minQuantity - totalItems, 0);
+    
+    fill.style.width = percentage + '%';
+    text.textContent = totalItems + ' / ' + CONFIG.minQuantity + ' itens';
+    
+    if (totalItems >= CONFIG.minQuantity) {
+      // Atingiu o minimo - APLICA DESCONTO
+      container.classList.add('complete');
+      message.innerHTML = 'Parabens! Voce ganhou ' + CONFIG.discountPercent + '% de desconto no atacado!';
+      info.innerHTML = '<strong>Desconto de ' + CONFIG.discountPercent + '% aplicado!</strong>';
+      
+      // Calcula e mostra o desconto
+      calculateAndShowDiscount(CONFIG.discountPercent);
+    } else {
+      // Ainda nao atingiu
+      container.classList.remove('complete');
+      message.innerHTML = 'Adicione mais ' + remaining + ' itens e ganhe ' + CONFIG.discountPercent + '% de desconto!';
+      info.innerHTML = 'Faltam apenas ' + remaining + ' itens para ganhar ' + CONFIG.discountPercent + '% de desconto!';
+      
+      // Esconde o desconto
+      hideDiscountLines();
+    }
+  }
+  
+  function calculateAndShowDiscount(discountPercent) {
+    var totalElement = document.getElementById('cart-total-original');
+    if (!totalElement) return;
+    
+    // Pega o valor total do carrinho
+    var totalText = totalElement.textContent.replace('R$', '').replace(/\s/g, '').replace('.', '').replace(',', '.');
+    var totalValue = parseFloat(totalText);
+    
+    if (isNaN(totalValue)) return;
+    
+    // Calcula o desconto
+    var discountValue = totalValue * (discountPercent / 100);
+    var finalValue = totalValue - discountValue;
+    
+    // Formata os valores
+    var discountFormatted = 'R$ ' + discountValue.toFixed(2).replace('.', ',');
+    var finalFormatted = 'R$ ' + finalValue.toFixed(2).replace('.', ',');
+    
+    // Atualiza os elementos
+    var discountLine = document.getElementById('atacado-discount-line');
+    var totalLine = document.getElementById('atacado-total-line');
+    var percentSpan = document.getElementById('atacado-percent');
+    var discountValueSpan = document.getElementById('atacado-discount-value');
+    var finalValueSpan = document.getElementById('atacado-total-final');
+    
+    if (discountLine && totalLine) {
+      percentSpan.textContent = discountPercent;
+      discountValueSpan.textContent = '-' + discountFormatted;
+      finalValueSpan.textContent = finalFormatted;
+      
+      discountLine.style.display = 'flex';
+      totalLine.style.display = 'flex';
+    }
+  }
+  
+  function hideDiscountLines() {
+    var discountLine = document.getElementById('atacado-discount-line');
+    var totalLine = document.getElementById('atacado-total-line');
+    
+    if (discountLine) discountLine.style.display = 'none';
+    if (totalLine) totalLine.style.display = 'none';
+  }
+  
+  // Atualiza quando a pagina carrega
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', updateAtacadoProgress);
+  } else {
+    setTimeout(updateAtacadoProgress, 500);
+  }
+  
+  // Atualiza quando o carrinho muda
+  document.addEventListener('cart:refresh', function() {
+    setTimeout(updateAtacadoProgress, 300);
+  });
+  
+  document.addEventListener('product:added', function() {
+    setTimeout(updateAtacadoProgress, 500);
+  });
+  
+  // Observa mudancas nos inputs de quantidade
+  var observer = new MutationObserver(function() {
+    updateAtacadoProgress();
+  });
+  
+  setTimeout(function() {
+    var cartForm = document.querySelector('form[action*="cart"]');
+    if (cartForm) {
+      observer.observe(cartForm, { 
+        childList: true, 
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['value']
+      });
+    }
+  }, 1000);
+  
+  // Atualiza a cada 3 segundos (fallback)
+  setInterval(updateAtacadoProgress, 3000);
+  
+})();
+</script>
+{% endif %}
