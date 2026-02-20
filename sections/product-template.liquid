@@ -376,7 +376,7 @@
                 </div>
                 
                 {%- comment -%}Calculadora de frete via planilha Google Sheets{%- endcomment -%}
-                {% render 'frete-planilha' %}
+                {% render 'frete-planilha', peso: product.weight, valor: product.price %}
 
                 {%- if section.settings.show_refunds_policy and shop.refund_policy != blank -%}
                   <div class="card__section card__section--tight">

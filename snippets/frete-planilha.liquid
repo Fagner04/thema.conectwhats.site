@@ -1,11 +1,18 @@
 {% comment %}
-  Snippet: Cálculo de Frete via Google Sheets
+  Snippet: Cálculo de Frete via Google Sheets ou API dos Correios
   
   Como usar:
   {% render 'frete-planilha' %}
+  
+  Com peso e valor do produto:
+  {% render 'frete-planilha', peso: product.weight, valor: product.price %}
 {% endcomment %}
 
 {% if settings.sheets_frete_enable and settings.sheets_frete_url != blank %}
+
+{%- assign produto_peso = peso | default: 1 -%}
+{%- assign produto_valor = valor | default: 0 -%}
+
 <style>
 .frete-planilha-container {
   margin: 15px 0;
@@ -128,6 +135,8 @@
 <script>
 (function() {
   const SHEETS_API_URL = {{ settings.sheets_frete_url | json }};
+  const PRODUTO_PESO = {{ produto_peso | json }};
+  const PRODUTO_VALOR = {{ produto_valor | divided_by: 100.0 | json }};
   
   const cepInput = document.getElementById('frete-planilha-cep');
   const calcularBtn = document.getElementById('frete-planilha-calcular');
@@ -167,7 +176,16 @@
     resultsDiv.innerHTML = '<div class="frete-planilha-loading">Consultando opções de frete...</div>';
     resultsDiv.classList.add('show');
     
-    fetch(SHEETS_API_URL + '?cep=' + cep)
+    // Montar URL com parâmetros
+    let url = SHEETS_API_URL + '?cep=' + cep;
+    if (PRODUTO_PESO > 0) {
+      url += '&peso=' + PRODUTO_PESO;
+    }
+    if (PRODUTO_VALOR > 0) {
+      url += '&valor=' + PRODUTO_VALOR;
+    }
+    
+    fetch(url)
       .then(response => response.json())
       .then(data => {
         if (data.error) {
