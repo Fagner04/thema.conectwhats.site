@@ -86,6 +86,7 @@
     "correios_codigo_administrativo": "22294287",
     "correios_cartao_postagem": "0077411030",
     "correios_cep_origem": "74550050",
+    "correios_api_token": "DNSn5cCfYG5Xd9qlMofFivcQFhHEGLSRmoQIeeCT",
     "ali_hunter_enable": true,
     "botao_direito_enable": false,
     "selecionar_conteudo_enable": false,
