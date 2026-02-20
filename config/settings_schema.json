@@ -775,29 +775,34 @@
         "max": 12,
         "step": 1,
         "default": 12
-      },
+      }
+    ]
+  },
+  {
+    "name": "Parcelamento Promocional",
+    "settings": [
       {
-        "type": "header",
-        "content": "Parcelamento por Categoria"
+        "type": "paragraph",
+        "content": "Configure parcelas diferentes para produtos de coleções específicas. Exemplo: produtos da coleção 'promocao' podem ter 3x sem juros."
       },
       {
         "type": "checkbox",
         "id": "enable_category_installments",
-        "label": "Ativar parcelamento especial por categoria",
-        "info": "Permite configurar parcelas diferentes para categorias específicas",
-        "default": false
+        "label": "Ativar parcelamento especial",
+        "info": "Ativa o sistema de parcelamento por categoria",
+        "default": true
       },
       {
         "type": "text",
         "id": "promo_collections",
-        "label": "Coleções promocionais",
-        "info": "Digite os handles das coleções separados por vírgula (ex: promocao,outlet,liquidacao)",
-        "default": ""
+        "label": "Handles das coleções (separados por vírgula)",
+        "info": "Exemplo: promocao,outlet,liquidacao",
+        "default": "promocao,outlet,liquidacao,black-friday,oferta"
       },
       {
         "type": "range",
         "id": "promo_qty_vezes",
-        "label": "Parcelas para categorias promocionais",
+        "label": "Número de parcelas",
         "min": 1,
         "max": 12,
         "step": 1,
@@ -806,19 +811,19 @@
       {
         "type": "select",
         "id": "promo_mostrar_parcelascomo",
-        "label": "Informar juros nas parcelas promocionais",
+        "label": "Exibição de juros",
         "options": [
           {
             "value": "info_juros",
-            "label": "Informar juros"
+            "label": "Mostrar 'com juros'"
           },
           {
             "value": "info_sem_juros",
-            "label": "Informar sem juros"
+            "label": "Mostrar 'sem juros'"
           },
           {
             "value": "no_info_juros",
-            "label": "Ocultar juros"
+            "label": "Não mostrar informação"
           }
         ],
         "default": "info_sem_juros"
@@ -826,8 +831,8 @@
       {
         "type": "text",
         "id": "promo_porcentagem_de_juros",
-        "label": "Porcentagem de juros para categorias promocionais",
-        "info": "Digite 1 para sem juros ou o multiplicador desejado",
+        "label": "Taxa de juros",
+        "info": "Digite 1 para sem juros",
         "default": "1"
       }
     ]

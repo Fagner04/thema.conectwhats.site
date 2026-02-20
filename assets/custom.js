@@ -74,10 +74,25 @@ function parcelamento() {
   var displayMode = window.theme.installments.displayMode || 'info_sem_juros';
   
   // VERIFICA SE É CATEGORIA PROMOCIONAL
-  // Lista de coleções que terão 3x sem juros (handles em minúsculas)
-  var colecoesProm = ['promocao', 'outlet', 'liquidacao', 'black-friday', 'oferta'];
+  var colecoesProm = [];
+  var usarSistemaCategoria = false;
   
-  if (window.theme.product && window.theme.product.collections) {
+  // Verifica se tem configurações do painel
+  if (window.theme.installments.categoryEnabled && window.theme.installments.promoCollections) {
+    // Usa configurações do painel
+    colecoesProm = window.theme.installments.promoCollections.split(',').map(function(c) { 
+      return c.trim().toLowerCase(); 
+    });
+    usarSistemaCategoria = true;
+    console.log('Usando configurações do painel:', colecoesProm);
+  } else {
+    // Usa lista padrão hardcoded
+    colecoesProm = ['promocao', 'outlet', 'liquidacao', 'black-friday', 'oferta'];
+    usarSistemaCategoria = true;
+    console.log('Usando lista padrão:', colecoesProm);
+  }
+  
+  if (usarSistemaCategoria && window.theme.product && window.theme.product.collections) {
     var produtoColecoes = window.theme.product.collections.map(function(c) { 
       return c.toLowerCase(); 
     });
@@ -87,10 +102,21 @@ function parcelamento() {
     });
     
     if (isPromo) {
-      console.log('✅ PRODUTO EM PROMOÇÃO - Aplicando 3x sem juros');
-      qtdParcelas = 3;
-      percentualJuros = 1;
-      displayMode = 'info_sem_juros';
+      console.log('✅ PRODUTO EM PROMOÇÃO');
+      
+      // Usa configurações do painel se disponíveis
+      if (window.theme.installments.promoMaxInstallments) {
+        qtdParcelas = parseInt(window.theme.installments.promoMaxInstallments);
+        percentualJuros = parseFloat(window.theme.installments.promoInterestRate) || 1;
+        displayMode = window.theme.installments.promoDisplayMode || 'info_sem_juros';
+        console.log('Configurações do painel - Parcelas:', qtdParcelas);
+      } else {
+        // Usa padrão: 3x sem juros
+        qtdParcelas = 3;
+        percentualJuros = 1;
+        displayMode = 'info_sem_juros';
+        console.log('Configurações padrão - 3x sem juros');
+      }
     } else {
       console.log('Produto normal - usando configuração padrão');
     }
