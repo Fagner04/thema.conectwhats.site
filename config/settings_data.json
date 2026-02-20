@@ -80,6 +80,7 @@
     "show_inventory_quantity": true,
     "low_inventory_threshold": 0,
     "show_reviews_badge": false,
+    "shipping_calculator_type": "correios_api",
     "correios_api_enable": true,
     "correios_usuario": "45688532000100",
     "correios_senha": "Repezza44@",
@@ -606,7 +607,7 @@
           "show_reviews_badge": false,
           "trust_title": "Pagamento Seguro",
           "show_payment_icons": true,
-          "show_shipping_estimator": false,
+          "show_shipping_estimator": true,
           "shipping_estimator_default_country": "Brasil",
           "show_refunds_policy": false
         }
