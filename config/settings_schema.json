@@ -838,11 +838,11 @@
     ]
   },
   {
-    "name": "Desconto Atacado",
+    "name": "💰 Desconto Atacado",
     "settings": [
       {
         "type": "paragraph",
-        "content": "Configure descontos automáticos por quantidade. Exemplo: compre 5 ou mais itens e ganhe 50% de desconto."
+        "content": "⚡ Configure descontos automáticos por quantidade. Exemplo: compre 5 ou mais itens e ganhe 50% de desconto."
       },
       {
         "type": "checkbox",
