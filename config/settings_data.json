@@ -552,7 +552,7 @@
           "btn-suspenso-flut": true,
           "show_quantity_selector": true,
           "title_variants_image": "color,colour,couleur,cor,cores,colore,farbe,색,色,カラー,färg,farve,opção,opções,quantidade,quantidades,dias,uso,tipo,tipos,modelo,modelos,material,materiais,unidade,ubos,combonidades,com,pacote,pacotes",
-          "mostrar_btn_wtspp": true,
+          "mostrar_btn_wtspp": false,
           "background_whatsapp_btn": "#ffffff",
           "txt_whatsapp_btn": "#0fb930",
           "wtspp_text": "Precisa de ajuda  clica aqui!",
