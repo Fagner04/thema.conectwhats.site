@@ -87,6 +87,8 @@
     "mostrar_parcelascomo": "info_sem_juros",
     "porcentagem_de_juros": "1",
     "qty_vezes": 6,
+    "enable_category_installments": true,
+    "promo_qty_vezes": 3,
     "addzap": false,
     "numberzap": "https://wa.me/message/AYJ45IUBHN64E1",
     "zap_icon_type": "original",
