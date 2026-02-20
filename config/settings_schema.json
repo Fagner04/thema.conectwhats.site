@@ -838,11 +838,11 @@
     ]
   },
   {
-    "name": "💰 Desconto Atacado",
+    "name": "Desconto Atacado",
     "settings": [
       {
         "type": "paragraph",
-        "content": "⚡ Configure descontos automáticos por quantidade. Exemplo: compre 5 ou mais itens e ganhe 50% de desconto."
+        "content": "Configure descontos automaticos por quantidade. Exemplo: compre 5 ou mais itens e ganhe 50% de desconto."
       },
       {
         "type": "checkbox",
@@ -894,9 +894,9 @@
       {
         "type": "text",
         "id": "wholesale_message_complete",
-        "label": "Mensagem quando atingiu o mínimo",
+        "label": "Mensagem quando atingiu o minimo",
         "info": "Use {discount} para mostrar a porcentagem",
-        "default": "🎉 Parabéns! Você ganhou {discount}% de desconto no atacado!"
+        "default": "Parabens! Voce ganhou {discount}% de desconto no atacado!"
       },
       {
         "type": "text",
