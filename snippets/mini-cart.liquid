@@ -16,9 +16,17 @@
       {%- endif -%}
     {%- endif -%}
   {%- endcapture -%}
+  
+  {%- capture wholesale_bar -%}
+    {% render 'wholesale-progress-bar' %}
+  {%- endcapture -%}
 
   {%- if cart.item_count == 0 -%}
     <div class="mini-cart__content mini-cart__content--empty">
+      {%- if wholesale_bar != blank -%}
+        {{- wholesale_bar -}}
+      {%- endif -%}
+      
       {%- if shipping_alert != blank -%}
         {{- shipping_alert -}}
       {%- endif -%}
@@ -33,6 +41,12 @@
   {%- else -%}
     <div class="mini-cart__inner">
       <div class="mini-cart__content">
+        {%- if wholesale_bar != blank -%}
+          <div class="mini-cart__wholesale-wrapper">
+            {{- wholesale_bar -}}
+          </div>
+        {%- endif -%}
+        
         {%- if shipping_alert != blank -%}
           <div class="mini-cart__alert-wrapper">
             {{- shipping_alert -}}

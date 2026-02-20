@@ -838,6 +838,76 @@
     ]
   },
   {
+    "name": "Desconto Atacado",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Configure descontos automáticos por quantidade. Exemplo: compre 5 ou mais itens e ganhe 50% de desconto."
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_wholesale_discount",
+        "label": "Ativar desconto por atacado",
+        "info": "Aplica desconto automático quando atingir quantidade mínima",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "wholesale_min_quantity",
+        "label": "Quantidade mínima para atacado",
+        "min": 2,
+        "max": 50,
+        "step": 1,
+        "default": 5,
+        "info": "Número mínimo de itens no carrinho para ativar o desconto"
+      },
+      {
+        "type": "range",
+        "id": "wholesale_discount_percent",
+        "label": "Porcentagem de desconto (%)",
+        "min": 5,
+        "max": 90,
+        "step": 5,
+        "default": 50,
+        "info": "Desconto aplicado quando atingir a quantidade mínima"
+      },
+      {
+        "type": "checkbox",
+        "id": "wholesale_show_progress_bar",
+        "label": "Mostrar barra de progresso no carrinho",
+        "info": "Exibe uma barra mostrando quantos itens faltam para o desconto",
+        "default": true
+      },
+      {
+        "type": "color",
+        "id": "wholesale_progress_color",
+        "label": "Cor da barra de progresso",
+        "default": "#00d864"
+      },
+      {
+        "type": "text",
+        "id": "wholesale_message_incomplete",
+        "label": "Mensagem quando não atingiu o mínimo",
+        "info": "Use {remaining} para mostrar quantos faltam e {min} para o mínimo",
+        "default": "Adicione mais {remaining} itens e ganhe {discount}% de desconto!"
+      },
+      {
+        "type": "text",
+        "id": "wholesale_message_complete",
+        "label": "Mensagem quando atingiu o mínimo",
+        "info": "Use {discount} para mostrar a porcentagem",
+        "default": "🎉 Parabéns! Você ganhou {discount}% de desconto no atacado!"
+      },
+      {
+        "type": "text",
+        "id": "wholesale_collections",
+        "label": "Coleções elegíveis (opcional)",
+        "info": "Deixe vazio para aplicar em todos os produtos. Ou digite handles separados por vírgula",
+        "default": ""
+      }
+    ]
+  },
+  {
     "name": "Whatsapp",
     "settings": [
       {
