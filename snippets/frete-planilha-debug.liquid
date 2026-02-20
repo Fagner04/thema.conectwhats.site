@@ -1,0 +1,33 @@
+{% comment %}
+  DEBUG: Verificar configurações do frete
+{% endcomment %}
+
+<div style="background: #fff3cd; border: 2px solid #ffc107; padding: 15px; margin: 20px 0; border-radius: 8px;">
+  <h3 style="margin-top: 0; color: #856404;">🔍 DEBUG - Configurações de Frete</h3>
+  
+  <p><strong>sheets_frete_enable:</strong> {{ settings.sheets_frete_enable }}</p>
+  <p><strong>sheets_frete_url:</strong> {{ settings.sheets_frete_url }}</p>
+  
+  {% if settings.sheets_frete_enable %}
+    <p style="color: green;">✅ Frete via planilha está ATIVADO</p>
+  {% else %}
+    <p style="color: red;">❌ Frete via planilha está DESATIVADO</p>
+    <p style="font-size: 12px;">Vá em: Temas > Personalizar > Configurações > Cálculo de Frete > Marque "Ativar cálculo de frete via planilha"</p>
+  {% endif %}
+  
+  {% if settings.sheets_frete_url != blank %}
+    <p style="color: green;">✅ URL da API está configurada</p>
+  {% else %}
+    <p style="color: red;">❌ URL da API está VAZIA</p>
+    <p style="font-size: 12px;">Vá em: Temas > Personalizar > Configurações > Cálculo de Frete > Cole a URL do Google Apps Script</p>
+  {% endif %}
+  
+  {% if settings.sheets_frete_enable and settings.sheets_frete_url != blank %}
+    <p style="color: green; font-weight: bold;">✅ TUDO CONFIGURADO! O calculador deve aparecer abaixo:</p>
+  {% else %}
+    <p style="color: red; font-weight: bold;">❌ Configure as opções acima para o calculador aparecer</p>
+  {% endif %}
+</div>
+
+{% comment %}Renderizar o calculador normal{% endcomment %}
+{% render 'frete-planilha', peso: product.weight, valor: product.price %}
