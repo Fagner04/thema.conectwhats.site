@@ -88,7 +88,7 @@
     "correios_cep_origem": "74550050",
     "correios_api_token": "DNSn5cCfYG5Xd9qlMofFivcQFhHEGLSRmoQIeeCT",
     "sheets_frete_enable": true,
-    "sheets_frete_url": "https://docs.google.com/spreadsheets/d/1ay0RjoBKaa6cPfV_O-Bbvu8jlSH0yNrwU9VPhcKjjrY/edit?usp=sharing",
+    "sheets_frete_url": "https://script.google.com/macros/s/AKfycbzAazkp4r-ZvJuvC0cu1cn2i04ML6hbKRjiD1AtJEk228VdEvD1qFv22gD0ueNdB_Sf_g/exec",
     "ali_hunter_enable": true,
     "botao_direito_enable": false,
     "selecionar_conteudo_enable": false,
