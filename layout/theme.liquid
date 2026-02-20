@@ -142,7 +142,12 @@
           show: {% if settings.show_parcelamento %}true{% else %}false{% endif %},
           maxInstallments: {{ settings.qty_vezes | json }},
           interestRate: {{ settings.porcentagem_de_juros | json }},
-          displayMode: {{ settings.mostrar_parcelascomo | json }}
+          displayMode: {{ settings.mostrar_parcelascomo | json }},
+          categoryEnabled: {% if settings.enable_category_installments %}true{% else %}false{% endif %},
+          promoCollections: {{ settings.promo_collections | json }},
+          promoMaxInstallments: {{ settings.promo_qty_vezes | json }},
+          promoInterestRate: {{ settings.promo_porcentagem_de_juros | json }},
+          promoDisplayMode: {{ settings.promo_mostrar_parcelascomo | json }}
         },
         freeShipping: {
           enabled: {% if settings.free_shipping_enable %}true{% else %}false{% endif %},

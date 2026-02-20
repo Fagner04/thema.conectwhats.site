@@ -641,6 +641,18 @@
              {% endif %}
             {% endif %}
             
+            <script>
+              // Adiciona informações do produto para parcelamento por categoria
+              if (!window.theme) window.theme = {};
+              window.theme.product = {
+                collections: [
+                  {%- for collection in product.collections -%}
+                    {{ collection.handle | json }}{% unless forloop.last %},{% endunless %}
+                  {%- endfor -%}
+                ]
+              };
+            </script>
+            
             {% comment %} Frete Grátis Personalizado {% endcomment %}
             {% render 'free-shipping-badge', product: product, context: 'product' %}
               

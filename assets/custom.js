@@ -70,10 +70,38 @@ function parcelamento() {
     return;
   }
   
-  // Pega as configurações do tema
+  // Verifica se o produto está em uma categoria promocional
+  var isPromoCategory = false;
   var qtdParcelas = parseInt(window.theme.installments.maxInstallments) || 4;
   var percentualJuros = parseFloat(window.theme.installments.interestRate) || 1;
   var displayMode = window.theme.installments.displayMode || 'no_info_juros';
+  
+  // Verifica configurações de categoria promocional
+  if (window.theme.installments.categoryEnabled && 
+      window.theme.installments.promoCollections && 
+      window.theme.product && 
+      window.theme.product.collections) {
+    
+    var promoCollections = window.theme.installments.promoCollections.split(',').map(function(c) { 
+      return c.trim().toLowerCase(); 
+    });
+    
+    var productCollections = window.theme.product.collections.map(function(c) { 
+      return c.toLowerCase(); 
+    });
+    
+    // Verifica se alguma coleção do produto está na lista de promoções
+    isPromoCategory = promoCollections.some(function(promo) {
+      return productCollections.indexOf(promo) !== -1;
+    });
+    
+    // Se for categoria promocional, usa as configurações específicas
+    if (isPromoCategory) {
+      qtdParcelas = parseInt(window.theme.installments.promoMaxInstallments) || 3;
+      percentualJuros = parseFloat(window.theme.installments.promoInterestRate) || 1;
+      displayMode = window.theme.installments.promoDisplayMode || 'info_sem_juros';
+    }
+  }
   
   // Validações adicionais
   if (qtdParcelas <= 0) qtdParcelas = 1;
