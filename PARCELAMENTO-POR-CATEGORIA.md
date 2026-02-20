@@ -98,6 +98,7 @@ Todos os produtos dessas 4 coleções terão o parcelamento promocional.
 2. Pressione **F12** para abrir o Console do navegador
 3. Procure por mensagens começando com `===`
 4. Você verá informações detalhadas sobre:
+   - Qual método conseguiu detectar o preço
    - Se o parcelamento está ativado
    - Quais coleções o produto pertence
    - Se o produto está em categoria promocional
@@ -105,10 +106,18 @@ Todos os produtos dessas 4 coleções terão o parcelamento promocional.
 
 ### Problemas Comuns
 
-#### O parcelamento não aparece
-- Verifique se "Mostrar parcelamento" está ativado nas configurações
-- Abra o Console (F12) e veja se há erros
-- Verifique se o elemento `.parcelamento-style` existe na página
+#### O parcelamento não aparece (Preço NaN)
+Este é o erro mais comum. O sistema tenta 4 métodos diferentes para detectar o preço:
+
+1. **Método 1**: Busca em `window.theme.product.price` (mais confiável)
+2. **Método 2**: Busca no elemento `.price--highlight`
+3. **Método 3**: Busca em elementos com classe `.price`
+4. **Método 4**: Busca qualquer texto que pareça "R$ XX,XX"
+
+**Solução**: 
+- Verifique no Console qual método está funcionando
+- Se nenhum funcionar, me envie uma captura de tela do HTML da página (aba Elements no DevTools)
+- O script mostrará exatamente onde está tentando buscar o preço
 
 #### O parcelamento promocional não funciona
 - Verifique no Console se `categoryEnabled` está `true`

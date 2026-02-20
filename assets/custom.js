@@ -47,15 +47,59 @@ if (window.matchMedia("(max-width: 768px)").matches) {
 function parcelamento() {
   console.log('=== Função parcelamento() iniciada ===');
   
-  // Atualiza labels de desconto
-  var precoText = $('.product-form__info-item .price--highlight').text().split('                  ')[0].replace('R$ ','').replace(',', '.').trim();
-  var preco = parseFloat(precoText);
+  // Tenta múltiplas formas de pegar o preço
+  var preco = 0;
+  var precoText = '';
   
-  console.log('Preço detectado:', preco);
+  // Método 1: Tenta pegar do window.theme.product (mais confiável)
+  if (window.theme && window.theme.product && window.theme.product.price) {
+    preco = parseFloat(window.theme.product.price) / 100; // Shopify retorna em centavos
+    console.log('Método 1 - Preço do window.theme.product.price:', preco);
+  }
+  
+  // Método 2: Tenta pegar do elemento .price--highlight
+  if (isNaN(preco) || preco <= 0) {
+    if ($('.product-form__info-item .price--highlight').length > 0) {
+      precoText = $('.product-form__info-item .price--highlight').text().split('                  ')[0].replace('R$ ','').replace('R$','').replace(',', '.').trim();
+      preco = parseFloat(precoText);
+      console.log('Método 2 - Preço do .price--highlight:', precoText, '=', preco);
+    }
+  }
+  
+  // Método 3: Tenta pegar de qualquer elemento com classe price
+  if (isNaN(preco) || preco <= 0) {
+    var priceElements = $('.price__current .price-item--regular, .price__current .price-item--sale, .price-item--sale, .price-item--regular');
+    if (priceElements.length > 0) {
+      precoText = priceElements.first().text().replace('R$ ','').replace('R$','').replace(',', '.').trim();
+      preco = parseFloat(precoText);
+      console.log('Método 3 - Preço de elementos .price:', precoText, '=', preco);
+    }
+  }
+  
+  // Método 4: Busca qualquer texto que pareça um preço em reais
+  if (isNaN(preco) || preco <= 0) {
+    $('.product-form__info-item, .product-meta__price').find('*').each(function() {
+      var text = $(this).text();
+      var match = text.match(/R\$\s*(\d+[.,]\d+)/);
+      if (match) {
+        precoText = match[1].replace(',', '.');
+        preco = parseFloat(precoText);
+        if (!isNaN(preco) && preco > 0) {
+          console.log('Método 4 - Preço encontrado por regex:', precoText, '=', preco);
+          return false; // Para o loop
+        }
+      }
+    });
+  }
+  
+  console.log('Preço final detectado:', preco);
   
   // Validação para evitar NaN
   if (isNaN(preco) || preco <= 0) {
-    console.warn('Preço inválido para parcelamento:', precoText);
+    console.warn('❌ Preço inválido para parcelamento. Tentou:', precoText);
+    console.log('Elementos .price--highlight encontrados:', $('.product-form__info-item .price--highlight').length);
+    console.log('Texto do elemento .price--highlight:', $('.product-form__info-item .price--highlight').text());
+    console.log('window.theme.product:', window.theme ? window.theme.product : 'window.theme não existe');
     return;
   }
   
@@ -187,6 +231,16 @@ $(".block-swatch__radio").change(function () {
 
 // Chama parcelamento quando o evento variant:changed é disparado
 document.addEventListener('variant:changed', function(event) {
+  console.log('Variante mudou:', event.detail.variant);
+  
+  // Atualiza o preço no window.theme.product
+  if (event.detail.variant && event.detail.variant.price) {
+    if (!window.theme) window.theme = {};
+    if (!window.theme.product) window.theme.product = {};
+    window.theme.product.price = event.detail.variant.price;
+    console.log('Preço atualizado para:', event.detail.variant.price);
+  }
+  
   setTimeout(function() { 
     parcelamento(); 
   }, 150);

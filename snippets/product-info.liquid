@@ -646,6 +646,8 @@
               (function() {
                 if (!window.theme) window.theme = {};
                 window.theme.product = {
+                  id: {{ product.id | json }},
+                  price: {{ selected_variant.price | json }},
                   collections: [
                     {%- for collection in product.collections -%}
                       {{ collection.handle | json }}{% unless forloop.last %},{% endunless %}
@@ -653,7 +655,10 @@
                   ]
                 };
                 
-                // Debug: mostra as coleções no console
+                // Debug: mostra as informações do produto
+                console.log('Produto ID:', window.theme.product.id);
+                console.log('Preço (centavos):', window.theme.product.price);
+                console.log('Preço (reais):', window.theme.product.price / 100);
                 console.log('Produto pertence às coleções:', window.theme.product.collections);
               })();
             </script>
