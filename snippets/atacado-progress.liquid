@@ -1,13 +1,14 @@
 {% comment %}
   Sistema de Desconto por Atacado
-  Configuração: 5 itens = 50% desconto
+  Configuravel via: Configuracoes do tema > Desconto Atacado
 {% endcomment %}
 
+{% if settings.atacado_enabled %}
 <div id="atacado-progress" style="display: none; margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 8px;">
   <div id="atacado-message" style="margin-bottom: 10px; font-weight: 600; font-size: 14px; text-align: center; color: #333;"></div>
   
   <div style="position: relative; height: 30px; background: #e0e0e0; border-radius: 15px; overflow: hidden;">
-    <div id="atacado-fill" style="height: 100%; background: #00d864; border-radius: 15px; transition: width 0.3s ease; width: 0%; display: flex; align-items: center; justify-content: center;">
+    <div id="atacado-fill" style="height: 100%; background: {{ settings.atacado_color | default: '#00d864' }}; border-radius: 15px; transition: width 0.3s ease; width: 0%; display: flex; align-items: center; justify-content: center;">
       <span id="atacado-text" style="color: white; font-weight: bold; font-size: 12px; position: absolute; left: 50%; transform: translateX(-50%); z-index: 2;"></span>
     </div>
   </div>
@@ -18,11 +19,11 @@
 <style>
   #atacado-progress.complete {
     background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-    border: 2px solid #00d864;
+    border: 2px solid {{ settings.atacado_color | default: '#00d864' }};
   }
   
   #atacado-progress.complete #atacado-message {
-    color: #00d864;
+    color: {{ settings.atacado_color | default: '#00d864' }};
     font-size: 16px;
   }
 </style>
@@ -31,11 +32,11 @@
 (function() {
   'use strict';
   
-  // CONFIGURAÇÕES (edite aqui)
+  // Configuracoes do painel
   var CONFIG = {
-    minQuantity: 5,        // Quantidade mínima de itens
-    discountPercent: 50,   // Porcentagem de desconto
-    enabled: true          // Ativar/desativar
+    minQuantity: {{ settings.atacado_min_qty | default: 5 }},
+    discountPercent: {{ settings.atacado_discount | default: 50 }},
+    enabled: true
   };
   
   function updateAtacadoProgress() {
@@ -61,7 +62,7 @@
       totalItems = window.theme.cartCount;
     }
     
-    console.log('Atacado - Total itens:', totalItems, 'Mínimo:', CONFIG.minQuantity);
+    console.log('Atacado - Total itens:', totalItems, 'Minimo:', CONFIG.minQuantity);
     
     if (totalItems === 0) {
       container.style.display = 'none';
@@ -82,19 +83,19 @@
     text.textContent = totalItems + ' / ' + CONFIG.minQuantity + ' itens';
     
     if (totalItems >= CONFIG.minQuantity) {
-      // Atingiu o mínimo
+      // Atingiu o minimo
       container.classList.add('complete');
-      message.innerHTML = '🎉 Parabéns! Você ganhou ' + CONFIG.discountPercent + '% de desconto no atacado!';
+      message.innerHTML = 'Parabens! Voce ganhou ' + CONFIG.discountPercent + '% de desconto no atacado!';
       info.innerHTML = '<strong>Desconto de ' + CONFIG.discountPercent + '% aplicado!</strong>';
     } else {
-      // Ainda não atingiu
+      // Ainda nao atingiu
       container.classList.remove('complete');
       message.innerHTML = 'Adicione mais ' + remaining + ' itens e ganhe ' + CONFIG.discountPercent + '% de desconto!';
       info.innerHTML = 'Faltam apenas ' + remaining + ' itens para ganhar ' + CONFIG.discountPercent + '% de desconto!';
     }
   }
   
-  // Atualiza quando a página carrega
+  // Atualiza quando a pagina carrega
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', updateAtacadoProgress);
   } else {
@@ -110,7 +111,7 @@
     setTimeout(updateAtacadoProgress, 500);
   });
   
-  // Observa mudanças nos inputs de quantidade
+  // Observa mudancas nos inputs de quantidade
   var observer = new MutationObserver(function() {
     updateAtacadoProgress();
   });
@@ -132,3 +133,4 @@
   
 })();
 </script>
+{% endif %}

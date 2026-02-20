@@ -838,6 +838,45 @@
     ]
   },
   {
+    "name": "Desconto Atacado",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Configure descontos automaticos por quantidade no carrinho."
+      },
+      {
+        "type": "checkbox",
+        "id": "atacado_enabled",
+        "label": "Ativar desconto por atacado",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "atacado_min_qty",
+        "label": "Quantidade minima de itens",
+        "min": 2,
+        "max": 50,
+        "step": 1,
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "atacado_discount",
+        "label": "Porcentagem de desconto",
+        "min": 5,
+        "max": 90,
+        "step": 5,
+        "default": 50
+      },
+      {
+        "type": "color",
+        "id": "atacado_color",
+        "label": "Cor da barra de progresso",
+        "default": "#00d864"
+      }
+    ]
+  },
+  {
     "name": "Whatsapp",
     "settings": [
       {
