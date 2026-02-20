@@ -2,6 +2,36 @@
 
 Este sistema permite configurar parcelas diferentes para categorias específicas da sua loja.
 
+## ⚠️ IMPORTANTE: Como ver as novas configurações
+
+Após instalar este código, você precisa:
+
+1. **Salvar o tema** no editor do Shopify
+2. **Fechar** o editor de personalização
+3. **Abrir novamente** o editor (Personalizar tema)
+4. Ir em **Configurações do tema** (ícone de engrenagem)
+5. Rolar até a seção **"Parcelamentos"**
+6. **Role para baixo** - você verá um novo cabeçalho: **"Parcelamento por Categoria"**
+
+### Se as novas opções não aparecerem:
+
+- Verifique se o arquivo `config/settings_schema.json` foi salvo corretamente
+- Tente fazer um "hard refresh" (Ctrl + Shift + R no Windows, Cmd + Shift + R no Mac)
+- Em último caso, faça upload do tema novamente
+
+### Como deve aparecer:
+
+Você verá estas novas opções abaixo das configurações normais de parcelamento:
+
+```
+📋 Parcelamento por Categoria
+├─ ☑️ Ativar parcelamento especial por categoria
+├─ 📝 Coleções promocionais (campo de texto)
+├─ 🔢 Parcelas para categorias promocionais (1-12)
+├─ 📊 Informar juros nas parcelas promocionais (dropdown)
+└─ 💯 Porcentagem de juros para categorias promocionais (campo de texto)
+```
+
 ## Como Funciona
 
 O tema agora suporta duas configurações de parcelamento:
