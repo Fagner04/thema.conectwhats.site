@@ -87,6 +87,8 @@
     "correios_cartao_postagem": "0077411030",
     "correios_cep_origem": "74550050",
     "correios_api_token": "DNSn5cCfYG5Xd9qlMofFivcQFhHEGLSRmoQIeeCT",
+    "sheets_frete_enable": true,
+    "sheets_frete_url": "https://docs.google.com/spreadsheets/d/1ay0RjoBKaa6cPfV_O-Bbvu8jlSH0yNrwU9VPhcKjjrY/edit?usp=sharing",
     "ali_hunter_enable": true,
     "botao_direito_enable": false,
     "selecionar_conteudo_enable": false,
