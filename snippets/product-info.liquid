@@ -643,14 +643,19 @@
             
             <script>
               // Adiciona informações do produto para parcelamento por categoria
-              if (!window.theme) window.theme = {};
-              window.theme.product = {
-                collections: [
-                  {%- for collection in product.collections -%}
-                    {{ collection.handle | json }}{% unless forloop.last %},{% endunless %}
-                  {%- endfor -%}
-                ]
-              };
+              (function() {
+                if (!window.theme) window.theme = {};
+                window.theme.product = {
+                  collections: [
+                    {%- for collection in product.collections -%}
+                      {{ collection.handle | json }}{% unless forloop.last %},{% endunless %}
+                    {%- endfor -%}
+                  ]
+                };
+                
+                // Debug: mostra as coleções no console
+                console.log('Produto pertence às coleções:', window.theme.product.collections);
+              })();
             </script>
             
             {% comment %} Frete Grátis Personalizado {% endcomment %}

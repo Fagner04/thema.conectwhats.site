@@ -45,9 +45,13 @@ if (window.matchMedia("(max-width: 768px)").matches) {
 } 
 
 function parcelamento() {
+  console.log('=== Função parcelamento() iniciada ===');
+  
   // Atualiza labels de desconto
   var precoText = $('.product-form__info-item .price--highlight').text().split('                  ')[0].replace('R$ ','').replace(',', '.').trim();
   var preco = parseFloat(precoText);
+  
+  console.log('Preço detectado:', preco);
   
   // Validação para evitar NaN
   if (isNaN(preco) || preco <= 0) {
@@ -67,8 +71,11 @@ function parcelamento() {
   
   // Verifica se o parcelamento está ativado
   if (!window.theme || !window.theme.installments || !window.theme.installments.show) {
+    console.warn('Parcelamento não está ativado nas configurações');
     return;
   }
+  
+  console.log('Configurações de parcelamento:', window.theme.installments);
   
   // Verifica se o produto está em uma categoria promocional
   var isPromoCategory = false;
@@ -76,11 +83,17 @@ function parcelamento() {
   var percentualJuros = parseFloat(window.theme.installments.interestRate) || 1;
   var displayMode = window.theme.installments.displayMode || 'no_info_juros';
   
+  console.log('Configurações padrão - Parcelas:', qtdParcelas, 'Juros:', percentualJuros, 'Modo:', displayMode);
+  
   // Verifica configurações de categoria promocional
   if (window.theme.installments.categoryEnabled && 
       window.theme.installments.promoCollections && 
       window.theme.product && 
       window.theme.product.collections) {
+    
+    console.log('Sistema de categoria ativado!');
+    console.log('Coleções promocionais configuradas:', window.theme.installments.promoCollections);
+    console.log('Coleções do produto:', window.theme.product.collections);
     
     var promoCollections = window.theme.installments.promoCollections.split(',').map(function(c) { 
       return c.trim().toLowerCase(); 
@@ -90,17 +103,30 @@ function parcelamento() {
       return c.toLowerCase(); 
     });
     
+    console.log('Coleções promo (processadas):', promoCollections);
+    console.log('Coleções produto (processadas):', productCollections);
+    
     // Verifica se alguma coleção do produto está na lista de promoções
     isPromoCategory = promoCollections.some(function(promo) {
       return productCollections.indexOf(promo) !== -1;
     });
+    
+    console.log('Produto está em categoria promocional?', isPromoCategory);
     
     // Se for categoria promocional, usa as configurações específicas
     if (isPromoCategory) {
       qtdParcelas = parseInt(window.theme.installments.promoMaxInstallments) || 3;
       percentualJuros = parseFloat(window.theme.installments.promoInterestRate) || 1;
       displayMode = window.theme.installments.promoDisplayMode || 'info_sem_juros';
+      
+      console.log('Usando configurações promocionais - Parcelas:', qtdParcelas, 'Juros:', percentualJuros, 'Modo:', displayMode);
     }
+  } else {
+    console.log('Sistema de categoria NÃO está ativado ou faltam dados');
+    if (!window.theme.installments.categoryEnabled) console.log('- categoryEnabled:', window.theme.installments.categoryEnabled);
+    if (!window.theme.installments.promoCollections) console.log('- promoCollections:', window.theme.installments.promoCollections);
+    if (!window.theme.product) console.log('- window.theme.product não existe');
+    if (window.theme.product && !window.theme.product.collections) console.log('- window.theme.product.collections não existe');
   }
   
   // Validações adicionais
@@ -135,13 +161,35 @@ function parcelamento() {
     textoJuros = ' sem juros';
   }
   
+  var textoFinal = 'em até ' + qtdParcelas + 'x de <span><b>' + calculoFormatado + '</b></span>' + textoJuros;
+  
+  console.log('Texto final do parcelamento:', textoFinal);
+  console.log('Elemento .parcelamento-style encontrado:', $('.parcelamento-style').length);
+  
   // Atualiza o elemento correto do parcelamento
-  $('.parcelamento-style').html('em até ' + qtdParcelas + 'x de <span><b>' + calculoFormatado + '</b></span>' + textoJuros);
+  $('.parcelamento-style').html(textoFinal);
+  
+  console.log('=== Função parcelamento() finalizada ===');
 }
 
 
+// Chama parcelamento quando a página carrega
+$(document).ready(function() {
+  setTimeout(function() { 
+    parcelamento(); 
+  }, 300);
+});
+
+// Chama parcelamento quando muda a variante
 $(".block-swatch__radio").change(function () {
   setTimeout(function () { parcelamento(); }, 150);
+});
+
+// Chama parcelamento quando o evento variant:changed é disparado
+document.addEventListener('variant:changed', function(event) {
+  setTimeout(function() { 
+    parcelamento(); 
+  }, 150);
 });
 
 // Funcionalidade do popup de aviso do carrinho

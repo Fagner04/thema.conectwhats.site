@@ -90,9 +90,57 @@ Todos os produtos dessas 4 coleções terão o parcelamento promocional.
 - Teste sempre após configurar para garantir que está funcionando corretamente
 - O parcelamento é atualizado automaticamente quando o usuário seleciona variantes
 
-## Suporte
+## Suporte e Debug
+
+### Como verificar se está funcionando
+
+1. Abra a página de um produto no navegador
+2. Pressione **F12** para abrir o Console do navegador
+3. Procure por mensagens começando com `===`
+4. Você verá informações detalhadas sobre:
+   - Se o parcelamento está ativado
+   - Quais coleções o produto pertence
+   - Se o produto está em categoria promocional
+   - Qual configuração está sendo aplicada
+
+### Problemas Comuns
+
+#### O parcelamento não aparece
+- Verifique se "Mostrar parcelamento" está ativado nas configurações
+- Abra o Console (F12) e veja se há erros
+- Verifique se o elemento `.parcelamento-style` existe na página
+
+#### O parcelamento promocional não funciona
+- Verifique no Console se `categoryEnabled` está `true`
+- Confirme que os handles das coleções estão corretos (sem espaços extras)
+- Verifique se o produto realmente pertence à coleção configurada
+- O Console mostrará: "Produto está em categoria promocional? true/false"
+
+#### Como encontrar o handle correto
+1. Vá em **Produtos** > **Coleções** no admin
+2. Clique na coleção
+3. Veja a URL: `admin.shopify.com/store/sua-loja/collections/HANDLE-AQUI`
+4. Use exatamente esse handle (em minúsculas)
+
+### Mensagens do Console
+
+Quando tudo estiver funcionando, você verá algo como:
+
+```
+=== Função parcelamento() iniciada ===
+Preço detectado: 99.90
+Configurações de parcelamento: {show: true, maxInstallments: 12, ...}
+Sistema de categoria ativado!
+Coleções promocionais configuradas: promocao,outlet
+Coleções do produto: ["promocao", "novidades"]
+Produto está em categoria promocional? true
+Usando configurações promocionais - Parcelas: 3 Juros: 1 Modo: info_sem_juros
+Texto final do parcelamento: em até 3x de R$ 33,30 sem juros
+=== Função parcelamento() finalizada ===
+```
 
 Se tiver dúvidas ou problemas, verifique:
 1. Se os handles das coleções estão corretos
 2. Se a opção "Ativar parcelamento especial por categoria" está marcada
 3. Se os produtos estão realmente nas coleções configuradas
+4. As mensagens no Console do navegador (F12)
