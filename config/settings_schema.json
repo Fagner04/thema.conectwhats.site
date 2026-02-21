@@ -976,6 +976,32 @@
     ]
   },
   {
+    "name": "ConectWhats Atacado",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Configure a barra de progresso e cálculo de preços de atacado usando os metafields do app ConectWhats."
+      },
+      {
+        "type": "checkbox",
+        "id": "conectwhats_atacado_enabled",
+        "label": "Ativar barra de atacado ConectWhats",
+        "info": "Mostra barra de progresso e calcula total com preços de atacado dos metafields",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "conectwhats_atacado_min_qty",
+        "label": "Quantidade mínima para atacado",
+        "info": "Número de itens necessários para ativar preços de atacado",
+        "min": 2,
+        "max": 50,
+        "step": 1,
+        "default": 6
+      }
+    ]
+  },
+  {
     "name": "Whatsapp",
     "settings": [
       {

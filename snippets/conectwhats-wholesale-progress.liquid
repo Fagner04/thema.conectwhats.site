@@ -1,5 +1,6 @@
 {%- comment -%} BARRA DE PROGRESSO ATACADO + CÁLCULO TOTAL {%- endcomment -%}
-{%- assign wholesale_min = 6 -%}
+{%- if settings.conectwhats_atacado_enabled -%}
+{%- assign wholesale_min = settings.conectwhats_atacado_min_qty | default: 6 -%}
 {%- assign total_items = cart.item_count -%}
 {%- assign progress = total_items | times: 100 | divided_by: wholesale_min -%}
 {%- if progress > 100 -%}
@@ -101,3 +102,4 @@
     <p style="font-size: 10px; color: #92400E; margin: 4px 0 0; text-align: center;">Adicione mais itens e pague preço de atacado 💰</p>
   {%- endif -%}
 </div>
+{%- endif -%}
