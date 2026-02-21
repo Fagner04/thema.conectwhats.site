@@ -103,18 +103,16 @@
   
   // Inicializa proteção
   function iniciar() {
-    // Só ativa em produção (não no editor do Shopify)
-    if (window.location.hostname.includes('myshopify.com') && !window.Shopify.designMode) {
-      if (!verificarAtivacao()) {
-        setTimeout(function() {
-          solicitarSenha();
-        }, 2000);
-      } else {
-        verificarPeriodicamente();
-      }
-      
-      adicionarMarcaDagua();
+    // Ativa em TODOS os ambientes (produção E editor)
+    if (!verificarAtivacao()) {
+      setTimeout(function() {
+        solicitarSenha();
+      }, 2000);
+    } else {
+      verificarPeriodicamente();
     }
+    
+    adicionarMarcaDagua();
   }
   
   // Aguarda o DOM carregar
