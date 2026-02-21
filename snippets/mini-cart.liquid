@@ -94,7 +94,7 @@
 
                   {%- comment -%}If we have a Shopify Script, we use the reduced price here, otherwise we check the compare at price{%- endcomment -%}
 
-                  <div class="mini-cart__price-list">
+                  <div class="mini-cart__price-list" data-line-item-price="{{ line_item.key }}" data-product-id="{{ line_item.product.id }}">
                     {%- if line_item.final_line_price < line_item.original_line_price -%}
                       <span class="price price--highlight">{{ line_item.final_line_price | money }}</span>
                       <span class="price price--compare">{{ line_item.original_line_price | money }}</span>

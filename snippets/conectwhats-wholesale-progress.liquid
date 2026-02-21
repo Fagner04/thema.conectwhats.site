@@ -102,4 +102,83 @@
     <p style="font-size: 10px; color: #92400E; margin: 4px 0 0; text-align: center;">Adicione mais itens e pague preço de atacado 💰</p>
   {%- endif -%}
 </div>
+
+<script>
+(function() {
+  var wholesaleActive = {{ wholesale_active | json }};
+  var hasWholesalePrices = {{ has_wholesale_prices | json }};
+  
+  if (wholesaleActive && hasWholesalePrices) {
+    // Criar mapa de preços de atacado por produto
+    var wholesalePrices = {};
+    {%- for item in cart.items -%}
+      {%- assign ws_price = item.product.metafields.custom.wholesale_price.value -%}
+      {%- unless ws_price -%}
+        {%- assign ws_price = item.product.metafields.custom.wholesale_price -%}
+      {%- endunless -%}
+      {%- if ws_price and ws_price > 0 -%}
+        {%- if ws_price < 1000 -%}
+          {%- assign ws_price_cents = ws_price | times: 100 -%}
+        {%- else -%}
+          {%- assign ws_price_cents = ws_price -%}
+        {%- endif -%}
+        {%- assign item_ws_total = ws_price_cents | times: item.quantity -%}
+        wholesalePrices['{{ item.product.id }}'] = {
+          unitPrice: {{ ws_price_cents | json }},
+          quantity: {{ item.quantity | json }},
+          total: {{ item_ws_total | json }},
+          originalTotal: {{ item.final_line_price | json }}
+        };
+      {%- endif -%}
+    {%- endfor -%}
+    
+    function formatMoney(cents) {
+      return 'R$ ' + (cents / 100).toFixed(2).replace('.', ',');
+    }
+    
+    function updateProductPrices() {
+      // Atualizar preços de cada produto no carrinho
+      var priceElements = document.querySelectorAll('[data-line-item-price]');
+      
+      priceElements.forEach(function(priceEl) {
+        var productId = priceEl.getAttribute('data-product-id');
+        
+        if (wholesalePrices[productId]) {
+          var wsData = wholesalePrices[productId];
+          var newHTML = '';
+          
+          // Preço original riscado
+          newHTML += '<span class="price price--compare" style="text-decoration: line-through; color: #9CA3AF; font-size: 13px;">';
+          newHTML += formatMoney(wsData.originalTotal);
+          newHTML += '</span> ';
+          
+          // Preço de atacado em verde
+          newHTML += '<span class="price price--highlight" style="color: #16A34A; font-weight: 700; font-size: 15px;">';
+          newHTML += formatMoney(wsData.total);
+          newHTML += '</span> ';
+          
+          // Badge atacado
+          newHTML += '<span class="cw-badge-atacado" style="margin-left: 4px;">🏷 Atacado</span>';
+          
+          priceEl.innerHTML = newHTML;
+        }
+      });
+    }
+    
+    // Executar quando carregar
+    setTimeout(updateProductPrices, 100);
+    setTimeout(updateProductPrices, 500);
+    
+    // Observar mudanças no carrinho
+    var observer = new MutationObserver(function() {
+      setTimeout(updateProductPrices, 200);
+    });
+    
+    var miniCart = document.querySelector('.mini-cart');
+    if (miniCart) {
+      observer.observe(miniCart, { childList: true, subtree: true });
+    }
+  }
+})();
+</script>
 {%- endif -%}
