@@ -325,6 +325,52 @@
           totalCell.innerHTML = newHTML;
         }
       });
+      
+      // Atualizar o TOTAL GERAL do mini-cart
+      var miniCartTotal = document.getElementById('mini-cart-total-price');
+      if (miniCartTotal) {
+        var wholesaleTotal = {{ wholesale_total | json }};
+        var originalTotal = {{ original_total | json }};
+        
+        if (wholesaleTotal > 0 && wholesaleTotal < originalTotal) {
+          var newHTML = '';
+          
+          // Total original riscado
+          newHTML += '<span style="display: block; text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '12px' : '14px') + '; margin-bottom: 2px;">';
+          newHTML += formatMoney(originalTotal);
+          newHTML += '</span>';
+          
+          // Total com atacado em verde
+          newHTML += '<span style="display: block; color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '16px' : '18px') + ';">';
+          newHTML += formatMoney(wholesaleTotal);
+          newHTML += '</span>';
+          
+          miniCartTotal.innerHTML = newHTML;
+        }
+      }
+      
+      // Atualizar o TOTAL GERAL da página do carrinho
+      var cartTotal = document.getElementById('cart-total-original');
+      if (cartTotal) {
+        var wholesaleTotal = {{ wholesale_total | json }};
+        var originalTotal = {{ original_total | json }};
+        
+        if (wholesaleTotal > 0 && wholesaleTotal < originalTotal) {
+          var newHTML = '';
+          
+          // Total original riscado
+          newHTML += '<span style="display: block; text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '13px' : '15px') + '; margin-bottom: 2px;">';
+          newHTML += formatMoney(originalTotal);
+          newHTML += '</span>';
+          
+          // Total com atacado em verde
+          newHTML += '<span style="display: block; color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '18px' : '20px') + ';">';
+          newHTML += formatMoney(wholesaleTotal);
+          newHTML += '</span>';
+          
+          cartTotal.innerHTML = newHTML;
+        }
+      }
     }
     
     // Executar quando carregar
