@@ -122,6 +122,7 @@
   var wholesaleActive = {{ wholesale_active | json }};
   var wholesaleTotal = {{ wholesale_total | json }};
   var hasWholesalePrices = {{ has_wholesale_prices | json }};
+  var savings = {{ savings | default: 0 | json }};
   
   if (wholesaleActive && hasWholesalePrices && wholesaleTotal > 0) {
     // Aguardar DOM carregar
@@ -132,22 +133,39 @@
     }
     
     function updateCartTotal() {
-      // Selecionar elemento do total (ajuste o seletor conforme seu tema)
-      var totalElements = document.querySelectorAll('.mini-cart__recap-price-line span:last-child, .cart__total-price');
+      // Seletor específico para o total no mini-cart
+      var totalPriceElement = document.querySelector('.mini-cart__recap-price-line span:last-child');
       
-      totalElements.forEach(function(el) {
-        if (el && el.textContent.includes('R$')) {
-          // Adicionar indicador visual de atacado
-          var wholesaleBadge = document.createElement('span');
-          wholesaleBadge.className = 'cw-badge-atacado';
-          wholesaleBadge.style.marginLeft = '6px';
-          wholesaleBadge.textContent = '🏷 Atacado';
-          
-          // Atualizar valor
-          el.innerHTML = '{{ wholesaleTotal | money }}';
-          el.appendChild(wholesaleBadge);
+      if (totalPriceElement) {
+        // Criar container para novo total
+        var newTotalHTML = '<span style="color: #16A34A; font-weight: 700;">{{ wholesale_total | money }}</span>';
+        newTotalHTML += ' <span class="cw-badge-atacado" style="margin-left: 4px;">🏷 Atacado</span>';
+        
+        // Adicionar preço original riscado se houver economia
+        if (savings > 0) {
+          newTotalHTML = '<span style="color: #9CA3AF; text-decoration: line-through; font-size: 0.9em; margin-right: 6px;">{{ original_total | money }}</span>' + newTotalHTML;
+        }
+        
+        totalPriceElement.innerHTML = newTotalHTML;
+      }
+      
+      // Também atualizar na página do carrinho se existir
+      var cartTotalElements = document.querySelectorAll('[data-cart-total]');
+      cartTotalElements.forEach(function(el) {
+        if (el) {
+          el.innerHTML = '<span style="color: #16A34A; font-weight: 700;">{{ wholesale_total | money }}</span> <span class="cw-badge-atacado">🏷 Atacado</span>';
         }
       });
+    }
+    
+    // Observar mudanças no carrinho (quando adicionar/remover itens)
+    var observer = new MutationObserver(function() {
+      setTimeout(updateCartTotal, 100);
+    });
+    
+    var miniCart = document.querySelector('.mini-cart');
+    if (miniCart) {
+      observer.observe(miniCart, { childList: true, subtree: true });
     }
   }
 })();
