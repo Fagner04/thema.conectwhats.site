@@ -589,7 +589,7 @@
           "mostrar_barra_de_entrega": false,
           "blackfriday": false,
           "selector_mode": "block",
-          "color_mode": "color",
+          "color_mode": "block",
           "show_payment_button": false,
           "enable_back_in_stock_notification": true,
           "image_size": "small",
