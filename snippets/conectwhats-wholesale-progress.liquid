@@ -1,4 +1,4 @@
-{%- comment -%} BARRA DE PROGRESSO ATACADO + PREÇOS + CÁLCULO TOTAL {%- endcomment -%}
+{%- comment -%} BARRA DE PROGRESSO ATACADO + CÁLCULO TOTAL {%- endcomment -%}
 {%- assign wholesale_min = 6 -%}
 {%- assign total_items = cart.item_count -%}
 {%- assign progress = total_items | times: 100 | divided_by: wholesale_min -%}
@@ -11,16 +11,6 @@
   {%- assign wholesale_active = true -%}
 {%- endif -%}
 
-{%- comment -%} DEBUG: Mostrar metafields dos produtos {%- endcomment -%}
-{%- comment -%}
-DEBUG INFO:
-{%- for item in cart.items -%}
-  Produto: {{ item.product.title }}
-  Metafield wholesale_price: {{ item.product.metafields.custom.wholesale_price.value }}
-  Metafield wholesale_price (direto): {{ item.product.metafields.custom.wholesale_price }}
-{%- endfor -%}
-{%- endcomment -%}
-
 {%- comment -%} CALCULAR TOTAL COM PREÇOS DE ATACADO {%- endcomment -%}
 {%- assign wholesale_total = 0 -%}
 {%- assign original_total = 0 -%}
@@ -28,7 +18,6 @@ DEBUG INFO:
 
 {%- if wholesale_active -%}
   {%- for item in cart.items -%}
-    {%- comment -%} Tentar diferentes formas de acessar o metafield {%- endcomment -%}
     {%- assign ws_price = item.product.metafields.custom.wholesale_price.value -%}
     {%- unless ws_price -%}
       {%- assign ws_price = item.product.metafields.custom.wholesale_price -%}
@@ -36,7 +25,6 @@ DEBUG INFO:
     
     {%- if ws_price and ws_price > 0 -%}
       {%- assign has_wholesale_prices = true -%}
-      {%- comment -%} Converter para centavos se necessário {%- endcomment -%}
       {%- if ws_price < 1000 -%}
         {%- assign ws_price_cents = ws_price | times: 100 -%}
       {%- else -%}
@@ -55,53 +43,6 @@ DEBUG INFO:
 {%- endif -%}
 
 <style>
-.cw-cart-price { 
-  display: flex; 
-  align-items: center; 
-  gap: 6px; 
-  flex-wrap: wrap; 
-  margin: 2px 0; 
-}
-.cw-price-wholesale { 
-  color: #16A34A; 
-  font-weight: 700; 
-  font-size: 14px; 
-}
-.cw-price-original { 
-  color: #9CA3AF; 
-  text-decoration: line-through; 
-  font-size: 12px; 
-}
-.cw-badge-atacado { 
-  display: inline-flex; 
-  align-items: center; 
-  gap: 2px; 
-  background: #DCFCE7; 
-  color: #15803D; 
-  font-size: 10px; 
-  font-weight: 600; 
-  padding: 1px 6px; 
-  border-radius: 4px; 
-}
-.cw-total-savings {
-  background: #DCFCE7;
-  border: 1px solid #86EFAC;
-  border-radius: 6px;
-  padding: 8px 12px;
-  margin: 8px 0;
-  text-align: center;
-}
-.cw-total-savings-text {
-  font-size: 11px;
-  color: #166534;
-  margin: 0 0 4px;
-}
-.cw-total-savings-amount {
-  font-size: 16px;
-  font-weight: 700;
-  color: #15803D;
-  margin: 0;
-}
 .cw-new-total {
   background: #F0FDF4;
   border: 2px solid #86EFAC;
@@ -137,7 +78,6 @@ DEBUG INFO:
       <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #22C55E, #16A34A); border-radius: 99px;"></div>
     </div>
     
-    {%- comment -%} MOSTRAR NOVO TOTAL COM ATACADO {%- endcomment -%}
     {%- if has_wholesale_prices and wholesale_total > 0 -%}
       <div class="cw-new-total">
         <p class="cw-new-total-label">💰 Total com Atacado:</p>
@@ -148,19 +88,6 @@ DEBUG INFO:
             <br>Você economiza: <strong>{{ savings | money }}</strong>
           </p>
         {%- endif -%}
-      </div>d
-    {%- else -%}
-      {%- comment -%} DEBUG: Mostrar por que não está funcionando {%- endcomment -%}
-      <div style="background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 6px; padding: 8px; margin: 8px 0; font-size: 11px;">
-        <strong>Debug Info:</strong><br>
-        Has wholesale prices: {{ has_wholesale_prices }}<br>
-        Wholesale total: {{ wholesale_total }}<br>
-        Original total: {{ original_total }}<br>
-        {%- for item in cart.items -%}
-          <br>Produto: {{ item.product.title }}<br>
-          Metafield (custom.wholesale_price.value): {{ item.product.metafields.custom.wholesale_price.value }}<br>
-          Metafield (custom.wholesale_price): {{ item.product.metafields.custom.wholesale_price }}<br>
-        {%- endfor -%}
       </div>
     {%- endif -%}
   {%- else -%}
@@ -174,53 +101,3 @@ DEBUG INFO:
     <p style="font-size: 10px; color: #92400E; margin: 4px 0 0; text-align: center;">Adicione mais itens e pague preço de atacado 💰</p>
   {%- endif -%}
 </div>
-
-<script>
-(function() {
-  var wholesaleActive = {{ wholesale_active | json }};
-  var wholesaleTotal = {{ wholesale_total | json }};
-  var hasWholesalePrices = {{ has_wholesale_prices | json }};
-  var originalTotal = {{ original_total | json }};
-  var savings = {{ savings | default: 0 | json }};
-  
-  if (wholesaleActive && hasWholesalePrices && wholesaleTotal > 0) {
-    function updateTotalDisplay() {
-      // Usar o ID específico que adicionamos
-      var totalElement = document.getElementById('mini-cart-total-price');
-      
-      if (totalElement) {
-        // Criar novo HTML
-        var newHTML = '';
-        
-        if (savings > 0) {
-          newHTML += '<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">';
-          newHTML += '<span style="color: #9CA3AF; text-decoration: line-through; font-size: 13px;">{{ original_total | money }}</span>';
-          newHTML += '<span style="color: #16A34A; font-weight: 700; font-size: 18px;">{{ wholesale_total | money }}</span>';
-          newHTML += '<span class="cw-badge-atacado" style="margin-top: 2px;">🏷 Atacado</span>';
-          newHTML += '</div>';
-        } else {
-          newHTML = '<span style="color: #16A34A; font-weight: 700; font-size: 18px;">{{ wholesale_total | money }}</span>';
-          newHTML += ' <span class="cw-badge-atacado">🏷 Atacado</span>';
-        }
-        
-        totalElement.innerHTML = newHTML;
-      }
-    }
-    
-    // Executar múltiplas vezes
-    setTimeout(updateTotalDisplay, 100);
-    setTimeout(updateTotalDisplay, 500);
-    setTimeout(updateTotalDisplay, 1000);
-    
-    // Observar mudanças no carrinho
-    var observer = new MutationObserver(function() {
-      setTimeout(updateTotalDisplay, 200);
-    });
-    
-    var miniCart = document.querySelector('.mini-cart');
-    if (miniCart) {
-      observer.observe(miniCart, { childList: true, subtree: true });
-    }
-  }
-})();
-</script>
