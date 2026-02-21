@@ -63,6 +63,105 @@
   color: #15803D;
   margin: 0;
 }
+.cw-badge-atacado {
+  display: inline-block;
+  background: #DCFCE7;
+  color: #166534;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* Responsivo para mobile */
+@media (max-width: 768px) {
+  .cw-wholesale-progress {
+    padding: 8px 10px !important;
+    margin: 8px 0 !important;
+    font-size: 11px;
+  }
+  
+  .cw-wholesale-progress p {
+    font-size: 10px !important;
+  }
+  
+  .cw-wholesale-progress span {
+    font-size: 11px !important;
+  }
+  
+  .cw-new-total {
+    padding: 10px;
+    margin: 10px 0;
+  }
+  
+  .cw-new-total-label {
+    font-size: 11px;
+  }
+  
+  .cw-new-total-price {
+    font-size: 16px;
+  }
+  
+  .cw-badge-atacado {
+    font-size: 8px !important;
+    padding: 1px 4px !important;
+    margin-left: 2px !important;
+  }
+  
+  /* Ajustar preços no carrinho mobile - coluna Produto */
+  .line-item__price-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    align-items: flex-start !important;
+  }
+  
+  .line-item__price-list .line-item__price--compare {
+    font-size: 11px !important;
+    display: block !important;
+  }
+  
+  .line-item__price-list .line-item__price--highlight {
+    font-size: 13px !important;
+    display: block !important;
+  }
+  
+  /* Ajustar mini-cart mobile */
+  .mini-cart__price-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+  
+  .mini-cart__price-list .price--compare {
+    font-size: 11px !important;
+  }
+  
+  .mini-cart__price-list .price--highlight {
+    font-size: 13px !important;
+  }
+  
+  /* Ajustar coluna Total mobile (quando visível) */
+  [data-line-total] span {
+    font-size: 12px !important;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cw-wholesale-progress {
+    padding: 10px 12px !important;
+  }
+  
+  .cw-new-total-price {
+    font-size: 18px;
+  }
+  
+  .cw-badge-atacado {
+    font-size: 9px !important;
+  }
+}
 </style>
 
 <div class="cw-wholesale-progress" style="margin: 12px 0; padding: 10px 14px; background: linear-gradient(135deg, #FFFBEB, #FFF7ED); border: 1px solid #FDBA74; border-radius: 8px; font-family: inherit;">
@@ -137,6 +236,9 @@
     }
     
     function updateProductPrices() {
+      // Detectar se está em mobile
+      var isMobile = window.innerWidth <= 768;
+      
       // Atualizar preços de cada produto no mini-cart
       var priceElements = document.querySelectorAll('[data-line-item-price]');
       
@@ -148,23 +250,56 @@
           var newHTML = '';
           
           // Preço original riscado
-          newHTML += '<span class="price price--compare" style="text-decoration: line-through; color: #9CA3AF; font-size: 13px;">';
+          newHTML += '<span class="price price--compare" style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + '; display: block; margin-bottom: 2px;">';
           newHTML += formatMoney(wsData.originalTotal);
-          newHTML += '</span><br>';
+          newHTML += '</span>';
           
           // Preço de atacado em verde
-          newHTML += '<span class="price price--highlight" style="color: #16A34A; font-weight: 700; font-size: 15px;">';
+          newHTML += '<span class="price price--highlight" style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '13px' : '15px') + '; display: block; margin-bottom: 2px;">';
           newHTML += formatMoney(wsData.total);
-          newHTML += '</span> ';
+          newHTML += '</span>';
           
           // Badge atacado
-          newHTML += '<span class="cw-badge-atacado" style="margin-left: 4px;">🏷 Atacado</span>';
+          newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
           
           priceEl.innerHTML = newHTML;
         }
       });
       
-      // Atualizar coluna "Total" na página do carrinho
+      // Atualizar preço unitário na coluna "Produto" da página do carrinho (desktop e mobile)
+      var productRows = document.querySelectorAll('tr[data-line-item-key]');
+      
+      productRows.forEach(function(row) {
+        var productId = row.getAttribute('data-product-id');
+        
+        if (wholesalePrices[productId]) {
+          var wsData = wholesalePrices[productId];
+          
+          // Encontrar TODOS os elementos de preço (desktop e mobile)
+          var unitPriceElements = row.querySelectorAll('.line-item__price-list');
+          
+          unitPriceElements.forEach(function(unitPriceEl) {
+            var newHTML = '';
+            
+            // Preço unitário original riscado
+            newHTML += '<span class="line-item__price line-item__price--compare" style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + '; display: block; margin-bottom: 2px;">';
+            newHTML += formatMoney(wsData.originalTotal / wsData.quantity);
+            newHTML += '</span>';
+            
+            // Preço unitário de atacado em verde
+            newHTML += '<span class="line-item__price line-item__price--highlight" style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '13px' : '15px') + '; display: block; margin-bottom: 2px;">';
+            newHTML += formatMoney(wsData.unitPrice);
+            newHTML += '</span>';
+            
+            // Badge atacado
+            newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
+            
+            unitPriceEl.innerHTML = newHTML;
+          });
+        }
+      });
+      
+      // Atualizar coluna "Total" na página do carrinho (apenas desktop - hidden-phone)
       var totalCells = document.querySelectorAll('[data-line-total]');
       
       totalCells.forEach(function(totalCell) {
@@ -175,12 +310,12 @@
           var newHTML = '';
           
           // Preço original riscado
-          newHTML += '<span style="display: block; text-decoration: line-through; color: #9CA3AF; font-size: 14px; margin-bottom: 4px;">';
+          newHTML += '<span style="display: block; text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + '; margin-bottom: 4px;">';
           newHTML += formatMoney(wsData.originalTotal);
           newHTML += '</span>';
           
           // Preço de atacado em verde
-          newHTML += '<span style="display: block; color: #16A34A; font-weight: 700; font-size: 17px; margin-bottom: 4px;">';
+          newHTML += '<span style="display: block; color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '14px' : '16px') + '; margin-bottom: 4px;">';
           newHTML += formatMoney(wsData.total);
           newHTML += '</span>';
           
@@ -196,6 +331,15 @@
     setTimeout(updateProductPrices, 100);
     setTimeout(updateProductPrices, 500);
     
+    // Atualizar ao redimensionar (rotação de tela mobile)
+    var resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() {
+        updateProductPrices();
+      }, 250);
+    });
+    
     // Observar mudanças no carrinho
     var observer = new MutationObserver(function() {
       setTimeout(updateProductPrices, 200);
@@ -204,6 +348,11 @@
     var miniCart = document.querySelector('.mini-cart');
     if (miniCart) {
       observer.observe(miniCart, { childList: true, subtree: true });
+    }
+    
+    var cartWrapper = document.querySelector('.cart-wrapper');
+    if (cartWrapper) {
+      observer.observe(cartWrapper, { childList: true, subtree: true });
     }
   }
 })();
