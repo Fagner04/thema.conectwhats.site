@@ -585,7 +585,7 @@
           "mostrar_cssareviews": false,
           "mostrar_quantidadevendidos": false,
           "mostrar_icone": false,
-          "mostrar_codigodoitem": true,
+          "mostrar_codigodoitem": false,
           "mostrar_barra_de_entrega": false,
           "blackfriday": false,
           "selector_mode": "block",
