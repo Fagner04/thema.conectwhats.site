@@ -161,3 +161,55 @@ DEBUG INFO:
     <p style="font-size: 10px; color: #92400E; margin: 4px 0 0; text-align: center;">Adicione mais itens e pague preço de atacado 💰</p>
   {%- endif -%}
 </div>
+
+<script>
+(function() {
+  var wholesaleActive = {{ wholesale_active | json }};
+  var wholesaleTotal = {{ wholesale_total | json }};
+  var hasWholesalePrices = {{ has_wholesale_prices | json }};
+  var originalTotal = {{ original_total | json }};
+  var savings = {{ savings | default: 0 | json }};
+  
+  if (wholesaleActive && hasWholesalePrices && wholesaleTotal > 0) {
+    function updateTotalDisplay() {
+      // Encontrar o elemento do total no mini-cart
+      var totalElements = document.querySelectorAll('.mini-cart__recap-price-line span:last-child');
+      
+      if (totalElements.length > 0) {
+        var totalElement = totalElements[0]; // Primeiro elemento é o Total
+        
+        // Criar novo HTML com preço de atacado
+        var newHTML = '<span style="color: #16A34A; font-weight: 700; font-size: 18px;">{{ wholesale_total | money }}</span>';
+        
+        // Adicionar preço original riscado se houver economia
+        if (savings > 0) {
+          newHTML = '<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">';
+          newHTML += '<span style="color: #9CA3AF; text-decoration: line-through; font-size: 14px;">{{ original_total | money }}</span>';
+          newHTML += '<span style="color: #16A34A; font-weight: 700; font-size: 18px;">{{ wholesale_total | money }}</span>';
+          newHTML += '<span class="cw-badge-atacado" style="margin-top: 2px;">🏷 Atacado</span>';
+          newHTML += '</div>';
+        }
+        
+        totalElement.innerHTML = newHTML;
+      }
+    }
+    
+    // Executar quando DOM carregar
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateTotalDisplay);
+    } else {
+      updateTotalDisplay();
+    }
+    
+    // Observar mudanças no carrinho
+    var observer = new MutationObserver(function() {
+      setTimeout(updateTotalDisplay, 200);
+    });
+    
+    var miniCart = document.querySelector('.mini-cart__recap');
+    if (miniCart) {
+      observer.observe(miniCart, { childList: true, subtree: true });
+    }
+  }
+})();
+</script>
