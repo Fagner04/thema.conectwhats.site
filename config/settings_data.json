@@ -99,7 +99,7 @@
     "qty_vezes": 6,
     "enable_category_installments": true,
     "promo_qty_vezes": 3,
-    "atacado_enabled": true,
+    "atacado_enabled": false,
     "conectwhats_atacado_enabled": false,
     "addzap": false,
     "numberzap": "https://wa.me/message/AYJ45IUBHN64E1",
