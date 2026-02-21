@@ -131,10 +131,10 @@ O desconto é aplicado pelo próprio app ConectWhats durante o checkout.
 
 O badge está implementado e funcionando! Configure os preços de atacado no app ConectWhats e eles aparecerão automaticamente no tema.
 
-## 📱 Responsivo
+## � Responsivo
 
 O badge se adapta automaticamente a todos os dispositivos:
-- 📱 Mobile
+- � Mobile
 - 💻 Desktop
 - 📲 Tablet
 
