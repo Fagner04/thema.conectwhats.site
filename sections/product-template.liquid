@@ -67,6 +67,7 @@
 
           <div class="product-block-list__item product-block-list__item--info">
             {% render 'product-info' %}
+            {% render 'hide-unavailable-colors' %}
           </div>
 
           {%- if product.description != blank -%}
