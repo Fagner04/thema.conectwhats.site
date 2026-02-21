@@ -137,7 +137,7 @@
     }
     
     function updateProductPrices() {
-      // Atualizar preços de cada produto no carrinho
+      // Atualizar preços de cada produto no mini-cart
       var priceElements = document.querySelectorAll('[data-line-item-price]');
       
       priceElements.forEach(function(priceEl) {
@@ -150,7 +150,7 @@
           // Preço original riscado
           newHTML += '<span class="price price--compare" style="text-decoration: line-through; color: #9CA3AF; font-size: 13px;">';
           newHTML += formatMoney(wsData.originalTotal);
-          newHTML += '</span> ';
+          newHTML += '</span><br>';
           
           // Preço de atacado em verde
           newHTML += '<span class="price price--highlight" style="color: #16A34A; font-weight: 700; font-size: 15px;">';
@@ -161,6 +161,33 @@
           newHTML += '<span class="cw-badge-atacado" style="margin-left: 4px;">🏷 Atacado</span>';
           
           priceEl.innerHTML = newHTML;
+        }
+      });
+      
+      // Atualizar coluna "Total" na página do carrinho
+      var totalCells = document.querySelectorAll('[data-line-total]');
+      
+      totalCells.forEach(function(totalCell) {
+        var productId = totalCell.getAttribute('data-product-id');
+        
+        if (wholesalePrices[productId]) {
+          var wsData = wholesalePrices[productId];
+          var newHTML = '';
+          
+          // Preço original riscado
+          newHTML += '<span style="display: block; text-decoration: line-through; color: #9CA3AF; font-size: 14px; margin-bottom: 4px;">';
+          newHTML += formatMoney(wsData.originalTotal);
+          newHTML += '</span>';
+          
+          // Preço de atacado em verde
+          newHTML += '<span style="display: block; color: #16A34A; font-weight: 700; font-size: 17px; margin-bottom: 4px;">';
+          newHTML += formatMoney(wsData.total);
+          newHTML += '</span>';
+          
+          // Badge atacado
+          newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
+          
+          totalCell.innerHTML = newHTML;
         }
       });
     }
