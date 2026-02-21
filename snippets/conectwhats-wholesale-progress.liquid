@@ -148,7 +148,7 @@ DEBUG INFO:
             <br>Você economiza: <strong>{{ savings | money }}</strong>
           </p>
         {%- endif -%}
-      </div>
+      </div>d
     {%- else -%}
       {%- comment -%} DEBUG: Mostrar por que não está funcionando {%- endcomment -%}
       <div style="background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 6px; padding: 8px; margin: 8px 0; font-size: 11px;">
@@ -183,70 +183,34 @@ DEBUG INFO:
   var originalTotal = {{ original_total | json }};
   var savings = {{ savings | default: 0 | json }};
   
-  console.log('Atacado Debug:', {
-    active: wholesaleActive,
-    total: wholesaleTotal,
-    hasPrices: hasWholesalePrices,
-    savings: savings
-  });
-  
   if (wholesaleActive && hasWholesalePrices && wholesaleTotal > 0) {
     function updateTotalDisplay() {
-      // Tentar múltiplos seletores
-      var selectors = [
-        '.mini-cart__recap-price-line:not(.mini-cart__recap-price-line--highlight) span:last-child',
-        '.mini-cart__recap-price-line span:nth-child(2)',
-        '[data-cart-total]'
-      ];
-      
-      var totalElement = null;
-      for (var i = 0; i < selectors.length; i++) {
-        var elements = document.querySelectorAll(selectors[i]);
-        if (elements.length > 0) {
-          // Pegar o primeiro que contém "R$"
-          for (var j = 0; j < elements.length; j++) {
-            if (elements[j].textContent.includes('R$')) {
-              totalElement = elements[j];
-              console.log('Found total element with selector:', selectors[i]);
-              break;
-            }
-          }
-          if (totalElement) break;
-        }
-      }
+      // Usar o ID específico que adicionamos
+      var totalElement = document.getElementById('mini-cart-total-price');
       
       if (totalElement) {
-        console.log('Updating total from', totalElement.textContent, 'to {{ wholesale_total | money }}');
-        
         // Criar novo HTML
-        var newHTML = '<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">';
+        var newHTML = '';
         
         if (savings > 0) {
+          newHTML += '<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px;">';
           newHTML += '<span style="color: #9CA3AF; text-decoration: line-through; font-size: 13px;">{{ original_total | money }}</span>';
+          newHTML += '<span style="color: #16A34A; font-weight: 700; font-size: 18px;">{{ wholesale_total | money }}</span>';
+          newHTML += '<span class="cw-badge-atacado" style="margin-top: 2px;">🏷 Atacado</span>';
+          newHTML += '</div>';
+        } else {
+          newHTML = '<span style="color: #16A34A; font-weight: 700; font-size: 18px;">{{ wholesale_total | money }}</span>';
+          newHTML += ' <span class="cw-badge-atacado">🏷 Atacado</span>';
         }
         
-        newHTML += '<span style="color: #16A34A; font-weight: 700; font-size: 18px;">{{ wholesale_total | money }}</span>';
-        newHTML += '<span class="cw-badge-atacado" style="margin-top: 2px;">🏷 Atacado</span>';
-        newHTML += '</div>';
-        
         totalElement.innerHTML = newHTML;
-        console.log('Total updated successfully');
-      } else {
-        console.log('Total element not found');
       }
     }
     
-    // Executar múltiplas vezes para garantir
+    // Executar múltiplas vezes
     setTimeout(updateTotalDisplay, 100);
     setTimeout(updateTotalDisplay, 500);
     setTimeout(updateTotalDisplay, 1000);
-    
-    // Executar quando DOM carregar
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function() {
-        setTimeout(updateTotalDisplay, 100);
-      });
-    }
     
     // Observar mudanças no carrinho
     var observer = new MutationObserver(function() {
