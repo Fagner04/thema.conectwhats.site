@@ -408,6 +408,8 @@
       {%- if modo_exibicao == 'no_info_juros' -%}
       <p class="parcelas-home">em até <b>{{ divididopor }}x</b> de <b style="color: var(--product-on-sale-accent)">{{- product.price | times: percentual | divided_by: divididopor | round: 2 | money -}}</b></p>
       {%- endif -%}
+      
+      {%- if product.metafields.custom.wholesale_price -%}<div class="wholesale-badge" style="margin-top: 8px; padding: 6px 10px; background: #FFF7ED; border: 1px solid #FDBA74; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px;"><span style="font-size: 12px; color: #9A3412;">Atacado:</span><strong style="color: #C2410C; font-size: 14px;">{{ product.metafields.custom.wholesale_price.value | money }}</strong>{%- if product.metafields.custom.wholesale_min_qty -%}<span style="font-size: 11px; color: #9A3412;">(mín. {{ product.metafields.custom.wholesale_min_qty.value }} un.)</span>{%- endif -%}</div>{%- endif -%}
             {% endif %}
       
         {%- if settings.mostrar_estrelas -%}
