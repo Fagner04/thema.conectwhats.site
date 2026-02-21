@@ -1,4 +1,4 @@
-{%- comment -%} BARRA DE PROGRESSO ATACADO + PREÇOS — Cole no cart-drawer.liquid ou cart-items.liquid {%- endcomment -%}
+{%- comment -%} BARRA DE PROGRESSO ATACADO + PREÇOS + CÁLCULO TOTAL {%- endcomment -%}
 {%- assign wholesale_min = 6 -%}
 {%- comment -%} ↑ Altere para a quantidade mínima configurada na ConectWhats {%- endcomment -%}
 {%- assign total_items = cart.item_count -%}
@@ -10,6 +10,28 @@
 {%- assign wholesale_active = false -%}
 {%- if remaining <= 0 -%}
   {%- assign wholesale_active = true -%}
+{%- endif -%}
+
+{%- comment -%} CALCULAR TOTAL COM PREÇOS DE ATACADO {%- endcomment -%}
+{%- assign wholesale_total = 0 -%}
+{%- assign original_total = 0 -%}
+{%- assign has_wholesale_prices = false -%}
+
+{%- if wholesale_active -%}
+  {%- for item in cart.items -%}
+    {%- assign ws_price = item.product.metafields.custom.wholesale_price.value -%}
+    {%- if ws_price -%}
+      {%- assign has_wholesale_prices = true -%}
+      {%- assign item_ws_total = ws_price | times: 100 | times: item.quantity -%}
+      {%- assign wholesale_total = wholesale_total | plus: item_ws_total -%}
+      {%- assign original_total = original_total | plus: item.final_line_price -%}
+    {%- else -%}
+      {%- assign wholesale_total = wholesale_total | plus: item.final_line_price -%}
+      {%- assign original_total = original_total | plus: item.final_line_price -%}
+    {%- endif -%}
+  {%- endfor -%}
+  
+  {%- assign savings = original_total | minus: wholesale_total -%}
 {%- endif -%}
 
 <style>
@@ -41,6 +63,25 @@
   padding: 1px 6px; 
   border-radius: 4px; 
 }
+.cw-total-savings {
+  background: #DCFCE7;
+  border: 1px solid #86EFAC;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 8px 0;
+  text-align: center;
+}
+.cw-total-savings-text {
+  font-size: 11px;
+  color: #166534;
+  margin: 0 0 4px;
+}
+.cw-total-savings-amount {
+  font-size: 16px;
+  font-weight: 700;
+  color: #15803D;
+  margin: 0;
+}
 </style>
 
 <div class="cw-wholesale-progress" style="margin: 12px 0; padding: 10px 14px; background: linear-gradient(135deg, #FFFBEB, #FFF7ED); border: 1px solid #FDBA74; border-radius: 8px; font-family: inherit;">
@@ -56,6 +97,13 @@
     <div style="width: 100%; height: 8px; background: #BBF7D0; border-radius: 99px; overflow: hidden; margin-top: 6px;">
       <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #22C55E, #16A34A); border-radius: 99px;"></div>
     </div>
+    
+    {%- if has_wholesale_prices and savings > 0 -%}
+      <div class="cw-total-savings">
+        <p class="cw-total-savings-text">💰 Economia total no atacado:</p>
+        <p class="cw-total-savings-amount">{{ savings | money }}</p>
+      </div>
+    {%- endif -%}
   {%- else -%}
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
       <span style="font-size: 12px; font-weight: 600; color: #92400E;">🛒 Faltam <strong style="color: #C2410C;">{{ remaining }}</strong> peça(s) para atacado!</span>
@@ -68,14 +116,39 @@
   {%- endif -%}
 </div>
 
-{%- comment -%} PREÇOS ATACADO NOS ITENS — Cole junto ao preço de cada line item {%- endcomment -%}
-{%- for item in cart.items -%}
-  {%- assign ws_price = item.product.metafields.custom.wholesale_price.value -%}
-  {%- if ws_price and wholesale_active -%}
-    <div class="cw-cart-price" data-item-key="{{ item.key }}">
-      <span class="cw-price-wholesale">{{ ws_price | times: 100 | money }}</span>
-      <span class="cw-price-original">{{ item.original_price | money }}</span>
-      <span class="cw-badge-atacado">🏷 Atacado</span>
-    </div>
-  {%- endif -%}
-{%- endfor -%}
+<script>
+(function() {
+  // Atualizar total do carrinho com preços de atacado
+  var wholesaleActive = {{ wholesale_active | json }};
+  var wholesaleTotal = {{ wholesale_total | json }};
+  var hasWholesalePrices = {{ has_wholesale_prices | json }};
+  
+  if (wholesaleActive && hasWholesalePrices && wholesaleTotal > 0) {
+    // Aguardar DOM carregar
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', updateCartTotal);
+    } else {
+      updateCartTotal();
+    }
+    
+    function updateCartTotal() {
+      // Selecionar elemento do total (ajuste o seletor conforme seu tema)
+      var totalElements = document.querySelectorAll('.mini-cart__recap-price-line span:last-child, .cart__total-price');
+      
+      totalElements.forEach(function(el) {
+        if (el && el.textContent.includes('R$')) {
+          // Adicionar indicador visual de atacado
+          var wholesaleBadge = document.createElement('span');
+          wholesaleBadge.className = 'cw-badge-atacado';
+          wholesaleBadge.style.marginLeft = '6px';
+          wholesaleBadge.textContent = '🏷 Atacado';
+          
+          // Atualizar valor
+          el.innerHTML = '{{ wholesaleTotal | money }}';
+          el.appendChild(wholesaleBadge);
+        }
+      });
+    }
+  }
+})();
+</script>
