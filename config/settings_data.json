@@ -129,7 +129,7 @@
     "cart_warning_bg_color": "#ffe8e5",
     "cart_warning_text_color": "#000000",
     "cart_warning_delay": 2,
-    "cart_warning_show_once": true,
+    "cart_warning_show_once": false,
     "ano_novo_card_enable": false,
     "ano_novo_card_icon": "",
     "ano_novo_card_message": "Que 2026 seja repleto de alegrias, conquistas e momentos especiais!",
