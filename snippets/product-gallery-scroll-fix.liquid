@@ -1,0 +1,20 @@
+<style>
+/* Permite que as thumbnails da galeria rolem até embaixo */
+@media screen and (min-width: 1000px) {
+  .product-gallery__thumbnail-list {
+    max-height: none !important; /* Remove limite de altura */
+    height: auto !important;
+    overflow-y: auto !important; /* Permite scroll vertical */
+  }
+  
+  /* Ajusta a galeria para ocupar toda altura disponível */
+  .product-gallery--with-thumbnails {
+    align-items: flex-start !important;
+  }
+  
+  .product-gallery--with-thumbnails .product-gallery__carousel-wrapper {
+    position: sticky;
+    top: 20px; /* Distância do topo quando fixar */
+  }
+}
+</style>
