@@ -149,6 +149,19 @@ DEBUG INFO:
           </p>
         {%- endif -%}
       </div>
+    {%- else -%}
+      {%- comment -%} DEBUG: Mostrar por que não está funcionando {%- endcomment -%}
+      <div style="background: #FEF3C7; border: 1px solid #FCD34D; border-radius: 6px; padding: 8px; margin: 8px 0; font-size: 11px;">
+        <strong>Debug Info:</strong><br>
+        Has wholesale prices: {{ has_wholesale_prices }}<br>
+        Wholesale total: {{ wholesale_total }}<br>
+        Original total: {{ original_total }}<br>
+        {%- for item in cart.items -%}
+          <br>Produto: {{ item.product.title }}<br>
+          Metafield (custom.wholesale_price.value): {{ item.product.metafields.custom.wholesale_price.value }}<br>
+          Metafield (custom.wholesale_price): {{ item.product.metafields.custom.wholesale_price }}<br>
+        {%- endfor -%}
+      </div>
     {%- endif -%}
   {%- else -%}
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
