@@ -249,18 +249,23 @@
           var wsData = wholesalePrices[productId];
           var newHTML = '';
           
+          // Container flex para alinhar preços
+          newHTML += '<div style="display: flex; flex-direction: column; gap: 2px;">';
+          
           // Preço original riscado
-          newHTML += '<span class="price price--compare" style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + '; display: block; margin-bottom: 2px;">';
+          newHTML += '<span class="price price--compare" style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + ';">';
           newHTML += formatMoney(wsData.originalTotal);
           newHTML += '</span>';
           
           // Preço de atacado em verde
-          newHTML += '<span class="price price--highlight" style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '13px' : '15px') + '; display: block; margin-bottom: 2px;">';
+          newHTML += '<span class="price price--highlight" style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '13px' : '15px') + ';">';
           newHTML += formatMoney(wsData.total);
           newHTML += '</span>';
           
+          newHTML += '</div>';
+          
           // Badge atacado
-          newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
+          newHTML += '<span class="cw-badge-atacado" style="margin-top: 2px;">🏷 Atacado</span>';
           
           priceEl.innerHTML = newHTML;
         }
@@ -281,15 +286,15 @@
           unitPriceElements.forEach(function(unitPriceEl) {
             var newHTML = '';
             
-            // Preço unitário original riscado
-            newHTML += '<span class="line-item__price line-item__price--compare" style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + '; display: block; margin-bottom: 2px;">';
+            // Preço unitário original riscado (inline)
+            newHTML += '<div style="margin-bottom: 2px;"><span class="line-item__price line-item__price--compare" style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + ';">';
             newHTML += formatMoney(wsData.originalTotal / wsData.quantity);
-            newHTML += '</span>';
+            newHTML += '</span></div>';
             
-            // Preço unitário de atacado em verde
-            newHTML += '<span class="line-item__price line-item__price--highlight" style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '13px' : '15px') + '; display: block; margin-bottom: 2px;">';
+            // Preço unitário de atacado em verde (inline)
+            newHTML += '<div style="margin-bottom: 2px;"><span class="line-item__price line-item__price--highlight" style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '13px' : '15px') + ';">';
             newHTML += formatMoney(wsData.unitPrice);
-            newHTML += '</span>';
+            newHTML += '</span></div>';
             
             // Badge atacado
             newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
@@ -309,15 +314,15 @@
           var wsData = wholesalePrices[productId];
           var newHTML = '';
           
-          // Preço original riscado
-          newHTML += '<span style="display: block; text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + '; margin-bottom: 4px;">';
+          // Preço original riscado (inline)
+          newHTML += '<div style="margin-bottom: 4px;"><span style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + ';">';
           newHTML += formatMoney(wsData.originalTotal);
-          newHTML += '</span>';
+          newHTML += '</span></div>';
           
-          // Preço de atacado em verde
-          newHTML += '<span style="display: block; color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '14px' : '16px') + '; margin-bottom: 4px;">';
+          // Preço de atacado em verde (inline)
+          newHTML += '<div style="margin-bottom: 4px;"><span style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '14px' : '16px') + ';">';
           newHTML += formatMoney(wsData.total);
-          newHTML += '</span>';
+          newHTML += '</span></div>';
           
           // Badge atacado
           newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
@@ -335,13 +340,13 @@
         if (wholesaleTotal > 0 && wholesaleTotal < originalTotal) {
           var newHTML = '';
           
-          // Total original riscado
-          newHTML += '<span style="display: block; text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '12px' : '14px') + '; margin-bottom: 2px;">';
+          // Total original riscado (inline)
+          newHTML += '<div style="margin-bottom: 2px;"><span style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '12px' : '14px') + ';">';
           newHTML += formatMoney(originalTotal);
-          newHTML += '</span>';
+          newHTML += '</span></div>';
           
           // Total com atacado em verde
-          newHTML += '<span style="display: block; color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '16px' : '18px') + ';">';
+          newHTML += '<span style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '16px' : '18px') + ';">';
           newHTML += formatMoney(wholesaleTotal);
           newHTML += '</span>';
           
@@ -358,13 +363,13 @@
         if (wholesaleTotal > 0 && wholesaleTotal < originalTotal) {
           var newHTML = '';
           
-          // Total original riscado
-          newHTML += '<span style="display: block; text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '13px' : '15px') + '; margin-bottom: 2px;">';
+          // Total original riscado (inline)
+          newHTML += '<div style="margin-bottom: 2px;"><span style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '13px' : '15px') + ';">';
           newHTML += formatMoney(originalTotal);
-          newHTML += '</span>';
+          newHTML += '</span></div>';
           
           // Total com atacado em verde
-          newHTML += '<span style="display: block; color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '18px' : '20px') + ';">';
+          newHTML += '<span style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '18px' : '20px') + ';">';
           newHTML += formatMoney(wholesaleTotal);
           newHTML += '</span>';
           
