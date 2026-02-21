@@ -103,16 +103,29 @@
   
   // Inicializa proteção
   function iniciar() {
-    // Ativa em TODOS os ambientes (produção E editor)
-    if (!verificarAtivacao()) {
-      setTimeout(function() {
-        solicitarSenha();
-      }, 2000);
-    } else {
-      verificarPeriodicamente();
-    }
+    // Detecta se é uma tentativa de copiar o tema
+    var isDuplicating = window.location.search.includes('preview_theme_id') || 
+                        window.location.pathname.includes('/admin/') ||
+                        (window.Shopify && window.Shopify.designMode);
     
-    adicionarMarcaDagua();
+    // Detecta se está em outra loja (domínio diferente do original)
+    var shopDomain = window.Shopify ? window.Shopify.shop : '';
+    var lojaOriginal = 'emporiobody.myshopify.com'; // COLOQUE O DOMÍNIO DA SUA LOJA AQUI
+    
+    // Só ativa proteção se:
+    // 1. Estiver tentando editar/duplicar OU
+    // 2. Estiver em uma loja diferente da original
+    if (isDuplicating || (shopDomain && shopDomain !== lojaOriginal)) {
+      if (!verificarAtivacao()) {
+        setTimeout(function() {
+          solicitarSenha();
+        }, 2000);
+      } else {
+        verificarPeriodicamente();
+      }
+      
+      adicionarMarcaDagua();
+    }
   }
   
   // Aguarda o DOM carregar
