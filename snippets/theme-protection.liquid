@@ -1,0 +1,128 @@
+{% comment %}
+  Sistema de Proteção do Tema
+  Impede uso não autorizado
+{% endcomment %}
+
+<script>
+(function() {
+  'use strict';
+  
+  // CONFIGURAÇÃO DA SENHA
+  var SENHA_CORRETA = 'CONECTWHATS2024'; // MUDE ESTA SENHA!
+  var TEMA_ATIVADO_KEY = 'tema_conectwhats_ativado';
+  var TENTATIVAS_KEY = 'tema_tentativas';
+  var MAX_TENTATIVAS = 3;
+  
+  // Verifica se já está ativado
+  function verificarAtivacao() {
+    var ativado = localStorage.getItem(TEMA_ATIVADO_KEY);
+    var shopDomain = window.Shopify ? window.Shopify.shop : '';
+    
+    // Se já está ativado para esta loja, permite
+    if (ativado === shopDomain) {
+      return true;
+    }
+    
+    return false;
+  }
+  
+  // Solicita senha
+  function solicitarSenha() {
+    var tentativas = parseInt(localStorage.getItem(TENTATIVAS_KEY) || '0');
+    
+    if (tentativas >= MAX_TENTATIVAS) {
+      mostrarBloqueio();
+      return;
+    }
+    
+    var senha = prompt('🔒 TEMA PROTEGIDO\n\nEste tema requer ativação.\nDigite a senha de ativação:');
+    
+    if (!senha) {
+      bloquearTema();
+      return;
+    }
+    
+    if (senha === SENHA_CORRETA) {
+      ativarTema();
+    } else {
+      tentativas++;
+      localStorage.setItem(TENTATIVAS_KEY, tentativas.toString());
+      
+      if (tentativas >= MAX_TENTATIVAS) {
+        mostrarBloqueio();
+      } else {
+        alert('❌ Senha incorreta!\n\nTentativas restantes: ' + (MAX_TENTATIVAS - tentativas));
+        solicitarSenha();
+      }
+    }
+  }
+  
+  // Ativa o tema
+  function ativarTema() {
+    var shopDomain = window.Shopify ? window.Shopify.shop : 'local';
+    localStorage.setItem(TEMA_ATIVADO_KEY, shopDomain);
+    localStorage.removeItem(TENTATIVAS_KEY);
+    alert('✅ Tema ativado com sucesso!\n\nObrigado por usar nosso tema.');
+    location.reload();
+  }
+  
+  // Bloqueia o tema
+  function bloquearTema() {
+    document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #f5f5f5; font-family: Arial, sans-serif; text-align: center; padding: 20px;"><div style="max-width: 500px;"><h1 style="font-size: 48px; margin-bottom: 20px;">🔒</h1><h2 style="color: #333; margin-bottom: 10px;">Tema Protegido</h2><p style="color: #666; margin-bottom: 20px;">Este tema requer ativação para funcionar.</p><p style="color: #999; font-size: 14px;">Entre em contato com o desenvolvedor para obter a senha de ativação.</p><p style="margin-top: 30px; padding: 15px; background: #fff; border-radius: 8px; border-left: 4px solid #ff0000;"><strong>Tema:</strong> ConectWhats Classic<br><strong>Desenvolvedor:</strong> conectwhats.com</p></div></div>';
+    
+    // Remove todos os scripts
+    var scripts = document.querySelectorAll('script');
+    scripts.forEach(function(script) {
+      if (!script.textContent.includes('theme-protection')) {
+        script.remove();
+      }
+    });
+  }
+  
+  // Mostra bloqueio por tentativas excedidas
+  function mostrarBloqueio() {
+    document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #f5f5f5; font-family: Arial, sans-serif; text-align: center; padding: 20px;"><div style="max-width: 500px;"><h1 style="font-size: 48px; margin-bottom: 20px;">⛔</h1><h2 style="color: #d32f2f; margin-bottom: 10px;">Acesso Bloqueado</h2><p style="color: #666; margin-bottom: 20px;">Número máximo de tentativas excedido.</p><p style="color: #999; font-size: 14px;">Entre em contato com o desenvolvedor para desbloquear.</p><p style="margin-top: 30px; padding: 15px; background: #fff; border-radius: 8px; border-left: 4px solid #d32f2f;"><strong>Suporte:</strong> conectwhats.com<br><strong>Email:</strong> suporte@conectwhats.com</p><button onclick="localStorage.clear(); location.reload();" style="margin-top: 20px; padding: 10px 20px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer;">Limpar e Tentar Novamente</button></div></div>';
+  }
+  
+  // Verifica periodicamente se o tema ainda está ativado
+  function verificarPeriodicamente() {
+    setInterval(function() {
+      if (!verificarAtivacao()) {
+        solicitarSenha();
+      }
+    }, 60000); // Verifica a cada 1 minuto
+  }
+  
+  // Adiciona marca d'água
+  function adicionarMarcaDagua() {
+    var watermark = document.createElement('div');
+    watermark.innerHTML = '© ConectWhats Theme';
+    watermark.style.cssText = 'position: fixed; bottom: 10px; right: 10px; font-size: 10px; color: rgba(0,0,0,0.3); z-index: 9999; pointer-events: none;';
+    document.body.appendChild(watermark);
+  }
+  
+  // Inicializa proteção
+  function iniciar() {
+    // Só ativa em produção (não no editor do Shopify)
+    if (window.location.hostname.includes('myshopify.com') && !window.Shopify.designMode) {
+      if (!verificarAtivacao()) {
+        setTimeout(function() {
+          solicitarSenha();
+        }, 2000);
+      } else {
+        verificarPeriodicamente();
+      }
+      
+      adicionarMarcaDagua();
+    }
+  }
+  
+  // Aguarda o DOM carregar
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', iniciar);
+  } else {
+    iniciar();
+  }
+  
+})();
+</script>
