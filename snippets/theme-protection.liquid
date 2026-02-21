@@ -1,25 +1,35 @@
-{% comment %}
-  Sistema de Proteção do Tema
-  Impede uso não autorizado
-{% endcomment %}
+{%- comment -%}
+  Sistema de Proteção do Tema - Versão Melhorada
+  Só bloqueia quando detectar tentativa de roubo/cópia
+{%- endcomment -%}
 
 <script>
 (function() {
   'use strict';
   
-  // CONFIGURAÇÃO DA SENHA
-  var SENHA_CORRETA = 'Fagner2020@'; // Senha personalizada
-  var TEMA_ATIVADO_KEY = 'tema_conectwhats_ativado';
-  var TENTATIVAS_KEY = 'tema_tentativas';
-  var MAX_TENTATIVAS = 3;
+  // CONFIGURAÇÃO
+  var SENHA_CORRETA = 'Fagner2020@';
+  var LOJA_AUTORIZADA = 'emporiobody.myshopify.com'; // SUA LOJA
+  var TEMA_ATIVADO_KEY = 'tema_conectwhats_ativado_' + LOJA_AUTORIZADA;
   
-  // Verifica se já está ativado
+  // Verifica se está na loja autorizada
+  function isLojaAutorizada() {
+    var shopDomain = window.Shopify ? window.Shopify.shop : '';
+    return shopDomain === LOJA_AUTORIZADA;
+  }
+  
+  // Verifica se já foi ativado nesta loja
   function verificarAtivacao() {
     var ativado = localStorage.getItem(TEMA_ATIVADO_KEY);
+    return ativado === 'true';
+  }
+  
+  // Detecta tentativa de cópia/roubo
+  function detectarTentativaRoubo() {
     var shopDomain = window.Shopify ? window.Shopify.shop : '';
     
-    // Se já está ativado para esta loja, permite
-    if (ativado === shopDomain) {
+    // Se não está na loja autorizada E não está ativado = possível roubo
+    if (!isLojaAutorizada() && !verificarAtivacao()) {
       return true;
     }
     
@@ -28,101 +38,58 @@
   
   // Solicita senha
   function solicitarSenha() {
-    var tentativas = parseInt(localStorage.getItem(TENTATIVAS_KEY) || '0');
-    
-    if (tentativas >= MAX_TENTATIVAS) {
-      mostrarBloqueio();
-      return;
-    }
-    
-    var senha = prompt('🔒 TEMA PROTEGIDO\n\nEste tema requer ativação.\nDigite a senha de ativação:');
+    var senha = prompt('🔒 TEMA PROTEGIDO\n\nEste tema pertence a ' + LOJA_AUTORIZADA + '\n\nPara usar em outra loja, digite a senha de autorização:');
     
     if (!senha) {
-      bloquearTema();
+      bloquearTema('Tema não autorizado para esta loja.');
       return;
     }
     
     if (senha === SENHA_CORRETA) {
       ativarTema();
     } else {
-      tentativas++;
-      localStorage.setItem(TENTATIVAS_KEY, tentativas.toString());
-      
-      if (tentativas >= MAX_TENTATIVAS) {
-        mostrarBloqueio();
-      } else {
-        alert('❌ Senha incorreta!\n\nTentativas restantes: ' + (MAX_TENTATIVAS - tentativas));
-        solicitarSenha();
-      }
+      bloquearTema('Senha incorreta. Entre em contato com o proprietário do tema.');
     }
   }
   
   // Ativa o tema
   function ativarTema() {
-    var shopDomain = window.Shopify ? window.Shopify.shop : 'local';
-    localStorage.setItem(TEMA_ATIVADO_KEY, shopDomain);
-    localStorage.removeItem(TENTATIVAS_KEY);
-    alert('✅ Tema ativado com sucesso!\n\nObrigado por usar nosso tema.');
+    localStorage.setItem(TEMA_ATIVADO_KEY, 'true');
+    alert('✅ Tema autorizado para esta loja!');
     location.reload();
   }
   
   // Bloqueia o tema
-  function bloquearTema() {
-    document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #f5f5f5; font-family: Arial, sans-serif; text-align: center; padding: 20px;"><div style="max-width: 500px;"><h1 style="font-size: 48px; margin-bottom: 20px;">🔒</h1><h2 style="color: #333; margin-bottom: 10px;">Tema Protegido</h2><p style="color: #666; margin-bottom: 20px;">Este tema requer ativação para funcionar.</p><p style="color: #999; font-size: 14px;">Entre em contato com o desenvolvedor para obter a senha de ativação.</p><p style="margin-top: 30px; padding: 15px; background: #fff; border-radius: 8px; border-left: 4px solid #ff0000;"><strong>Tema:</strong> ConectWhats Classic<br><strong>Desenvolvedor:</strong> conectwhats.com</p></div></div>';
-    
-    // Remove todos os scripts
-    var scripts = document.querySelectorAll('script');
-    scripts.forEach(function(script) {
-      if (!script.textContent.includes('theme-protection')) {
-        script.remove();
-      }
-    });
+  function bloquearTema(mensagem) {
+    document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; padding: 20px;"><div style="max-width: 500px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;"><div style="font-size: 64px; margin-bottom: 20px;">🔒</div><h1 style="color: #333; font-size: 28px; margin-bottom: 15px; font-weight: 600;">Tema Protegido</h1><p style="color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">' + mensagem + '</p><div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;"><p style="margin: 5px 0; color: #555; font-size: 14px;"><strong>Tema:</strong> ConectWhats Classic</p><p style="margin: 5px 0; color: #555; font-size: 14px;"><strong>Loja Autorizada:</strong> ' + LOJA_AUTORIZADA + '</p></div><p style="color: #999; font-size: 13px;">Para autorizar este tema em sua loja, entre em contato com o desenvolvedor.</p></div></div>';
   }
   
-  // Mostra bloqueio por tentativas excedidas
-  function mostrarBloqueio() {
-    document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: #f5f5f5; font-family: Arial, sans-serif; text-align: center; padding: 20px;"><div style="max-width: 500px;"><h1 style="font-size: 48px; margin-bottom: 20px;">⛔</h1><h2 style="color: #d32f2f; margin-bottom: 10px;">Acesso Bloqueado</h2><p style="color: #666; margin-bottom: 20px;">Número máximo de tentativas excedido.</p><p style="color: #999; font-size: 14px;">Entre em contato com o desenvolvedor para desbloquear.</p><p style="margin-top: 30px; padding: 15px; background: #fff; border-radius: 8px; border-left: 4px solid #d32f2f;"><strong>Suporte:</strong> conectwhats.com<br><strong>Email:</strong> suporte@conectwhats.com</p><button onclick="localStorage.clear(); location.reload();" style="margin-top: 20px; padding: 10px 20px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer;">Limpar e Tentar Novamente</button></div></div>';
-  }
-  
-  // Verifica periodicamente se o tema ainda está ativado
-  function verificarPeriodicamente() {
-    setInterval(function() {
-      if (!verificarAtivacao()) {
-        solicitarSenha();
-      }
-    }, 60000); // Verifica a cada 1 minuto
-  }
-  
-  // Adiciona marca d'água
+  // Adiciona marca d\'água discreta
   function adicionarMarcaDagua() {
-    var watermark = document.createElement('div');
-    watermark.innerHTML = '© ConectWhats Theme';
-    watermark.style.cssText = 'position: fixed; bottom: 10px; right: 10px; font-size: 10px; color: rgba(0,0,0,0.3); z-index: 9999; pointer-events: none;';
-    document.body.appendChild(watermark);
+    if (!isLojaAutorizada()) {
+      var watermark = document.createElement('div');
+      watermark.innerHTML = '© ConectWhats Theme - Não Autorizado';
+      watermark.style.cssText = 'position: fixed; bottom: 5px; right: 5px; font-size: 9px; color: rgba(255,0,0,0.4); z-index: 99999; pointer-events: none; background: rgba(255,255,255,0.8); padding: 2px 5px; border-radius: 3px;';
+      document.body.appendChild(watermark);
+    }
   }
   
   // Inicializa proteção
   function iniciar() {
-    // Detecta se é uma tentativa de copiar o tema
-    var isDuplicating = window.location.search.includes('preview_theme_id') || 
-                        window.location.pathname.includes('/admin/') ||
-                        (window.Shopify && window.Shopify.designMode);
+    // Se está na loja autorizada, não faz nada
+    if (isLojaAutorizada()) {
+      console.log('✅ Tema rodando na loja autorizada');
+      return;
+    }
     
-    // Detecta se está em outra loja (domínio diferente do original)
-    var shopDomain = window.Shopify ? window.Shopify.shop : '';
-    var lojaOriginal = 'emporiobody.myshopify.com'; // COLOQUE O DOMÍNIO DA SUA LOJA AQUI
-    
-    // Só ativa proteção se:
-    // 1. Estiver tentando editar/duplicar OU
-    // 2. Estiver em uma loja diferente da original
-    if (isDuplicating || (shopDomain && shopDomain !== lojaOriginal)) {
-      if (!verificarAtivacao()) {
-        setTimeout(function() {
-          solicitarSenha();
-        }, 2000);
-      } else {
-        verificarPeriodicamente();
-      }
+    // Se detectar tentativa de roubo
+    if (detectarTentativaRoubo()) {
+      console.warn('⚠️ Tema detectado em loja não autorizada');
+      
+      // Aguarda 3 segundos antes de pedir senha (para não atrapalhar preview rápido)
+      setTimeout(function() {
+        solicitarSenha();
+      }, 3000);
       
       adicionarMarcaDagua();
     }
