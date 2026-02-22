@@ -1483,6 +1483,135 @@
     ]
   },
   {
+    "name": "Prova Social",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Notificacoes de Prova Social",
+        "info": "Mostra notificacoes de compras recentes para aumentar conversao"
+      },
+      {
+        "type": "checkbox",
+        "id": "social_proof_enabled",
+        "label": "Ativar prova social",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "social_proof_min_delay",
+        "label": "Intervalo minimo entre notificacoes (segundos)",
+        "min": 3,
+        "max": 30,
+        "step": 1,
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "social_proof_max_delay",
+        "label": "Intervalo maximo entre notificacoes (segundos)",
+        "min": 10,
+        "max": 60,
+        "step": 5,
+        "default": 15
+      },
+      {
+        "type": "range",
+        "id": "social_proof_display_time",
+        "label": "Tempo de exibicao de cada notificacao (segundos)",
+        "min": 3,
+        "max": 15,
+        "step": 1,
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "social_proof_max_notifications",
+        "label": "Numero maximo de notificacoes por sessao",
+        "min": 3,
+        "max": 20,
+        "step": 1,
+        "default": 10
+      }
+    ]
+  },
+  {
+    "name": "Popup de Saida",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Popup com Cupom de Desconto",
+        "info": "Mostra popup com cupom quando usuario tenta sair da pagina"
+      },
+      {
+        "type": "checkbox",
+        "id": "exit_popup_enabled",
+        "label": "Ativar popup de saida",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "exit_popup_title",
+        "label": "Titulo do popup",
+        "default": "Espere! Nao va embora!"
+      },
+      {
+        "type": "textarea",
+        "id": "exit_popup_message",
+        "label": "Mensagem do popup",
+        "default": "Ganhe um desconto especial na sua primeira compra!"
+      },
+      {
+        "type": "header",
+        "content": "Configuracao do Cupom"
+      },
+      {
+        "type": "text",
+        "id": "exit_popup_coupon_label",
+        "label": "Rotulo do cupom",
+        "default": "Use o cupom:"
+      },
+      {
+        "type": "text",
+        "id": "exit_popup_coupon_code",
+        "label": "Codigo do cupom",
+        "info": "Digite o codigo do cupom que sera copiado pelo cliente",
+        "default": "BEMVINDO10"
+      },
+      {
+        "type": "text",
+        "id": "exit_popup_discount_text",
+        "label": "Texto do desconto",
+        "default": "10% OFF na sua primeira compra"
+      },
+      {
+        "type": "text",
+        "id": "exit_popup_button_text",
+        "label": "Texto do botao",
+        "default": "Continuar Comprando"
+      },
+      {
+        "type": "header",
+        "content": "Configuracoes Avancadas"
+      },
+      {
+        "type": "range",
+        "id": "exit_popup_delay",
+        "label": "Atraso para mostrar popup (milissegundos)",
+        "info": "Tempo de espera apos mouse sair da pagina",
+        "min": 0,
+        "max": 3000,
+        "step": 100,
+        "default": 1000
+      },
+      {
+        "type": "checkbox",
+        "id": "exit_popup_show_once",
+        "label": "Mostrar apenas uma vez por sessao",
+        "default": true
+      }
+    ]
+  },
+  {
     "name": "Redes Sociais",
     "settings": [
       {

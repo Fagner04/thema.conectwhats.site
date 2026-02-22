@@ -1,0 +1,349 @@
+{%- comment -%}
+  Popup de Saída com Cupom
+  Mostra popup com cupom de desconto quando usuário tenta sair da página
+{%- endcomment -%}
+
+{%- if settings.exit_popup_enabled -%}
+<div id="exit-popup-overlay" class="exit-popup-overlay" style="display: none;">
+  <div class="exit-popup-container">
+    <button class="exit-popup-close" aria-label="Fechar">×</button>
+    
+    <div class="exit-popup-content">
+      <div class="exit-popup-icon">🎁</div>
+      <h2 class="exit-popup-title">{{ settings.exit_popup_title | default: "Espere! Não vá embora!" }}</h2>
+      <p class="exit-popup-message">{{ settings.exit_popup_message | default: "Ganhe um desconto especial na sua primeira compra!" }}</p>
+      
+      <div class="exit-popup-coupon">
+        <div class="exit-popup-coupon-label">{{ settings.exit_popup_coupon_label | default: "Use o cupom:" }}</div>
+        <div class="exit-popup-coupon-code" id="exit-popup-coupon-code">{{ settings.exit_popup_coupon_code | default: "BEMVINDO10" }}</div>
+        <button class="exit-popup-copy-btn" id="exit-popup-copy-btn">
+          <span class="copy-text">Copiar Cupom</span>
+          <span class="copied-text" style="display: none;">✓ Copiado!</span>
+        </button>
+      </div>
+      
+      <div class="exit-popup-discount">{{ settings.exit_popup_discount_text | default: "10% OFF na sua primeira compra" }}</div>
+      
+      <a href="/collections/all" class="exit-popup-shop-btn">{{ settings.exit_popup_button_text | default: "Continuar Comprando" }}</a>
+    </div>
+  </div>
+</div>
+
+<style>
+.exit-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.exit-popup-container {
+  background: white;
+  border-radius: 20px;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  animation: slideUp 0.4s ease-out;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.exit-popup-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: #999;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 10;
+}
+
+.exit-popup-close:hover {
+  color: #333;
+  transform: rotate(90deg);
+}
+
+.exit-popup-content {
+  padding: 40px 30px;
+  text-align: center;
+}
+
+.exit-popup-icon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  animation: bounce 1s infinite;
+}
+
+.exit-popup-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 15px 0;
+}
+
+.exit-popup-message {
+  font-size: 16px;
+  color: #666;
+  margin: 0 0 30px 0;
+  line-height: 1.5;
+}
+
+.exit-popup-coupon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.exit-popup-coupon-label {
+  color: white;
+  font-size: 14px;
+  margin-bottom: 10px;
+  opacity: 0.9;
+}
+
+.exit-popup-coupon-code {
+  background: white;
+  color: #667eea;
+  font-size: 24px;
+  font-weight: 700;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  letter-spacing: 2px;
+  font-family: monospace;
+}
+
+.exit-popup-copy-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  color: white;
+  padding: 10px 30px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.exit-popup-copy-btn:hover {
+  background: white;
+  color: #667eea;
+}
+
+.exit-popup-discount {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4CAF50;
+  margin-bottom: 25px;
+}
+
+.exit-popup-shop-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+  color: white;
+  padding: 15px 40px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.exit-popup-shop-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@media (max-width: 640px) {
+  .exit-popup-container {
+    width: 95%;
+    max-width: 100%;
+  }
+  
+  .exit-popup-content {
+    padding: 30px 20px;
+  }
+  
+  .exit-popup-icon {
+    font-size: 48px;
+  }
+  
+  .exit-popup-title {
+    font-size: 22px;
+  }
+  
+  .exit-popup-message {
+    font-size: 14px;
+  }
+  
+  .exit-popup-coupon-code {
+    font-size: 20px;
+    padding: 12px;
+  }
+  
+  .exit-popup-discount {
+    font-size: 16px;
+  }
+  
+  .exit-popup-shop-btn {
+    padding: 12px 30px;
+    font-size: 14px;
+  }
+}
+</style>
+
+<script>
+(function() {
+  'use strict';
+  
+  var config = {
+    enabled: {{ settings.exit_popup_enabled | json }},
+    delay: {{ settings.exit_popup_delay | default: 1000 | json }}, // ms
+    showOnce: {{ settings.exit_popup_show_once | default: true | json }}
+  };
+  
+  if (!config.enabled) return;
+  
+  var overlay = document.getElementById('exit-popup-overlay');
+  var closeBtn = overlay.querySelector('.exit-popup-close');
+  var copyBtn = document.getElementById('exit-popup-copy-btn');
+  var couponCode = document.getElementById('exit-popup-coupon-code').textContent.trim();
+  
+  var hasShown = false;
+  var canShow = true;
+  var timeoutId = null;
+  
+  // Verifica se já mostrou antes (localStorage)
+  if (config.showOnce && localStorage.getItem('exitPopupShown')) {
+    canShow = false;
+  }
+  
+  // Detecta quando mouse sai da página
+  document.addEventListener('mouseleave', function(e) {
+    if (e.clientY < 0 && canShow && !hasShown) {
+      timeoutId = setTimeout(function() {
+        showPopup();
+      }, config.delay);
+    }
+  });
+  
+  // Cancela se mouse voltar
+  document.addEventListener('mouseenter', function() {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+  });
+  
+  function showPopup() {
+    overlay.style.display = 'flex';
+    hasShown = true;
+    
+    if (config.showOnce) {
+      localStorage.setItem('exitPopupShown', 'true');
+    }
+  }
+  
+  function hidePopup() {
+    overlay.style.display = 'none';
+  }
+  
+  // Botão fechar
+  closeBtn.addEventListener('click', hidePopup);
+  
+  // Fechar ao clicar fora
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      hidePopup();
+    }
+  });
+  
+  // Copiar cupom
+  copyBtn.addEventListener('click', function() {
+    var copyText = copyBtn.querySelector('.copy-text');
+    var copiedText = copyBtn.querySelector('.copied-text');
+    
+    // Copia para clipboard
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(couponCode).then(function() {
+        showCopiedFeedback();
+      });
+    } else {
+      // Fallback para navegadores antigos
+      var textarea = document.createElement('textarea');
+      textarea.value = couponCode;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      showCopiedFeedback();
+    }
+    
+    function showCopiedFeedback() {
+      copyText.style.display = 'none';
+      copiedText.style.display = 'inline';
+      
+      setTimeout(function() {
+        copyText.style.display = 'inline';
+        copiedText.style.display = 'none';
+      }, 2000);
+    }
+  });
+  
+  // Fechar com ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && overlay.style.display === 'flex') {
+      hidePopup();
+    }
+  });
+  
+})();
+</script>
+{%- endif -%}
