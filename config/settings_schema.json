@@ -1136,6 +1136,95 @@
       },
       {
         "type": "header",
+        "content": "Horario de Atendimento"
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_schedule_enabled",
+        "label": "Ativar controle de horario",
+        "info": "Mostra status online/offline baseado no horario configurado",
+        "default": false
+      },
+      {
+        "type": "select",
+        "id": "whatsapp_timezone",
+        "label": "Fuso horario",
+        "options": [
+          {
+            "value": "-5",
+            "label": "Acre (UTC-5)"
+          },
+          {
+            "value": "-4",
+            "label": "Amazonas (UTC-4)"
+          },
+          {
+            "value": "-3",
+            "label": "Brasilia (UTC-3)"
+          },
+          {
+            "value": "-2",
+            "label": "Fernando de Noronha (UTC-2)"
+          }
+        ],
+        "default": "-3"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_weekday_start",
+        "label": "Horario de inicio (Segunda a Sexta)",
+        "info": "Formato: HH:MM (ex: 09:00)",
+        "default": "09:00"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_weekday_end",
+        "label": "Horario de termino (Segunda a Sexta)",
+        "info": "Formato: HH:MM (ex: 18:00)",
+        "default": "18:00"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_saturday_start",
+        "label": "Horario de inicio (Sabado)",
+        "info": "Formato: HH:MM (ex: 09:00)",
+        "default": "09:00"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_saturday_end",
+        "label": "Horario de termino (Sabado)",
+        "info": "Formato: HH:MM (ex: 13:00)",
+        "default": "13:00"
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_sunday_enabled",
+        "label": "Atender aos domingos",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_sunday_start",
+        "label": "Horario de inicio (Domingo)",
+        "info": "Formato: HH:MM (ex: 09:00)",
+        "default": "09:00"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_sunday_end",
+        "label": "Horario de termino (Domingo)",
+        "info": "Formato: HH:MM (ex: 13:00)",
+        "default": "13:00"
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_offline_message",
+        "label": "Mensagem quando offline",
+        "default": "No momento estamos offline. Deixe sua mensagem!"
+      },
+      {
+        "type": "header",
         "content": "Equipe ConectWhats"
       },
       {
