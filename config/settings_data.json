@@ -123,7 +123,7 @@
     "cart_empty_button_link": "shopify://collections/all",
     "cart_show_free_shipping_threshold": false,
     "cart_free_shipping_threshold": "0",
-    "cart_warning_enable": true,
+    "cart_warning_enable": false,
     "cart_warning_message": "coleção sem frete gratis{PROMOÇÃO}\n\ncoleção sem desconto no pix{PROMOÇÃO}\n\nAntes de finalizar saiba que não estamos recebendo  trocas e nem devoluções de produtos da promoção, a não ser  defeitos,\nQualquer duvida chama no chat",
     "cart_warning_type": "warning",
     "cart_warning_bg_color": "#ffffff",
