@@ -1108,6 +1108,34 @@
       },
       {
         "type": "header",
+        "content": "Opcoes de Rastreio e Frete"
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_show_tracking",
+        "label": "Mostrar botao de rastreio",
+        "default": true
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_tracking_message",
+        "label": "Mensagem padrao para rastreio",
+        "default": "Ola! Gostaria de rastrear meu pedido."
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_show_shipping",
+        "label": "Mostrar botao de calculo de frete",
+        "default": true
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_shipping_message",
+        "label": "Mensagem padrao para frete",
+        "default": "Ola! Gostaria de calcular o frete para meu CEP."
+      },
+      {
+        "type": "header",
         "content": "Equipe ConectWhats"
       },
       {
