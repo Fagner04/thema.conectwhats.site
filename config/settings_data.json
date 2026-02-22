@@ -145,6 +145,7 @@
     "ano_novo_auto_close": false,
     "ano_novo_auto_close_time": 15,
     "social_proof_enabled": true,
+    "social_proof_max_delay": 20,
     "exit_popup_enabled": true,
     "social_facebook": "http://",
     "social_twitter": "",
