@@ -144,6 +144,7 @@
     "ano_novo_show_once": true,
     "ano_novo_auto_close": false,
     "ano_novo_auto_close_time": 15,
+    "exit_popup_enabled": true,
     "social_facebook": "http://",
     "social_twitter": "",
     "social_pinterest": "",
