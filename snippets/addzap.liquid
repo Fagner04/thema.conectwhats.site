@@ -1074,13 +1074,23 @@
       var state = JSON.parse(cycleState);
       var timeSinceLastMessage = Date.now() - state.timestamp;
       
-      // Se passou menos que o tempo de pausa, continua de onde parou
-      if (timeSinceLastMessage < autoMessageConfig.pauseAfterCycle) {
-        currentMessageIndex = state.index;
-        hasShownCycle = state.completed;
+      // Se completou o ciclo, verifica se ainda está na pausa
+      if (state.completed) {
+        if (timeSinceLastMessage < autoMessageConfig.pauseAfterCycle) {
+          // Ainda em pausa, não faz nada agora
+          hasShownCycle = true;
+          currentMessageIndex = 0;
+        } else {
+          // Pausa terminou, reinicia
+          localStorage.removeItem('whatsapp_cycle_state');
+          hasShownCycle = false;
+          currentMessageIndex = 0;
+        }
       } else {
-        // Se passou o tempo de pausa, limpa e reinicia
-        localStorage.removeItem('whatsapp_cycle_state');
+        // Ciclo não completou, continua de onde parou
+        // Avança para próxima mensagem (pois a atual já foi mostrada)
+        currentMessageIndex = state.index + 1;
+        hasShownCycle = false;
       }
     } catch (e) {
       localStorage.removeItem('whatsapp_cycle_state');
@@ -1610,7 +1620,7 @@
       
       // URL da API do Google Sheets configurada
       var sheetsApiUrl = '{{ settings.sheets_frete_url }}';
-      var cepOrigem = '{{ settings.correios_cep_origem | default: "01310-100" }}'; // Mantém formatado
+      var cepOrigem = '{{ settings.correios_cep_origem | default: "74550050" }}'; // CEP de origem
       
       if (!sheetsApiUrl || sheetsApiUrl === '') {
         loading.classList.remove('show');
@@ -1619,24 +1629,22 @@
         return;
       }
       
-      // Parâmetros para cálculo (CEPs COM hífen)
+      // Remove hífen dos CEPs para enviar à API
+      var cepOrigemLimpo = cepOrigem.replace(/\D/g, '');
+      var cepDestinoLimpo = cep; // Já está sem hífen
+      
+      // Parâmetros conforme esperado pelo script do Google Sheets
+      // O script espera: cep ou destination_cep, cep_origem ou origin_cep, peso ou cart_weight
       var params = {
-        cepOrigem: cepOrigem,
-        cepDestino: cepFormatado, // Envia com hífen
-        peso: 0.3,
-        comprimento: 20,
-        altura: 10,
-        largura: 15,
-        formato: 1,
-        maoPropria: 'N',
-        valorDeclarado: 0,
-        avisoRecebimento: 'N'
+        cep: cepDestinoLimpo,
+        cep_origem: cepOrigemLimpo,
+        peso: 0.5 // peso em kg
       };
       
       // Monta URL com parâmetros
       var url = sheetsApiUrl + '?';
       for (var key in params) {
-        url += key + '=' + params[key] + '&';
+        url += key + '=' + encodeURIComponent(params[key]) + '&';
       }
       url = url.slice(0, -1); // Remove último &
       
@@ -1653,28 +1661,17 @@
           console.log('Resposta da API:', data); // Debug
           loading.classList.remove('show');
           
-          // Verifica diferentes formatos de erro
-          if (data.erro || data.error) {
-            var mensagemErro = data.mensagem || data.message || 'Não foi possível calcular o frete para este CEP.';
+          // Verifica se houve erro
+          if (data.success === false || data.error) {
+            var mensagemErro = data.error || 'Não foi possível calcular o frete para este CEP.';
             error.textContent = mensagemErro;
             error.classList.add('show');
             return;
           }
           
-          // Verifica se tem serviços
-          if (!data.servicos || data.servicos.length === 0) {
+          // Verifica se tem opções de frete
+          if (!data.options || data.options.length === 0) {
             error.textContent = 'Nenhum serviço de frete disponível para este CEP.';
-            error.classList.add('show');
-            return;
-          }
-          
-          // Filtra apenas serviços sem erro
-          var servicosValidos = data.servicos.filter(function(s) {
-            return !s.erro || s.erro === '0' || s.erro === 0;
-          });
-          
-          if (servicosValidos.length === 0) {
-            error.textContent = 'Não foi possível calcular o frete. Tente outro CEP ou entre em contato.';
             error.classList.add('show');
             return;
           }
@@ -1692,27 +1689,22 @@
               }
               html += '</h4>';
               
-              // Processa cada serviço válido
-              servicosValidos.forEach(function(servico) {
-                var nome = servico.nome || servico.codigo || 'Correios';
-                var valor = parseFloat(servico.valor || servico.Valor || 0);
-                var prazo = servico.prazoEntrega || servico.PrazoEntrega || '?';
-                
-                // Formata nome do serviço
-                if (nome.includes('PAC') || nome.includes('04510')) nome = 'PAC';
-                else if (nome.includes('SEDEX') || nome.includes('04014')) nome = 'SEDEX';
-                else if (nome.includes('04669')) nome = 'PAC';
+              // Processa cada opção de frete
+              data.options.forEach(function(option) {
+                var nome = option.name || 'Correios';
+                var valor = parseFloat(option.price || 0);
+                var prazo = option.estimated_days || 'Consultar';
                 
                 html += '<div class="whatsapp-shipping-option">';
                 html += '<div>';
                 html += '<div class="whatsapp-shipping-name">' + nome + '</div>';
-                html += '<div class="whatsapp-shipping-time">Entrega em ' + prazo + ' dias úteis</div>';
+                html += '<div class="whatsapp-shipping-time">' + prazo + '</div>';
                 html += '</div>';
                 html += '<div class="whatsapp-shipping-price">R$ ' + valor.toFixed(2).replace('.', ',') + '</div>';
                 html += '</div>';
               });
               
-              html += '<p style="font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center;">Valores calculados pelos Correios. Peso: 300g</p>';
+              html += '<p style="font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center;">Valores calculados pelos Correios</p>';
               
               result.innerHTML = html;
               result.classList.add('show');
@@ -1721,25 +1713,21 @@
               // Se falhar buscar CEP, mostra sem cidade
               var html = '<h4>Opções de Frete</h4>';
               
-              servicosValidos.forEach(function(servico) {
-                var nome = servico.nome || servico.codigo || 'Correios';
-                var valor = parseFloat(servico.valor || servico.Valor || 0);
-                var prazo = servico.prazoEntrega || servico.PrazoEntrega || '?';
-                
-                if (nome.includes('PAC') || nome.includes('04510')) nome = 'PAC';
-                else if (nome.includes('SEDEX') || nome.includes('04014')) nome = 'SEDEX';
-                else if (nome.includes('04669')) nome = 'PAC';
+              data.options.forEach(function(option) {
+                var nome = option.name || 'Correios';
+                var valor = parseFloat(option.price || 0);
+                var prazo = option.estimated_days || 'Consultar';
                 
                 html += '<div class="whatsapp-shipping-option">';
                 html += '<div>';
                 html += '<div class="whatsapp-shipping-name">' + nome + '</div>';
-                html += '<div class="whatsapp-shipping-time">Entrega em ' + prazo + ' dias úteis</div>';
+                html += '<div class="whatsapp-shipping-time">' + prazo + '</div>';
                 html += '</div>';
                 html += '<div class="whatsapp-shipping-price">R$ ' + valor.toFixed(2).replace('.', ',') + '</div>';
                 html += '</div>';
               });
               
-              html += '<p style="font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center;">Valores calculados pelos Correios. Peso: 300g</p>';
+              html += '<p style="font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center;">Valores calculados pelos Correios</p>';
               
               result.innerHTML = html;
               result.classList.add('show');
