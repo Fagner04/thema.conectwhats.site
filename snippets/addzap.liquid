@@ -1557,21 +1557,65 @@
       // Mostra loading
       loading.classList.add('show');
       
-      // Redireciona para o site dos Correios
-      // Como não há API gratuita confiável, abrimos o rastreamento oficial
-      loading.classList.remove('show');
+      // URL da API do Google Sheets (mesma do frete)
+      var sheetsApiUrl = '{{ settings.sheets_frete_url }}';
       
-      var html = '<h4>Rastreamento</h4>';
-      html += '<p style="font-size: 14px; color: #374151; line-height: 1.6; margin-bottom: 15px;">Clique no botão abaixo para rastrear seu pedido no site oficial dos Correios:</p>';
-      html += '<a href="https://rastreamento.correios.com.br/app/index.php" target="_blank" style="display: block; background: var(--whatsapp-primary); color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-bottom: 10px;">Rastrear nos Correios</a>';
-      html += '<div style="background: #f3f4f6; padding: 12px; border-radius: 8px; margin-top: 10px;">';
-      html += '<div style="font-size: 11px; color: #9ca3af; margin-bottom: 4px;">Seu código:</div>';
-      html += '<div style="font-size: 14px; color: #374151; font-weight: 600; font-family: monospace;">' + code + '</div>';
-      html += '</div>';
-      html += '<p style="font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center;">Cole o código acima no site dos Correios</p>';
+      if (!sheetsApiUrl || sheetsApiUrl === '') {
+        loading.classList.remove('show');
+        error.textContent = 'API não configurada. Configure em: Temas > Cálculo de Frete > URL da API.';
+        error.classList.add('show');
+        return;
+      }
       
-      result.innerHTML = html;
-      result.classList.add('show');
+      // Chama API com parâmetro codigo
+      var url = sheetsApiUrl + '?codigo=' + encodeURIComponent(code);
+      
+      fetch(url)
+        .then(function(response) {
+          if (!response.ok) {
+            throw new Error('Erro na API: ' + response.status);
+          }
+          return response.json();
+        })
+        .then(function(data) {
+          console.log('Resposta rastreamento:', data);
+          loading.classList.remove('show');
+          
+          if (data.success === false || data.error) {
+            error.textContent = data.error || 'Código de rastreio não encontrado.';
+            error.classList.add('show');
+            return;
+          }
+          
+          if (!data.eventos || data.eventos.length === 0) {
+            error.textContent = 'Nenhuma informação de rastreamento disponível.';
+            error.classList.add('show');
+            return;
+          }
+          
+          var html = '<h4>Status do Pedido</h4>';
+          data.eventos.forEach(function(evento) {
+            html += '<div class="whatsapp-tracking-status">';
+            html += '<div class="whatsapp-tracking-date">' + evento.data + ' - ' + evento.hora + '</div>';
+            html += '<div class="whatsapp-tracking-text">' + evento.status + '</div>';
+            if (evento.local || evento.cidade) {
+              var localizacao = [];
+              if (evento.local) localizacao.push(evento.local);
+              if (evento.cidade) localizacao.push(evento.cidade);
+              html += '<div class="whatsapp-tracking-text" style="font-size: 12px; color: #9ca3af; margin-top: 4px;">' + localizacao.join(' - ') + '</div>';
+            }
+            html += '</div>';
+          });
+          
+          result.innerHTML = html;
+          result.classList.add('show');
+        })
+        .catch(function(err) {
+          loading.classList.remove('show');
+          console.error('Erro no rastreamento:', err);
+          error.textContent = 'Erro ao buscar rastreamento. Verifique o código e tente novamente.';
+          error.classList.add('show');
+        });
     });
   }
   
