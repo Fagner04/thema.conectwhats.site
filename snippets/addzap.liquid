@@ -18,6 +18,142 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* Balão de mensagem externa */
+.whatsapp-external-message {
+  position: absolute;
+  bottom: 0;
+  right: 80px;
+  background: white;
+  border-radius: 16px;
+  padding: 14px 18px;
+  max-width: 280px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(20px);
+  transition: all 0.4s ease-out;
+  z-index: 9998;
+}
+
+.whatsapp-external-message.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.whatsapp-external-message::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  bottom: 20px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid white;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+.whatsapp-external-message-text {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.5;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.whatsapp-external-message-time {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 6px;
+  display: block;
+  text-align: right;
+}
+
+.whatsapp-external-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  padding: 2px 6px;
+  transition: color 0.2s;
+}
+
+.whatsapp-external-close:hover {
+  color: #374151;
+}
+
+/* Indicador de digitação externo */
+.whatsapp-external-typing {
+  position: absolute;
+  bottom: 0;
+  right: 80px;
+  background: white;
+  border-radius: 16px;
+  padding: 12px 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(20px);
+  transition: all 0.4s ease-out;
+  z-index: 9998;
+  display: none;
+}
+
+.whatsapp-external-typing.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  display: block;
+}
+
+.whatsapp-external-typing::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  bottom: 15px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid white;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+.whatsapp-external-typing-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.whatsapp-external-typing-dots span {
+  width: 8px;
+  height: 8px;
+  background: #9ca3af;
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.whatsapp-external-typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.whatsapp-external-typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .whatsapp-external-message,
+  .whatsapp-external-typing {
+    right: 75px;
+    max-width: calc(100vw - 110px);
+  }
+}
+
 /* Botão Flutuante */
 .whatsapp-float-btn {
   width: 60px;
@@ -433,6 +569,22 @@
 </style>
 
 <div class="whatsapp-widget">
+  <!-- Indicador de digitação externo -->
+  <div class="whatsapp-external-typing" id="whatsapp-external-typing">
+    <div class="whatsapp-external-typing-dots">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
+  <!-- Balão de mensagem externo -->
+  <div class="whatsapp-external-message" id="whatsapp-external-message">
+    <button class="whatsapp-external-close" id="whatsapp-external-close">×</button>
+    <p class="whatsapp-external-message-text" id="whatsapp-external-text"></p>
+    <span class="whatsapp-external-message-time" id="whatsapp-external-time"></span>
+  </div>
+
   <!-- Botão Flutuante -->
   <div class="whatsapp-float-btn" id="whatsapp-toggle">
     {% if settings.show_online_icon %}
@@ -733,6 +885,49 @@
   // Sistema de mensagens automáticas
   var typingIndicator = document.getElementById('whatsapp-typing');
   var autoMessagesContainer = document.getElementById('whatsapp-auto-messages');
+  var externalTyping = document.getElementById('whatsapp-external-typing');
+  var externalMessage = document.getElementById('whatsapp-external-message');
+  var externalText = document.getElementById('whatsapp-external-text');
+  var externalTime = document.getElementById('whatsapp-external-time');
+  var externalClose = document.getElementById('whatsapp-external-close');
+  
+  // Fechar mensagem externa
+  if (externalClose) {
+    externalClose.addEventListener('click', function(e) {
+      e.stopPropagation();
+      hideExternalMessage();
+    });
+  }
+  
+  function showExternalTyping() {
+    if (externalTyping) {
+      externalTyping.classList.add('show');
+    }
+  }
+  
+  function hideExternalTyping() {
+    if (externalTyping) {
+      externalTyping.classList.remove('show');
+    }
+  }
+  
+  function showExternalMessage(message) {
+    if (!externalMessage || !externalText || !externalTime) return;
+    
+    var now = getCurrentTime();
+    var timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                  now.getMinutes().toString().padStart(2, '0');
+    
+    externalText.textContent = message;
+    externalTime.textContent = timeStr;
+    externalMessage.classList.add('show');
+  }
+  
+  function hideExternalMessage() {
+    if (externalMessage) {
+      externalMessage.classList.remove('show');
+    }
+  }
   
   function showTypingIndicator() {
     if (typingIndicator) {
@@ -790,27 +985,55 @@
       return;
     }
     
-    // Mostra indicador de digitação
-    showTypingIndicator();
+    // Se chat estiver aberto, mostra dentro do chat
+    var isChatOpen = chatBox.classList.contains('active');
     
-    // Após duração de digitação, mostra mensagem
-    messageTimeout = setTimeout(function() {
-      hideTypingIndicator();
-      showAutoMessage(autoMessages[currentMessageIndex]);
-      currentMessageIndex++;
+    if (isChatOpen) {
+      // Mostra indicador de digitação interno
+      showTypingIndicator();
       
-      // Agenda próxima mensagem
+      // Após duração de digitação, mostra mensagem
       messageTimeout = setTimeout(function() {
-        showNextMessage();
-      }, autoMessageConfig.interval);
+        hideTypingIndicator();
+        showAutoMessage(autoMessages[currentMessageIndex]);
+        currentMessageIndex++;
+        
+        // Agenda próxima mensagem
+        messageTimeout = setTimeout(function() {
+          showNextMessage();
+        }, autoMessageConfig.interval);
+        
+      }, autoMessageConfig.typingDuration);
+    } else {
+      // Mostra balão externo (fora do chat)
+      hideExternalMessage(); // Esconde mensagem anterior
+      showExternalTyping();
       
-    }, autoMessageConfig.typingDuration);
+      // Após duração de digitação, mostra mensagem externa
+      messageTimeout = setTimeout(function() {
+        hideExternalTyping();
+        showExternalMessage(autoMessages[currentMessageIndex]);
+        currentMessageIndex++;
+        
+        // Agenda próxima mensagem (esconde balão antes)
+        messageTimeout = setTimeout(function() {
+          hideExternalMessage();
+          
+          // Aguarda um pouco antes da próxima
+          setTimeout(function() {
+            showNextMessage();
+          }, 1000);
+          
+        }, autoMessageConfig.interval);
+        
+      }, autoMessageConfig.typingDuration);
+    }
   }
   
   function startMessageCycle() {
     if (!autoMessageConfig.enabled || autoMessages.length === 0) return;
     
-    // Limpa mensagens anteriores
+    // Limpa mensagens anteriores do chat
     if (autoMessagesContainer) {
       autoMessagesContainer.innerHTML = '';
     }
@@ -823,6 +1046,15 @@
     if (cycleTimeout) clearTimeout(cycleTimeout);
     if (messageTimeout) clearTimeout(messageTimeout);
     hideTypingIndicator();
+    hideExternalTyping();
+    hideExternalMessage();
+  }
+  
+  // Inicia ciclo automaticamente após 3 segundos (sem precisar abrir chat)
+  if (autoMessageConfig.enabled && autoMessages.length > 0) {
+    setTimeout(function() {
+      startMessageCycle();
+    }, 3000);
   }
   
   // Toggle chat
@@ -841,12 +1073,9 @@
       closeIcon.style.display = 'block';
       updateStatus(); // Atualiza ao abrir
       
-      // Inicia ciclo de mensagens se não foi mostrado ainda
-      if (!hasShownCycle && autoMessageConfig.enabled && autoMessages.length > 0) {
-        setTimeout(function() {
-          startMessageCycle();
-        }, 1000); // Aguarda 1s após abrir
-      }
+      // Esconde balões externos ao abrir chat
+      hideExternalMessage();
+      hideExternalTyping();
     }
   });
   
@@ -857,7 +1086,6 @@
     toggle.classList.remove('active');
     whatsappIcon.style.display = 'block';
     closeIcon.style.display = 'none';
-    stopMessageCycle(); // Para mensagens ao fechar
   });
   
   // Send message
