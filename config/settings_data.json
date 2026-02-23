@@ -155,8 +155,8 @@
     "ano_novo_auto_close_time": 15,
     "social_proof_enabled": true,
     "social_proof_min_delay": 25,
-    "social_proof_max_delay": 60,
-    "social_proof_display_time": 15,
+    "social_proof_max_delay": 45,
+    "social_proof_display_time": 11,
     "exit_popup_enabled": true,
     "social_facebook": "http://",
     "social_twitter": "",
@@ -271,7 +271,7 @@
           "navigation_email": "E-mail: emporiobodyofc@gmail.com",
           "show_condensed_search": false,
           "show_search_filter": false,
-          "search_menu": "",
+          "search_menu": "inicio",
           "show_search_menu_title": true
         }
       },
