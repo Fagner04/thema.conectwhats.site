@@ -334,7 +334,86 @@
   }
 }
 
-/* Scrollbar */
+/* Indicador de digitação */
+.whatsapp-typing-indicator {
+  display: none;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  width: fit-content;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.whatsapp-typing-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.whatsapp-typing-dots span {
+  width: 8px;
+  height: 8px;
+  background: #9ca3af;
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.whatsapp-typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.whatsapp-typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+/* Mensagens automáticas */
+.whatsapp-auto-message {
+  background: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  animation: messageSlideIn 0.3s ease-out;
+  display: none;
+}
+
+.whatsapp-auto-message p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--whatsapp-text);
+  line-height: 1.5;
+}
+
+.whatsapp-auto-message-time {
+  display: block;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 6px;
+  text-align: right;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 .whatsapp-body::-webkit-scrollbar {
   width: 6px;
 }
@@ -401,6 +480,18 @@
         <p id="whatsapp-greeting">{{ settings.chatzap | default: 'Olá! Bem-vindo. Como posso ajudar você hoje?' }}</p>
         <span class="whatsapp-welcome-time" id="whatsapp-time-greeting">Boa noite! 👍</span>
       </div>
+
+      <!-- Indicador de digitação -->
+      <div class="whatsapp-typing-indicator" id="whatsapp-typing">
+        <div class="whatsapp-typing-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+
+      <!-- Container para mensagens automáticas -->
+      <div id="whatsapp-auto-messages"></div>
 
       <!-- Botões de Ação -->
       <div class="whatsapp-action-buttons">
@@ -473,6 +564,37 @@
   var avatarOnline = chatBox.querySelector('.whatsapp-avatar-online');
   
   var whatsappNumber = '{{ settings.numberzap }}';
+  
+  // Mensagens automáticas configuradas
+  var autoMessages = [];
+  {% if settings.whatsapp_auto_message_1 != blank %}
+    autoMessages.push('{{ settings.whatsapp_auto_message_1 | escape }}');
+  {% endif %}
+  {% if settings.whatsapp_auto_message_2 != blank %}
+    autoMessages.push('{{ settings.whatsapp_auto_message_2 | escape }}');
+  {% endif %}
+  {% if settings.whatsapp_auto_message_3 != blank %}
+    autoMessages.push('{{ settings.whatsapp_auto_message_3 | escape }}');
+  {% endif %}
+  {% if settings.whatsapp_auto_message_4 != blank %}
+    autoMessages.push('{{ settings.whatsapp_auto_message_4 | escape }}');
+  {% endif %}
+  {% if settings.whatsapp_auto_message_5 != blank %}
+    autoMessages.push('{{ settings.whatsapp_auto_message_5 | escape }}');
+  {% endif %}
+  
+  // Configurações de mensagens automáticas
+  var autoMessageConfig = {
+    enabled: {{ settings.whatsapp_auto_messages_enabled | default: false | json }},
+    interval: {{ settings.whatsapp_auto_message_interval | default: 5 | json }} * 1000, // segundos para ms
+    pauseAfterCycle: {{ settings.whatsapp_auto_message_pause | default: 20 | json }} * 60 * 1000, // minutos para ms
+    typingDuration: 2000 // 2 segundos de digitação
+  };
+  
+  var currentMessageIndex = 0;
+  var cycleTimeout = null;
+  var messageTimeout = null;
+  var hasShownCycle = false;
   
   // Configurações de horário
   var config = {
@@ -608,6 +730,101 @@
   // Atualiza status a cada minuto
   setInterval(updateStatus, 60000);
   
+  // Sistema de mensagens automáticas
+  var typingIndicator = document.getElementById('whatsapp-typing');
+  var autoMessagesContainer = document.getElementById('whatsapp-auto-messages');
+  
+  function showTypingIndicator() {
+    if (typingIndicator) {
+      typingIndicator.style.display = 'block';
+      // Scroll para baixo
+      if (chatBox.querySelector('.whatsapp-body')) {
+        var body = chatBox.querySelector('.whatsapp-body');
+        body.scrollTop = body.scrollHeight;
+      }
+    }
+  }
+  
+  function hideTypingIndicator() {
+    if (typingIndicator) {
+      typingIndicator.style.display = 'none';
+    }
+  }
+  
+  function showAutoMessage(message) {
+    if (!autoMessagesContainer) return;
+    
+    var messageDiv = document.createElement('div');
+    messageDiv.className = 'whatsapp-auto-message';
+    messageDiv.style.display = 'block';
+    
+    var now = getCurrentTime();
+    var timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                  now.getMinutes().toString().padStart(2, '0');
+    
+    messageDiv.innerHTML = '<p>' + message + '</p><span class="whatsapp-auto-message-time">' + timeStr + '</span>';
+    
+    autoMessagesContainer.appendChild(messageDiv);
+    
+    // Scroll para baixo
+    if (chatBox.querySelector('.whatsapp-body')) {
+      var body = chatBox.querySelector('.whatsapp-body');
+      setTimeout(function() {
+        body.scrollTop = body.scrollHeight;
+      }, 100);
+    }
+  }
+  
+  function showNextMessage() {
+    if (!autoMessageConfig.enabled || autoMessages.length === 0) return;
+    if (currentMessageIndex >= autoMessages.length) {
+      // Terminou o ciclo, aguarda pausa
+      hasShownCycle = true;
+      currentMessageIndex = 0;
+      
+      // Agenda próximo ciclo após pausa
+      cycleTimeout = setTimeout(function() {
+        startMessageCycle();
+      }, autoMessageConfig.pauseAfterCycle);
+      
+      return;
+    }
+    
+    // Mostra indicador de digitação
+    showTypingIndicator();
+    
+    // Após duração de digitação, mostra mensagem
+    messageTimeout = setTimeout(function() {
+      hideTypingIndicator();
+      showAutoMessage(autoMessages[currentMessageIndex]);
+      currentMessageIndex++;
+      
+      // Agenda próxima mensagem
+      messageTimeout = setTimeout(function() {
+        showNextMessage();
+      }, autoMessageConfig.interval);
+      
+    }, autoMessageConfig.typingDuration);
+  }
+  
+  function startMessageCycle() {
+    if (!autoMessageConfig.enabled || autoMessages.length === 0) return;
+    
+    // Limpa mensagens anteriores
+    if (autoMessagesContainer) {
+      autoMessagesContainer.innerHTML = '';
+    }
+    
+    currentMessageIndex = 0;
+    showNextMessage();
+  }
+  
+  function stopMessageCycle() {
+    if (cycleTimeout) clearTimeout(cycleTimeout);
+    if (messageTimeout) clearTimeout(messageTimeout);
+    hideTypingIndicator();
+  }
+  
   // Toggle chat
   toggle.addEventListener('click', function() {
     var isActive = chatBox.classList.contains('active');
@@ -623,6 +840,13 @@
       whatsappIcon.style.display = 'none';
       closeIcon.style.display = 'block';
       updateStatus(); // Atualiza ao abrir
+      
+      // Inicia ciclo de mensagens se não foi mostrado ainda
+      if (!hasShownCycle && autoMessageConfig.enabled && autoMessages.length > 0) {
+        setTimeout(function() {
+          startMessageCycle();
+        }, 1000); // Aguarda 1s após abrir
+      }
     }
   });
   
@@ -633,6 +857,7 @@
     toggle.classList.remove('active');
     whatsappIcon.style.display = 'block';
     closeIcon.style.display = 'none';
+    stopMessageCycle(); // Para mensagens ao fechar
   });
   
   // Send message

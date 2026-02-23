@@ -1225,6 +1225,65 @@
       },
       {
         "type": "header",
+        "content": "Mensagens Automaticas"
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_auto_messages_enabled",
+        "label": "Ativar mensagens automaticas",
+        "info": "Mostra mensagens automaticas com efeito de digitacao",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "whatsapp_auto_message_interval",
+        "label": "Intervalo entre mensagens (segundos)",
+        "min": 3,
+        "max": 15,
+        "step": 1,
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "whatsapp_auto_message_pause",
+        "label": "Pausa apos ciclo completo (minutos)",
+        "min": 5,
+        "max": 60,
+        "step": 5,
+        "default": 20
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_auto_message_1",
+        "label": "Mensagem automatica 1",
+        "info": "Primeira mensagem do ciclo"
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_auto_message_2",
+        "label": "Mensagem automatica 2",
+        "info": "Segunda mensagem do ciclo"
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_auto_message_3",
+        "label": "Mensagem automatica 3",
+        "info": "Terceira mensagem do ciclo"
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_auto_message_4",
+        "label": "Mensagem automatica 4",
+        "info": "Quarta mensagem do ciclo"
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_auto_message_5",
+        "label": "Mensagem automatica 5",
+        "info": "Quinta mensagem do ciclo"
+      },
+      {
+        "type": "header",
         "content": "Equipe ConectWhats"
       },
       {
