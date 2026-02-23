@@ -1587,7 +1587,8 @@
     shippingForm.addEventListener('submit', function(e) {
       e.preventDefault();
       
-      var cep = document.getElementById('shipping-cep').value.replace(/\D/g, '');
+      var cepFormatado = document.getElementById('shipping-cep').value; // Com hífen
+      var cep = cepFormatado.replace(/\D/g, ''); // Sem hífen para validação
       var loading = document.getElementById('shipping-loading');
       var result = document.getElementById('shipping-result');
       var error = document.getElementById('shipping-error');
@@ -1609,7 +1610,7 @@
       
       // URL da API do Google Sheets configurada
       var sheetsApiUrl = '{{ settings.sheets_frete_url }}';
-      var cepOrigem = '{{ settings.correios_cep_origem | default: "01310-100" }}'.replace(/\D/g, '');
+      var cepOrigem = '{{ settings.correios_cep_origem | default: "01310-100" }}'; // Mantém formatado
       
       if (!sheetsApiUrl || sheetsApiUrl === '') {
         loading.classList.remove('show');
@@ -1618,10 +1619,10 @@
         return;
       }
       
-      // Parâmetros para cálculo (CEPs sem hífen)
+      // Parâmetros para cálculo (CEPs COM hífen)
       var params = {
         cepOrigem: cepOrigem,
-        cepDestino: cep, // Já está sem hífen
+        cepDestino: cepFormatado, // Envia com hífen
         peso: 0.3,
         comprimento: 20,
         altura: 10,
