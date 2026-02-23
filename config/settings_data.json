@@ -112,7 +112,7 @@
     "txtzap": "EmporioBody",
     "colorzap": "#746e6c",
     "chatzap": "Olá, estou aqui para te ajudar!",
-    "digizap": "Ola queria mais informacoes de um produso",
+    "digizap": "",
     "whatsapp_schedule_enabled": true,
     "whatsapp_auto_messages_enabled": true,
     "whatsapp_auto_message_interval": 6,
