@@ -116,7 +116,7 @@
     "whatsapp_schedule_enabled": true,
     "whatsapp_auto_messages_enabled": true,
     "whatsapp_auto_message_interval": 5,
-    "whatsapp_auto_message_pause": 5,
+    "whatsapp_auto_message_pause": 45,
     "whatsapp_auto_message_1": "Olá..",
     "whatsapp_auto_message_2": "Seja bem vinda 😍",
     "whatsapp_auto_message_3": "Cupom primeira compra EMPORIO10",
