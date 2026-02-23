@@ -1067,13 +1067,23 @@
   var messageTimeout = null;
   var hasShownCycle = false;
   
-  // Verifica se já mostrou o ciclo nesta sessão
-  var lastCycleTime = localStorage.getItem('whatsapp_last_cycle');
-  if (lastCycleTime) {
-    var timeSinceLastCycle = Date.now() - parseInt(lastCycleTime);
-    // Se passou menos tempo que a pausa configurada, não mostra
-    if (timeSinceLastCycle < autoMessageConfig.pauseAfterCycle) {
-      hasShownCycle = true;
+  // Recupera estado do ciclo do localStorage
+  var cycleState = localStorage.getItem('whatsapp_cycle_state');
+  if (cycleState) {
+    try {
+      var state = JSON.parse(cycleState);
+      var timeSinceLastMessage = Date.now() - state.timestamp;
+      
+      // Se passou menos que o tempo de pausa, continua de onde parou
+      if (timeSinceLastMessage < autoMessageConfig.pauseAfterCycle) {
+        currentMessageIndex = state.index;
+        hasShownCycle = state.completed;
+      } else {
+        // Se passou o tempo de pausa, limpa e reinicia
+        localStorage.removeItem('whatsapp_cycle_state');
+      }
+    } catch (e) {
+      localStorage.removeItem('whatsapp_cycle_state');
     }
   }
   
@@ -1306,17 +1316,29 @@
       hasShownCycle = true;
       currentMessageIndex = 0;
       
-      // Salva timestamp do ciclo completo
-      localStorage.setItem('whatsapp_last_cycle', Date.now().toString());
+      // Salva estado: ciclo completo
+      localStorage.setItem('whatsapp_cycle_state', JSON.stringify({
+        index: 0,
+        completed: true,
+        timestamp: Date.now()
+      }));
       
       // Agenda próximo ciclo após pausa
       cycleTimeout = setTimeout(function() {
-        localStorage.removeItem('whatsapp_last_cycle');
+        localStorage.removeItem('whatsapp_cycle_state');
+        hasShownCycle = false;
         startMessageCycle();
       }, autoMessageConfig.pauseAfterCycle);
       
       return;
     }
+    
+    // Salva estado atual antes de mostrar mensagem
+    localStorage.setItem('whatsapp_cycle_state', JSON.stringify({
+      index: currentMessageIndex,
+      completed: false,
+      timestamp: Date.now()
+    }));
     
     // Se chat estiver aberto, mostra dentro do chat
     var isChatOpen = chatBox.classList.contains('active');
@@ -1381,13 +1403,29 @@
     hideTypingIndicator();
     hideExternalTyping();
     hideExternalMessage();
+    // Não limpa localStorage aqui para manter estado ao recarregar
   }
   
   // Inicia ciclo automaticamente após 3 segundos (sem precisar abrir chat)
+  // Só inicia se não completou o ciclo ou se passou o tempo de pausa
   if (autoMessageConfig.enabled && autoMessages.length > 0 && !hasShownCycle) {
     setTimeout(function() {
       startMessageCycle();
     }, 3000);
+  } else if (hasShownCycle) {
+    // Se completou, agenda para quando a pausa terminar
+    var state = JSON.parse(localStorage.getItem('whatsapp_cycle_state') || '{}');
+    if (state.completed && state.timestamp) {
+      var timeRemaining = autoMessageConfig.pauseAfterCycle - (Date.now() - state.timestamp);
+      if (timeRemaining > 0) {
+        cycleTimeout = setTimeout(function() {
+          localStorage.removeItem('whatsapp_cycle_state');
+          hasShownCycle = false;
+          currentMessageIndex = 0;
+          startMessageCycle();
+        }, timeRemaining);
+      }
+    }
   }
   
   // Toggle chat
