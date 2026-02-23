@@ -1557,37 +1557,21 @@
       // Mostra loading
       loading.classList.add('show');
       
-      // API dos Correios para rastreamento
-      fetch('https://api.linketrack.com/track/json?user=teste&token=1abcd00b2731640e886fb41a8a9671ad1434c599dbaa0a0de9a5aa619f29a83f&codigo=' + code)
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-          loading.classList.remove('show');
-          
-          if (data.erro || !data.eventos || data.eventos.length === 0) {
-            error.textContent = 'Código de rastreio não encontrado ou inválido.';
-            error.classList.add('show');
-            return;
-          }
-          
-          var html = '<h4>Status do Pedido</h4>';
-          data.eventos.forEach(function(evento) {
-            html += '<div class="whatsapp-tracking-status">';
-            html += '<div class="whatsapp-tracking-date">' + evento.data + ' - ' + evento.hora + '</div>';
-            html += '<div class="whatsapp-tracking-text">' + evento.status + '</div>';
-            if (evento.subStatus && evento.subStatus.length > 0) {
-              html += '<div class="whatsapp-tracking-text" style="font-size: 12px; color: #9ca3af; margin-top: 4px;">' + evento.subStatus[0] + '</div>';
-            }
-            html += '</div>';
-          });
-          
-          result.innerHTML = html;
-          result.classList.add('show');
-        })
-        .catch(function(err) {
-          loading.classList.remove('show');
-          error.textContent = 'Erro ao buscar rastreamento. Tente novamente.';
-          error.classList.add('show');
-        });
+      // Redireciona para o site dos Correios
+      // Como não há API gratuita confiável, abrimos o rastreamento oficial
+      loading.classList.remove('show');
+      
+      var html = '<h4>Rastreamento</h4>';
+      html += '<p style="font-size: 14px; color: #374151; line-height: 1.6; margin-bottom: 15px;">Clique no botão abaixo para rastrear seu pedido no site oficial dos Correios:</p>';
+      html += '<a href="https://rastreamento.correios.com.br/app/index.php" target="_blank" style="display: block; background: var(--whatsapp-primary); color: white; text-align: center; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-bottom: 10px;">Rastrear nos Correios</a>';
+      html += '<div style="background: #f3f4f6; padding: 12px; border-radius: 8px; margin-top: 10px;">';
+      html += '<div style="font-size: 11px; color: #9ca3af; margin-bottom: 4px;">Seu código:</div>';
+      html += '<div style="font-size: 14px; color: #374151; font-weight: 600; font-family: monospace;">' + code + '</div>';
+      html += '</div>';
+      html += '<p style="font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center;">Cole o código acima no site dos Correios</p>';
+      
+      result.innerHTML = html;
+      result.classList.add('show');
     });
   }
   
