@@ -247,7 +247,7 @@
   padding: 12px 16px;
   border: 2px solid #e5e7eb;
   border-radius: 12px;
-  font-size: 14px;
+  font-size: 16px;
   outline: none;
   transition: border-color 0.2s;
 }
@@ -657,7 +657,7 @@
   padding: 12px 16px;
   border: 1px solid #e5e7eb;
   border-radius: 25px;
-  font-size: 14px;
+  font-size: 16px;
   outline: none;
   transition: border-color 0.2s;
 }
@@ -1595,30 +1595,69 @@
       // Mostra loading
       loading.classList.add('show');
       
-      // Simulação de cálculo (você pode integrar com API real dos Correios)
-      setTimeout(function() {
-        loading.classList.remove('show');
-        
-        var html = '<h4>Opções de Frete</h4>';
-        html += '<div class="whatsapp-shipping-option">';
-        html += '<div>';
-        html += '<div class="whatsapp-shipping-name">PAC</div>';
-        html += '<div class="whatsapp-shipping-time">Entrega em 8-12 dias úteis</div>';
-        html += '</div>';
-        html += '<div class="whatsapp-shipping-price">R$ 15,90</div>';
-        html += '</div>';
-        
-        html += '<div class="whatsapp-shipping-option">';
-        html += '<div>';
-        html += '<div class="whatsapp-shipping-name">SEDEX</div>';
-        html += '<div class="whatsapp-shipping-time">Entrega em 3-5 dias úteis</div>';
-        html += '</div>';
-        html += '<div class="whatsapp-shipping-price">R$ 25,90</div>';
-        html += '</div>';
-        
-        result.innerHTML = html;
-        result.classList.add('show');
-      }, 1500);
+      // Configurações dos Correios
+      var cepOrigem = '{{ settings.correios_cep_origem | default: "01310-100" }}'.replace(/\D/g, '');
+      
+      // Usa API pública dos Correios (ViaCEP + cálculo estimado)
+      // Para produção, você deve usar a API oficial com suas credenciais
+      fetch('https://viacep.com.br/ws/' + cep + '/json/')
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+          if (data.erro) {
+            throw new Error('CEP não encontrado');
+          }
+          
+          // Cálculo estimado baseado na distância (simulação)
+          // Em produção, use a API oficial dos Correios com suas credenciais
+          var pacPrice = 15.90;
+          var sedexPrice = 25.90;
+          var pacDays = '8-12';
+          var sedexDays = '3-5';
+          
+          // Ajusta preço baseado no estado (simulação simples)
+          var uf = data.uf;
+          if (['SP', 'RJ', 'MG', 'ES'].indexOf(uf) === -1) {
+            pacPrice += 5;
+            sedexPrice += 8;
+            pacDays = '10-15';
+            sedexDays = '5-8';
+          }
+          if (['AM', 'RR', 'AP', 'PA', 'TO', 'RO', 'AC'].indexOf(uf) !== -1) {
+            pacPrice += 15;
+            sedexPrice += 20;
+            pacDays = '15-20';
+            sedexDays = '8-12';
+          }
+          
+          loading.classList.remove('show');
+          
+          var html = '<h4>Opções de Frete para ' + data.localidade + ' - ' + uf + '</h4>';
+          html += '<div class="whatsapp-shipping-option">';
+          html += '<div>';
+          html += '<div class="whatsapp-shipping-name">PAC</div>';
+          html += '<div class="whatsapp-shipping-time">Entrega em ' + pacDays + ' dias úteis</div>';
+          html += '</div>';
+          html += '<div class="whatsapp-shipping-price">R$ ' + pacPrice.toFixed(2).replace('.', ',') + '</div>';
+          html += '</div>';
+          
+          html += '<div class="whatsapp-shipping-option">';
+          html += '<div>';
+          html += '<div class="whatsapp-shipping-name">SEDEX</div>';
+          html += '<div class="whatsapp-shipping-time">Entrega em ' + sedexDays + ' dias úteis</div>';
+          html += '</div>';
+          html += '<div class="whatsapp-shipping-price">R$ ' + sedexPrice.toFixed(2).replace('.', ',') + '</div>';
+          html += '</div>';
+          
+          html += '<p style="font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center;">Valores estimados. Confirme no checkout.</p>';
+          
+          result.innerHTML = html;
+          result.classList.add('show');
+        })
+        .catch(function(err) {
+          loading.classList.remove('show');
+          error.textContent = 'Erro ao calcular frete. Verifique o CEP e tente novamente.';
+          error.classList.add('show');
+        });
     });
   }
   
