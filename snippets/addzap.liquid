@@ -1618,15 +1618,15 @@
         return;
       }
       
-      // Parâmetros padrão para cálculo (você pode ajustar conforme necessário)
+      // Parâmetros para cálculo (CEPs sem hífen)
       var params = {
         cepOrigem: cepOrigem,
-        cepDestino: cep,
-        peso: 0.3, // 300g padrão
+        cepDestino: cep, // Já está sem hífen
+        peso: 0.3,
         comprimento: 20,
         altura: 10,
         largura: 15,
-        formato: 1, // Caixa/Pacote
+        formato: 1,
         maoPropria: 'N',
         valorDeclarado: 0,
         avisoRecebimento: 'N'
