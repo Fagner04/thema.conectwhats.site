@@ -115,7 +115,7 @@
     "digizap": "",
     "whatsapp_schedule_enabled": true,
     "whatsapp_auto_messages_enabled": true,
-    "whatsapp_auto_message_interval": 6,
+    "whatsapp_auto_message_interval": 5,
     "whatsapp_auto_message_pause": 40,
     "whatsapp_auto_message_1": "Olá..",
     "whatsapp_auto_message_2": "Seja bem vinda 😍",
