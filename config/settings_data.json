@@ -263,7 +263,7 @@
           "background4": "#3a7c3a",
           "show_locale_selector": false,
           "show_currency_selector": false,
-          "navigation_menu": "",
+          "navigation_menu": "main-menu-1",
           "desktop_navigation_layout": "inline",
           "desktop_navigation_open_trigger": "hover",
           "show_navigation_social_media": true,
