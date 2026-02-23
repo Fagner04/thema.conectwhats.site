@@ -1642,14 +1642,38 @@
       // Chama API do Google Sheets
       fetch(url)
         .then(function(response) {
-          if (!response.ok) throw new Error('Erro na API');
+          if (!response.ok) {
+            console.error('Erro HTTP:', response.status);
+            throw new Error('Erro na API: ' + response.status);
+          }
           return response.json();
         })
         .then(function(data) {
+          console.log('Resposta da API:', data); // Debug
           loading.classList.remove('show');
           
-          if (data.erro || !data.servicos || data.servicos.length === 0) {
-            error.textContent = data.mensagem || 'Não foi possível calcular o frete para este CEP.';
+          // Verifica diferentes formatos de erro
+          if (data.erro || data.error) {
+            var mensagemErro = data.mensagem || data.message || 'Não foi possível calcular o frete para este CEP.';
+            error.textContent = mensagemErro;
+            error.classList.add('show');
+            return;
+          }
+          
+          // Verifica se tem serviços
+          if (!data.servicos || data.servicos.length === 0) {
+            error.textContent = 'Nenhum serviço de frete disponível para este CEP.';
+            error.classList.add('show');
+            return;
+          }
+          
+          // Filtra apenas serviços sem erro
+          var servicosValidos = data.servicos.filter(function(s) {
+            return !s.erro || s.erro === '0' || s.erro === 0;
+          });
+          
+          if (servicosValidos.length === 0) {
+            error.textContent = 'Não foi possível calcular o frete. Tente outro CEP ou entre em contato.';
             error.classList.add('show');
             return;
           }
@@ -1667,17 +1691,16 @@
               }
               html += '</h4>';
               
-              // Processa cada serviço retornado
-              data.servicos.forEach(function(servico) {
-                if (servico.erro && servico.erro !== '0') return; // Pula serviços com erro
-                
-                var nome = servico.nome || servico.codigo;
-                var valor = parseFloat(servico.valor || 0);
-                var prazo = servico.prazoEntrega || '?';
+              // Processa cada serviço válido
+              servicosValidos.forEach(function(servico) {
+                var nome = servico.nome || servico.codigo || 'Correios';
+                var valor = parseFloat(servico.valor || servico.Valor || 0);
+                var prazo = servico.prazoEntrega || servico.PrazoEntrega || '?';
                 
                 // Formata nome do serviço
-                if (nome.includes('PAC')) nome = 'PAC';
-                else if (nome.includes('SEDEX')) nome = 'SEDEX';
+                if (nome.includes('PAC') || nome.includes('04510')) nome = 'PAC';
+                else if (nome.includes('SEDEX') || nome.includes('04014')) nome = 'SEDEX';
+                else if (nome.includes('04669')) nome = 'PAC';
                 
                 html += '<div class="whatsapp-shipping-option">';
                 html += '<div>';
@@ -1697,15 +1720,14 @@
               // Se falhar buscar CEP, mostra sem cidade
               var html = '<h4>Opções de Frete</h4>';
               
-              data.servicos.forEach(function(servico) {
-                if (servico.erro && servico.erro !== '0') return;
+              servicosValidos.forEach(function(servico) {
+                var nome = servico.nome || servico.codigo || 'Correios';
+                var valor = parseFloat(servico.valor || servico.Valor || 0);
+                var prazo = servico.prazoEntrega || servico.PrazoEntrega || '?';
                 
-                var nome = servico.nome || servico.codigo;
-                var valor = parseFloat(servico.valor || 0);
-                var prazo = servico.prazoEntrega || '?';
-                
-                if (nome.includes('PAC')) nome = 'PAC';
-                else if (nome.includes('SEDEX')) nome = 'SEDEX';
+                if (nome.includes('PAC') || nome.includes('04510')) nome = 'PAC';
+                else if (nome.includes('SEDEX') || nome.includes('04014')) nome = 'SEDEX';
+                else if (nome.includes('04669')) nome = 'PAC';
                 
                 html += '<div class="whatsapp-shipping-option">';
                 html += '<div>';
@@ -1724,9 +1746,9 @@
         })
         .catch(function(err) {
           loading.classList.remove('show');
+          console.error('Erro no cálculo de frete:', err);
           error.textContent = 'Erro ao calcular frete. Verifique a configuração da API ou tente novamente.';
           error.classList.add('show');
-          console.error('Erro no cálculo de frete:', err);
         });
     });
   }
