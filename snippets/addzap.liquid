@@ -1408,22 +1408,34 @@
   
   // Inicia ciclo automaticamente após 3 segundos (sem precisar abrir chat)
   // Só inicia se não completou o ciclo ou se passou o tempo de pausa
-  if (autoMessageConfig.enabled && autoMessages.length > 0 && !hasShownCycle) {
-    setTimeout(function() {
-      startMessageCycle();
-    }, 3000);
-  } else if (hasShownCycle) {
-    // Se completou, agenda para quando a pausa terminar
-    var state = JSON.parse(localStorage.getItem('whatsapp_cycle_state') || '{}');
-    if (state.completed && state.timestamp) {
-      var timeRemaining = autoMessageConfig.pauseAfterCycle - (Date.now() - state.timestamp);
-      if (timeRemaining > 0) {
-        cycleTimeout = setTimeout(function() {
+  if (autoMessageConfig.enabled && autoMessages.length > 0) {
+    if (!hasShownCycle) {
+      // Não completou ainda, continua de onde parou
+      var delayTime = currentMessageIndex === 0 ? 3000 : 1000; // 3s na primeira, 1s nas demais
+      setTimeout(function() {
+        showNextMessage();
+      }, delayTime);
+    } else {
+      // Completou, agenda para quando a pausa terminar
+      var state = JSON.parse(localStorage.getItem('whatsapp_cycle_state') || '{}');
+      if (state.completed && state.timestamp) {
+        var timeRemaining = autoMessageConfig.pauseAfterCycle - (Date.now() - state.timestamp);
+        if (timeRemaining > 0) {
+          cycleTimeout = setTimeout(function() {
+            localStorage.removeItem('whatsapp_cycle_state');
+            hasShownCycle = false;
+            currentMessageIndex = 0;
+            startMessageCycle();
+          }, timeRemaining);
+        } else {
+          // Pausa já passou, reinicia
           localStorage.removeItem('whatsapp_cycle_state');
           hasShownCycle = false;
           currentMessageIndex = 0;
-          startMessageCycle();
-        }, timeRemaining);
+          setTimeout(function() {
+            startMessageCycle();
+          }, 3000);
+        }
       }
     }
   }
