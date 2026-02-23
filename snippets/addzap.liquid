@@ -1067,6 +1067,16 @@
   var messageTimeout = null;
   var hasShownCycle = false;
   
+  // Verifica se já mostrou o ciclo nesta sessão
+  var lastCycleTime = localStorage.getItem('whatsapp_last_cycle');
+  if (lastCycleTime) {
+    var timeSinceLastCycle = Date.now() - parseInt(lastCycleTime);
+    // Se passou menos tempo que a pausa configurada, não mostra
+    if (timeSinceLastCycle < autoMessageConfig.pauseAfterCycle) {
+      hasShownCycle = true;
+    }
+  }
+  
   // Configurações de horário
   var config = {
     enabled: {{ settings.whatsapp_schedule_enabled | default: false | json }},
@@ -1296,8 +1306,12 @@
       hasShownCycle = true;
       currentMessageIndex = 0;
       
+      // Salva timestamp do ciclo completo
+      localStorage.setItem('whatsapp_last_cycle', Date.now().toString());
+      
       // Agenda próximo ciclo após pausa
       cycleTimeout = setTimeout(function() {
+        localStorage.removeItem('whatsapp_last_cycle');
         startMessageCycle();
       }, autoMessageConfig.pauseAfterCycle);
       
@@ -1370,7 +1384,7 @@
   }
   
   // Inicia ciclo automaticamente após 3 segundos (sem precisar abrir chat)
-  if (autoMessageConfig.enabled && autoMessages.length > 0) {
+  if (autoMessageConfig.enabled && autoMessages.length > 0 && !hasShownCycle) {
     setTimeout(function() {
       startMessageCycle();
     }, 3000);
