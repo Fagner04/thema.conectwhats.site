@@ -105,7 +105,7 @@
     "numberzap": "https://wa.me/message/AYJ45IUBHN64E1",
     "zap_icon_type": "original",
     "zap_icon": "shopify://shop_images/Screenshot_1.png",
-    "show_online_icon": false,
+    "show_online_icon": true,
     "zap_img_type": "icone",
     "zap_img": "shopify://shop_images/Screenshot_1.png",
     "titlezap": "Oiii seja bem vindo (@)",
