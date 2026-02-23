@@ -1595,68 +1595,126 @@
       // Mostra loading
       loading.classList.add('show');
       
-      // Configurações dos Correios
+      // URL da API do Google Sheets configurada
+      var sheetsApiUrl = '{{ settings.sheets_frete_url }}';
       var cepOrigem = '{{ settings.correios_cep_origem | default: "01310-100" }}'.replace(/\D/g, '');
       
-      // Usa API pública dos Correios (ViaCEP + cálculo estimado)
-      // Para produção, você deve usar a API oficial com suas credenciais
-      fetch('https://viacep.com.br/ws/' + cep + '/json/')
-        .then(function(response) { return response.json(); })
+      if (!sheetsApiUrl || sheetsApiUrl === '') {
+        loading.classList.remove('show');
+        error.textContent = 'API de frete não configurada. Configure em: Temas > Cálculo de Frete > URL da API.';
+        error.classList.add('show');
+        return;
+      }
+      
+      // Parâmetros padrão para cálculo (você pode ajustar conforme necessário)
+      var params = {
+        cepOrigem: cepOrigem,
+        cepDestino: cep,
+        peso: 0.3, // 300g padrão
+        comprimento: 20,
+        altura: 10,
+        largura: 15,
+        formato: 1, // Caixa/Pacote
+        maoPropria: 'N',
+        valorDeclarado: 0,
+        avisoRecebimento: 'N'
+      };
+      
+      // Monta URL com parâmetros
+      var url = sheetsApiUrl + '?';
+      for (var key in params) {
+        url += key + '=' + params[key] + '&';
+      }
+      url = url.slice(0, -1); // Remove último &
+      
+      // Chama API do Google Sheets
+      fetch(url)
+        .then(function(response) {
+          if (!response.ok) throw new Error('Erro na API');
+          return response.json();
+        })
         .then(function(data) {
-          if (data.erro) {
-            throw new Error('CEP não encontrado');
-          }
-          
-          // Cálculo estimado baseado na distância (simulação)
-          // Em produção, use a API oficial dos Correios com suas credenciais
-          var pacPrice = 15.90;
-          var sedexPrice = 25.90;
-          var pacDays = '8-12';
-          var sedexDays = '3-5';
-          
-          // Ajusta preço baseado no estado (simulação simples)
-          var uf = data.uf;
-          if (['SP', 'RJ', 'MG', 'ES'].indexOf(uf) === -1) {
-            pacPrice += 5;
-            sedexPrice += 8;
-            pacDays = '10-15';
-            sedexDays = '5-8';
-          }
-          if (['AM', 'RR', 'AP', 'PA', 'TO', 'RO', 'AC'].indexOf(uf) !== -1) {
-            pacPrice += 15;
-            sedexPrice += 20;
-            pacDays = '15-20';
-            sedexDays = '8-12';
-          }
-          
           loading.classList.remove('show');
           
-          var html = '<h4>Opções de Frete para ' + data.localidade + ' - ' + uf + '</h4>';
-          html += '<div class="whatsapp-shipping-option">';
-          html += '<div>';
-          html += '<div class="whatsapp-shipping-name">PAC</div>';
-          html += '<div class="whatsapp-shipping-time">Entrega em ' + pacDays + ' dias úteis</div>';
-          html += '</div>';
-          html += '<div class="whatsapp-shipping-price">R$ ' + pacPrice.toFixed(2).replace('.', ',') + '</div>';
-          html += '</div>';
+          if (data.erro || !data.servicos || data.servicos.length === 0) {
+            error.textContent = data.mensagem || 'Não foi possível calcular o frete para este CEP.';
+            error.classList.add('show');
+            return;
+          }
           
-          html += '<div class="whatsapp-shipping-option">';
-          html += '<div>';
-          html += '<div class="whatsapp-shipping-name">SEDEX</div>';
-          html += '<div class="whatsapp-shipping-time">Entrega em ' + sedexDays + ' dias úteis</div>';
-          html += '</div>';
-          html += '<div class="whatsapp-shipping-price">R$ ' + sedexPrice.toFixed(2).replace('.', ',') + '</div>';
-          html += '</div>';
-          
-          html += '<p style="font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center;">Valores estimados. Confirme no checkout.</p>';
-          
-          result.innerHTML = html;
-          result.classList.add('show');
+          // Busca informações do CEP para mostrar cidade
+          fetch('https://viacep.com.br/ws/' + cep + '/json/')
+            .then(function(r) { return r.json(); })
+            .then(function(cepData) {
+              var cidade = cepData.localidade || '';
+              var uf = cepData.uf || '';
+              
+              var html = '<h4>Opções de Frete';
+              if (cidade && uf) {
+                html += ' para ' + cidade + ' - ' + uf;
+              }
+              html += '</h4>';
+              
+              // Processa cada serviço retornado
+              data.servicos.forEach(function(servico) {
+                if (servico.erro && servico.erro !== '0') return; // Pula serviços com erro
+                
+                var nome = servico.nome || servico.codigo;
+                var valor = parseFloat(servico.valor || 0);
+                var prazo = servico.prazoEntrega || '?';
+                
+                // Formata nome do serviço
+                if (nome.includes('PAC')) nome = 'PAC';
+                else if (nome.includes('SEDEX')) nome = 'SEDEX';
+                
+                html += '<div class="whatsapp-shipping-option">';
+                html += '<div>';
+                html += '<div class="whatsapp-shipping-name">' + nome + '</div>';
+                html += '<div class="whatsapp-shipping-time">Entrega em ' + prazo + ' dias úteis</div>';
+                html += '</div>';
+                html += '<div class="whatsapp-shipping-price">R$ ' + valor.toFixed(2).replace('.', ',') + '</div>';
+                html += '</div>';
+              });
+              
+              html += '<p style="font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center;">Valores calculados pelos Correios. Peso: 300g</p>';
+              
+              result.innerHTML = html;
+              result.classList.add('show');
+            })
+            .catch(function() {
+              // Se falhar buscar CEP, mostra sem cidade
+              var html = '<h4>Opções de Frete</h4>';
+              
+              data.servicos.forEach(function(servico) {
+                if (servico.erro && servico.erro !== '0') return;
+                
+                var nome = servico.nome || servico.codigo;
+                var valor = parseFloat(servico.valor || 0);
+                var prazo = servico.prazoEntrega || '?';
+                
+                if (nome.includes('PAC')) nome = 'PAC';
+                else if (nome.includes('SEDEX')) nome = 'SEDEX';
+                
+                html += '<div class="whatsapp-shipping-option">';
+                html += '<div>';
+                html += '<div class="whatsapp-shipping-name">' + nome + '</div>';
+                html += '<div class="whatsapp-shipping-time">Entrega em ' + prazo + ' dias úteis</div>';
+                html += '</div>';
+                html += '<div class="whatsapp-shipping-price">R$ ' + valor.toFixed(2).replace('.', ',') + '</div>';
+                html += '</div>';
+              });
+              
+              html += '<p style="font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center;">Valores calculados pelos Correios. Peso: 300g</p>';
+              
+              result.innerHTML = html;
+              result.classList.add('show');
+            });
         })
         .catch(function(err) {
           loading.classList.remove('show');
-          error.textContent = 'Erro ao calcular frete. Verifique o CEP e tente novamente.';
+          error.textContent = 'Erro ao calcular frete. Verifique a configuração da API ou tente novamente.';
           error.classList.add('show');
+          console.error('Erro no cálculo de frete:', err);
         });
     });
   }
