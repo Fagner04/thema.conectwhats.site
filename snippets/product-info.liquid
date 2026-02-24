@@ -600,6 +600,20 @@
               {%- else -%}
                 <span class="price--highlight price-without-discount">{{ selected_variant.price | money }}</span>
            {%- endif -%}
+           
+            {%- comment -%} PREÇO DE ATACADO - Logo abaixo do preço de varejo {%- endcomment -%}
+            {%- if product.metafields.custom.wholesale_price -%}
+              <div class="wholesale-info" style="margin: 8px 0 4px; font-size: 13px; line-height: 1.4;">
+                <span style="color: #9A3412; font-weight: 600;">Atacado: </span>
+                <strong style="color: #C2410C; font-size: 15px;">{{ product.metafields.custom.wholesale_price.value | money }}</strong>
+                {%- if product.metafields.custom.wholesale_min_qty -%}
+                  <span style="color: #9A3412; font-size: 12px;"> (mín. {{ product.metafields.custom.wholesale_min_qty.value }} un.)</span>
+                {%- endif -%}
+                {%- if product.metafields.custom.wholesale_min_value -%}
+                  <br><span style="font-size: 11px; color: #B45309;">Pedido mínimo: {{ product.metafields.custom.wholesale_min_value.value | money }}</span>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
 
             {% if settings.show_parcelamento %}
              {% comment %} Pega os valores das configurações com fallbacks {% endcomment %}
@@ -650,6 +664,18 @@
                   collections: [
                     {%- for collection in product.collections -%}
                       {{ collection.handle | json }}{% unless forloop.last %},{% endunless %}
+                    {%- endfor -%}
+                  ],
+                  options: {{ product.options | json }},
+                  variants: [
+                    {%- for variant in product.variants -%}
+                    {
+                      id: {{ variant.id | json }},
+                      available: {{ variant.available | json }},
+                      option1: {{ variant.option1 | json }},
+                      option2: {{ variant.option2 | json }},
+                      option3: {{ variant.option3 | json }}
+                    }{% unless forloop.last %},{% endunless %}
                     {%- endfor -%}
                   ]
                 };

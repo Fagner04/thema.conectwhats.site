@@ -67,6 +67,8 @@
 
           <div class="product-block-list__item product-block-list__item--info">
             {% render 'product-info' %}
+            {% render 'hide-unavailable-colors' %}
+            {% render 'product-gallery-scroll-fix' %}
           </div>
 
           {%- if product.description != blank -%}

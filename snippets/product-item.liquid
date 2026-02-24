@@ -152,6 +152,25 @@
           {%- endif -%}
         </div>
 
+        {%- comment -%} PREÇO DE ATACADO - Logo abaixo do preço de varejo {%- endcomment -%}
+        {%- if product.metafields.custom.wholesale_price -%}
+          <div class="wholesale-info" style="margin: 6px 0 2px; font-size: 12px; line-height: 1.3;">
+            <span style="color: #9A3412; font-weight: 600;">Atacado: </span>
+            <strong style="color: #C2410C; font-size: 13px;">{{ product.metafields.custom.wholesale_price.value | money }}</strong>
+            {%- if product.metafields.custom.wholesale_min_qty -%}
+              <span class="wholesale-min-qty" style="color: #9A3412; font-size: 11px;"> (mín. {{ product.metafields.custom.wholesale_min_qty.value }} un.)</span>
+            {%- endif -%}
+          </div>
+          <style>
+            /* Ocultar quantidade mínima no mobile (listagem) */
+            @media (max-width: 768px) {
+              .product-item .wholesale-min-qty {
+                display: none;
+              }
+            }
+          </style>
+        {%- endif -%}
+
         {%- if product.selected_or_first_available_variant.unit_price_measurement -%}
           <div class="product-item__price-info">
             <div class="unit-price-measurement">
@@ -408,6 +427,7 @@
       {%- if modo_exibicao == 'no_info_juros' -%}
       <p class="parcelas-home">em até <b>{{ divididopor }}x</b> de <b style="color: var(--product-on-sale-accent)">{{- product.price | times: percentual | divided_by: divididopor | round: 2 | money -}}</b></p>
       {%- endif -%}
+      
             {% endif %}
       
         {%- if settings.mostrar_estrelas -%}

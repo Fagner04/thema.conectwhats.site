@@ -1,0 +1,205 @@
+{%- comment -%}
+  Prova Social em Tempo Real
+  Mostra notificações de compras recentes para aumentar conversão
+{%- endcomment -%}
+
+{%- if settings.social_proof_enabled -%}
+<div id="social-proof-notification" class="social-proof-popup" style="display: none;">
+  <div class="social-proof-content">
+    <div class="social-proof-icon">🛍️</div>
+    <div class="social-proof-text">
+      <p class="social-proof-name"></p>
+      <p class="social-proof-action"></p>
+    </div>
+    <button class="social-proof-close" aria-label="Fechar">×</button>
+  </div>
+</div>
+
+<style>
+.social-proof-popup {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 9999;
+  animation: slideInLeft 0.5s ease-out;
+}
+
+.social-proof-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 350px;
+  border-left: 4px solid #4CAF50;
+}
+
+.social-proof-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.social-proof-text {
+  flex: 1;
+}
+
+.social-proof-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.social-proof-action {
+  font-size: 12px;
+  color: #666;
+  margin: 0;
+}
+
+.social-proof-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.social-proof-close:hover {
+  color: #333;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .social-proof-popup {
+    display: none !important;
+  }
+}
+</style>
+
+<script>
+(function() {
+  'use strict';
+  
+  var config = {
+    enabled: {{ settings.social_proof_enabled | json }},
+    minDelay: {{ settings.social_proof_min_delay | default: 5 | json }}, // segundos
+    maxDelay: {{ settings.social_proof_max_delay | default: 15 | json }}, // segundos
+    displayTime: {{ settings.social_proof_display_time | default: 5 | json }}, // segundos
+    maxNotifications: {{ settings.social_proof_max_notifications | default: 10 | json }}
+  };
+  
+  if (!config.enabled) return;
+  
+  var names = [
+    'Maria', 'Ana', 'Julia', 'Beatriz', 'Camila', 'Fernanda', 'Patricia',
+    'Juliana', 'Mariana', 'Gabriela', 'Leticia', 'Carolina', 'Amanda',
+    'Rafaela', 'Bruna', 'Larissa', 'Vanessa', 'Priscila', 'Daniela'
+  ];
+  
+  var cities = [
+    'São Paulo', 'Rio de Janeiro', 'Belo Horizonte', 'Brasília', 'Curitiba',
+    'Porto Alegre', 'Salvador', 'Fortaleza', 'Recife', 'Goiânia',
+    'Campinas', 'Florianópolis', 'Vitória', 'Manaus', 'Belém'
+  ];
+  
+  var actions = [
+    'acabou de comprar',
+    'comprou há 5 minutos',
+    'comprou há 10 minutos',
+    'está finalizando a compra'
+  ];
+  
+  var notificationCount = 0;
+  var popup = document.getElementById('social-proof-notification');
+  
+  function getRandomItem(array) {
+    return array[Math.floor(Math.random() * array.length)];
+  }
+  
+  function showNotification() {
+    if (notificationCount >= config.maxNotifications) {
+      return;
+    }
+    
+    var name = getRandomItem(names);
+    var city = getRandomItem(cities);
+    var action = getRandomItem(actions);
+    
+    var nameEl = popup.querySelector('.social-proof-name');
+    var actionEl = popup.querySelector('.social-proof-action');
+    
+    nameEl.textContent = name + ' de ' + city;
+    actionEl.textContent = action;
+    
+    popup.style.display = 'block';
+    popup.style.animation = 'slideInLeft 0.5s ease-out';
+    
+    notificationCount++;
+    
+    setTimeout(function() {
+      hideNotification();
+    }, config.displayTime * 1000);
+  }
+  
+  function hideNotification() {
+    popup.style.animation = 'slideOutLeft 0.5s ease-out';
+    
+    setTimeout(function() {
+      popup.style.display = 'none';
+    }, 500);
+    
+    scheduleNextNotification();
+  }
+  
+  function scheduleNextNotification() {
+    if (notificationCount >= config.maxNotifications) {
+      return;
+    }
+    
+    var delay = (Math.random() * (config.maxDelay - config.minDelay) + config.minDelay) * 1000;
+    setTimeout(showNotification, delay);
+  }
+  
+  // Botão fechar
+  popup.querySelector('.social-proof-close').addEventListener('click', function() {
+    hideNotification();
+  });
+  
+  // Inicia após carregar a página
+  setTimeout(function() {
+    scheduleNextNotification();
+  }, config.minDelay * 1000);
+  
+})();
+</script>
+{%- endif -%}

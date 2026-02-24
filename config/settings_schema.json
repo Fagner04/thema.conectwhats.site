@@ -3,7 +3,7 @@
     "name": "theme_info",
     "theme_name": "Classic®",
     "theme_author": "conectwhats.com",
-    "theme_version": "5.0",
+    "theme_version": "8.0",
     "theme_documentation_url": "https:\/\/conectwhats.com\/",
     "theme_support_url": "https:\/\/conectwhats.com\/"
   },
@@ -976,6 +976,32 @@
     ]
   },
   {
+    "name": "ConectWhats Atacado",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Configure a barra de progresso e cálculo de preços de atacado usando os metafields do app ConectWhats."
+      },
+      {
+        "type": "checkbox",
+        "id": "conectwhats_atacado_enabled",
+        "label": "Ativar barra de atacado ConectWhats",
+        "info": "Mostra barra de progresso e calcula total com preços de atacado dos metafields",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "conectwhats_atacado_min_qty",
+        "label": "Quantidade mínima para atacado",
+        "info": "Número de itens necessários para ativar preços de atacado",
+        "min": 2,
+        "max": 50,
+        "step": 1,
+        "default": 6
+      }
+    ]
+  },
+  {
     "name": "Whatsapp",
     "settings": [
       {
@@ -1079,6 +1105,182 @@
         "id": "digizap",
         "label": "Texto onde vai escrever",
         "info": "O texto que mostra para o cliente"
+      },
+      {
+        "type": "header",
+        "content": "Opcoes de Rastreio e Frete"
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_show_tracking",
+        "label": "Mostrar botao de rastreio",
+        "default": true
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_tracking_message",
+        "label": "Mensagem padrao para rastreio",
+        "default": "Ola! Gostaria de rastrear meu pedido."
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_show_shipping",
+        "label": "Mostrar botao de calculo de frete",
+        "default": true
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_shipping_message",
+        "label": "Mensagem padrao para frete",
+        "default": "Ola! Gostaria de calcular o frete para meu CEP."
+      },
+      {
+        "type": "header",
+        "content": "Horario de Atendimento"
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_schedule_enabled",
+        "label": "Ativar controle de horario",
+        "info": "Mostra status online/offline baseado no horario configurado",
+        "default": false
+      },
+      {
+        "type": "select",
+        "id": "whatsapp_timezone",
+        "label": "Fuso horario",
+        "options": [
+          {
+            "value": "-5",
+            "label": "Acre (UTC-5)"
+          },
+          {
+            "value": "-4",
+            "label": "Amazonas (UTC-4)"
+          },
+          {
+            "value": "-3",
+            "label": "Brasilia (UTC-3)"
+          },
+          {
+            "value": "-2",
+            "label": "Fernando de Noronha (UTC-2)"
+          }
+        ],
+        "default": "-3"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_weekday_start",
+        "label": "Horario de inicio (Segunda a Sexta)",
+        "info": "Formato: HH:MM (ex: 09:00)",
+        "default": "09:00"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_weekday_end",
+        "label": "Horario de termino (Segunda a Sexta)",
+        "info": "Formato: HH:MM (ex: 18:00)",
+        "default": "18:00"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_saturday_start",
+        "label": "Horario de inicio (Sabado)",
+        "info": "Formato: HH:MM (ex: 09:00)",
+        "default": "09:00"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_saturday_end",
+        "label": "Horario de termino (Sabado)",
+        "info": "Formato: HH:MM (ex: 13:00)",
+        "default": "13:00"
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_sunday_enabled",
+        "label": "Atender aos domingos",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_sunday_start",
+        "label": "Horario de inicio (Domingo)",
+        "info": "Formato: HH:MM (ex: 09:00)",
+        "default": "09:00"
+      },
+      {
+        "type": "text",
+        "id": "whatsapp_sunday_end",
+        "label": "Horario de termino (Domingo)",
+        "info": "Formato: HH:MM (ex: 13:00)",
+        "default": "13:00"
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_offline_message",
+        "label": "Mensagem quando offline",
+        "default": "No momento estamos offline. Deixe sua mensagem!"
+      },
+      {
+        "type": "header",
+        "content": "Mensagens Automaticas"
+      },
+      {
+        "type": "checkbox",
+        "id": "whatsapp_auto_messages_enabled",
+        "label": "Ativar mensagens automaticas",
+        "info": "Mostra mensagens automaticas com efeito de digitacao",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "whatsapp_auto_message_interval",
+        "label": "Intervalo entre mensagens (segundos)",
+        "min": 3,
+        "max": 15,
+        "step": 1,
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "whatsapp_auto_message_pause",
+        "label": "Pausa apos ciclo completo (minutos)",
+        "min": 5,
+        "max": 60,
+        "step": 5,
+        "default": 20
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_auto_message_1",
+        "label": "Mensagem automatica 1",
+        "info": "Primeira mensagem do ciclo"
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_auto_message_2",
+        "label": "Mensagem automatica 2",
+        "info": "Segunda mensagem do ciclo"
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_auto_message_3",
+        "label": "Mensagem automatica 3",
+        "info": "Terceira mensagem do ciclo"
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_auto_message_4",
+        "label": "Mensagem automatica 4",
+        "info": "Quarta mensagem do ciclo"
+      },
+      {
+        "type": "textarea",
+        "id": "whatsapp_auto_message_5",
+        "label": "Mensagem automatica 5",
+        "info": "Quinta mensagem do ciclo"
       },
       {
         "type": "header",
@@ -1453,6 +1655,135 @@
         "max": 60,
         "step": 5,
         "default": 15
+      }
+    ]
+  },
+  {
+    "name": "Prova Social",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Notificacoes de Prova Social",
+        "info": "Mostra notificacoes de compras recentes para aumentar conversao"
+      },
+      {
+        "type": "checkbox",
+        "id": "social_proof_enabled",
+        "label": "Ativar prova social",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "social_proof_min_delay",
+        "label": "Intervalo minimo entre notificacoes (segundos)",
+        "min": 3,
+        "max": 30,
+        "step": 1,
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "social_proof_max_delay",
+        "label": "Intervalo maximo entre notificacoes (segundos)",
+        "min": 10,
+        "max": 60,
+        "step": 5,
+        "default": 15
+      },
+      {
+        "type": "range",
+        "id": "social_proof_display_time",
+        "label": "Tempo de exibicao de cada notificacao (segundos)",
+        "min": 3,
+        "max": 15,
+        "step": 1,
+        "default": 5
+      },
+      {
+        "type": "range",
+        "id": "social_proof_max_notifications",
+        "label": "Numero maximo de notificacoes por sessao",
+        "min": 3,
+        "max": 20,
+        "step": 1,
+        "default": 10
+      }
+    ]
+  },
+  {
+    "name": "Popup de Saida",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Popup com Cupom de Desconto",
+        "info": "Mostra popup com cupom quando usuario tenta sair da pagina"
+      },
+      {
+        "type": "checkbox",
+        "id": "exit_popup_enabled",
+        "label": "Ativar popup de saida",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "exit_popup_title",
+        "label": "Titulo do popup",
+        "default": "Espere! Nao va embora!"
+      },
+      {
+        "type": "textarea",
+        "id": "exit_popup_message",
+        "label": "Mensagem do popup",
+        "default": "Ganhe um desconto especial na sua primeira compra!"
+      },
+      {
+        "type": "header",
+        "content": "Configuracao do Cupom"
+      },
+      {
+        "type": "text",
+        "id": "exit_popup_coupon_label",
+        "label": "Rotulo do cupom",
+        "default": "Use o cupom:"
+      },
+      {
+        "type": "text",
+        "id": "exit_popup_coupon_code",
+        "label": "Codigo do cupom",
+        "info": "Digite o codigo do cupom que sera copiado pelo cliente",
+        "default": "BEMVINDO10"
+      },
+      {
+        "type": "text",
+        "id": "exit_popup_discount_text",
+        "label": "Texto do desconto",
+        "default": "10% OFF na sua primeira compra"
+      },
+      {
+        "type": "text",
+        "id": "exit_popup_button_text",
+        "label": "Texto do botao",
+        "default": "Continuar Comprando"
+      },
+      {
+        "type": "header",
+        "content": "Configuracoes Avancadas"
+      },
+      {
+        "type": "range",
+        "id": "exit_popup_delay",
+        "label": "Atraso para mostrar popup (milissegundos)",
+        "info": "Tempo de espera apos mouse sair da pagina",
+        "min": 0,
+        "max": 3000,
+        "step": 100,
+        "default": 1000
+      },
+      {
+        "type": "checkbox",
+        "id": "exit_popup_show_once",
+        "label": "Mostrar apenas uma vez por sessao",
+        "default": true
       }
     ]
   },

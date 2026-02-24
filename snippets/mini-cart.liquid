@@ -36,6 +36,7 @@
     <div class="mini-cart__inner">
       <div class="mini-cart__content">
         {% render 'atacado-progress' %}
+        {% render 'conectwhats-wholesale-progress' %}
         
         {%- if shipping_alert != blank -%}
           <div class="mini-cart__alert-wrapper">
@@ -93,7 +94,7 @@
 
                   {%- comment -%}If we have a Shopify Script, we use the reduced price here, otherwise we check the compare at price{%- endcomment -%}
 
-                  <div class="mini-cart__price-list">
+                  <div class="mini-cart__price-list" data-line-item-price="{{ line_item.key }}" data-product-id="{{ line_item.product.id }}">
                     {%- if line_item.final_line_price < line_item.original_line_price -%}
                       <span class="price price--highlight">{{ line_item.final_line_price | money }}</span>
                       <span class="price price--compare">{{ line_item.original_line_price | money }}</span>
@@ -168,7 +169,7 @@
 
         <div class="mini-cart__recap-price-line">
           <span>{{ 'cart.general.total' | t }}</span>
-          <span>{{ cart.total_price | money }}</span>
+          <span id="mini-cart-total-price">{{ cart.total_price | money }}</span>
         </div>
 
         {%- comment -%}To calculate the total discount, we take both into account the Shopify Script (for Plus merchants), but we also add the compare at price{%- endcomment -%}

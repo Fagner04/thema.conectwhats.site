@@ -1,0 +1,47 @@
+<style>
+/* Permite que as thumbnails da galeria rolem até embaixo */
+@media screen and (min-width: 1000px) {
+  .product-gallery__thumbnail-list {
+    max-height: none !important; /* Remove limite de altura */
+    height: auto !important;
+    overflow-y: auto !important; /* Permite scroll vertical */
+  }
+  
+  /* Ajusta a galeria para ocupar toda altura disponível */
+  .product-gallery--with-thumbnails {
+    align-items: flex-start !important;
+  }
+  
+  .product-gallery--with-thumbnails .product-gallery__carousel-wrapper {
+    position: sticky;
+    top: 20px; /* Distância do topo quando fixar */
+  }
+}
+
+/* Padroniza o tamanho de todas as imagens principais */
+.product-gallery__carousel {
+  min-height: 500px; /* Altura mínima consistente */
+}
+
+.product-gallery__carousel-item .aspect-ratio {
+  padding-bottom: 133.33% !important; /* Proporção 3:4 (padrão de fotos de produto) */
+  position: relative;
+  width: 100%;
+}
+
+.product-gallery__image {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important; /* Preenche todo o espaço mantendo proporção */
+}
+
+/* Ajuste para mobile */
+@media screen and (max-width: 999px) {
+  .product-gallery__carousel {
+    min-height: 400px;
+  }
+}
+</style>

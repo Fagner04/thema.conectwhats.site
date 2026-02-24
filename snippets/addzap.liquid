@@ -1,16 +1,16 @@
+{%- comment -%}
+  WhatsApp Chat Widget Moderno
+  Com opções de rastreio e cálculo de frete
+{%- endcomment -%}
+
 <style>
-  
-  :root {
-  
-  --imagezap-background: url({{ settings.imagezap | img_url: 'master' }});
-  --colorzap-color: {{ settings.colorzap }};
-    
-  }
-    
-  .hidden {
-	display: none;
+:root {
+  --whatsapp-primary: {{ settings.colorzap | default: '#7c3aed' }};
+  --whatsapp-bg: #f5f5f5;
+  --whatsapp-text: #4a5568;
 }
 
+<<<<<<< HEAD
 .sticky-button {
     position: fixed;
     background: none var(--imagezap-background);
@@ -298,95 +298,1779 @@
 }
 
 .online-icon {
+=======
+.whatsapp-widget {
+>>>>>>> 5cf243451390bd75a19e88c96ed26b42987378c6
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 14px;
-  height: 14px;
-  z-index: 21;
+  z-index: 9999;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
-  
-.online-icon::after {
+
+/* Balão de mensagem externa */
+.whatsapp-external-message {
+  position: absolute;
+  bottom: 0;
+  right: 80px;
+  background: white;
+  border-radius: 20px;
+  padding: 12px 16px;
+  max-width: 320px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(20px);
+  transition: all 0.4s ease-out;
+  z-index: 9998;
+  white-space: nowrap;
+}
+
+.whatsapp-external-message.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+}
+
+.whatsapp-external-message::after {
   content: '';
   position: absolute;
+  right: -8px;
+  bottom: 18px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid white;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+.whatsapp-external-message-text {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.4;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  display: inline;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}
+
+.whatsapp-external-message-time {
+  font-size: 11px;
+  color: #9ca3af;
+  margin-left: 8px;
+  display: inline;
+  white-space: nowrap;
+}
+
+.whatsapp-external-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 2px 6px;
+  transition: color 0.2s;
+}
+
+.whatsapp-external-close:hover {
+  color: #374151;
+}
+
+/* Indicador de digitação externo */
+.whatsapp-external-typing {
+  position: absolute;
+  bottom: 0;
+  right: 80px;
+  background: white;
+  border-radius: 16px;
+  padding: 12px 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(20px);
+  transition: all 0.4s ease-out;
+  z-index: 9998;
+  display: none;
+}
+
+.whatsapp-external-typing.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  display: block;
+}
+
+.whatsapp-external-typing::after {
+  content: '';
+  position: absolute;
+  right: -8px;
+  bottom: 15px;
+  width: 0;
+  height: 0;
+  border-left: 10px solid white;
+  border-top: 8px solid transparent;
+  border-bottom: 8px solid transparent;
+}
+
+.whatsapp-external-typing-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.whatsapp-external-typing-dots span {
+  width: 8px;
+  height: 8px;
+  background: #9ca3af;
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.whatsapp-external-typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.whatsapp-external-typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .whatsapp-external-message,
+  .whatsapp-external-typing {
+    right: 75px;
+    max-width: calc(100vw - 110px);
+  }
+}
+
+/* Modais de Rastreio e Frete */
+.whatsapp-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s;
+}
+
+.whatsapp-modal-overlay.active {
+  display: flex;
+}
+
+.whatsapp-modal {
+  background: white;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  animation: slideUp 0.3s;
+}
+
+.whatsapp-modal-header {
+  background: var(--whatsapp-primary);
+  color: white;
+  padding: 20px;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.whatsapp-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.whatsapp-modal-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.whatsapp-modal-body {
+  padding: 25px;
+}
+
+.whatsapp-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.whatsapp-modal-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.whatsapp-modal-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.whatsapp-modal-input {
+  padding: 12px 16px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.whatsapp-modal-input:focus {
+  border-color: var(--whatsapp-primary);
+}
+
+.whatsapp-modal-button {
+  background: var(--whatsapp-primary);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
+}
+
+.whatsapp-modal-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+}
+
+.whatsapp-modal-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.whatsapp-modal-result {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f3f4f6;
+  border-radius: 12px;
+  display: none;
+}
+
+.whatsapp-modal-result.show {
+  display: block;
+}
+
+.whatsapp-modal-result h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  color: #374151;
+}
+
+.whatsapp-shipping-option {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.whatsapp-shipping-option:last-child {
+  margin-bottom: 0;
+}
+
+.whatsapp-shipping-name {
+  font-weight: 600;
+  color: #374151;
+  font-size: 14px;
+}
+
+.whatsapp-shipping-time {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 4px;
+}
+
+.whatsapp-shipping-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--whatsapp-primary);
+}
+
+.whatsapp-tracking-status {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.whatsapp-tracking-date {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 4px;
+}
+
+.whatsapp-tracking-text {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.whatsapp-modal-error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-top: 15px;
+  display: none;
+}
+
+.whatsapp-modal-error.show {
+  display: block;
+}
+
+.whatsapp-modal-loading {
+  text-align: center;
+  padding: 20px;
+  display: none;
+}
+
+.whatsapp-modal-loading.show {
+  display: block;
+}
+
+.whatsapp-modal-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e5e7eb;
+  border-top-color: var(--whatsapp-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Botão Flutuante */
+.whatsapp-float-btn {
+  width: 60px;
+  height: 60px;
+  background: var(--whatsapp-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  transition: all 0.3s;
+  position: relative;
+}
+
+.whatsapp-float-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+}
+
+.whatsapp-float-btn svg {
+  width: 32px;
+  height: 32px;
+  fill: white;
+}
+
+.whatsapp-float-btn.active {
+  background: #ef4444;
+}
+
+/* Indicador Online */
+.whatsapp-online-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 16px;
+  height: 16px;
+  background: #10b981;
+  border: 3px solid white;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Chat Box */
+.whatsapp-chat-box {
+  position: absolute;
+  bottom: 80px;
+  right: 0;
+  width: 360px;
+  max-height: 550px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s;
+}
+
+.whatsapp-chat-box.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Header */
+.whatsapp-header {
+  background: var(--whatsapp-primary);
+  padding: 20px;
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: white;
+}
+
+.whatsapp-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.whatsapp-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.whatsapp-avatar svg {
+  width: 28px;
+  height: 28px;
+  fill: var(--whatsapp-primary);
+}
+
+.whatsapp-avatar-online {
+  position: absolute;
+  bottom: 0;
+  right: 0;
   width: 14px;
   height: 14px;
-  border-radius: 30px;
-  background: #15e300;
-  border: 3px solid var(--background);
-  left: 0;
-  bottom: 0;
-  z-index: 999;
+  background: #10b981;
+  border: 2px solid var(--whatsapp-primary);
+  border-radius: 50%;
 }
+
+.whatsapp-header-info h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.whatsapp-header-info p {
+  margin: 2px 0 0 0;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.whatsapp-close-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  font-size: 24px;
+  line-height: 1;
+  opacity: 0.9;
+  transition: opacity 0.2s;
+}
+
+.whatsapp-close-btn:hover {
+  opacity: 1;
+}
+
+/* Body */
+.whatsapp-body {
+  padding: 20px;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+/* Mensagem de Boas-vindas */
+.whatsapp-welcome-message {
+  background: #f3f4f6;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  position: relative;
+  padding-top: 20px;
+}
+
+.whatsapp-welcome-message::before {
+  content: '👋';
+  font-size: 20px;
+  position: absolute;
+  top: 12px;
+  left: 15px;
+}
+
+.whatsapp-welcome-message p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--whatsapp-text);
+  line-height: 1.5;
+  padding-left: 30px;
+}
+
+.whatsapp-welcome-time {
+  display: block;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 8px;
+  text-align: right;
+}
+
+/* Botões de Ação */
+.whatsapp-action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.whatsapp-action-btn {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: var(--whatsapp-text);
+}
+
+.whatsapp-action-btn:hover {
+  border-color: var(--whatsapp-primary);
+  background: #faf5ff;
+  transform: translateY(-2px);
+}
+
+.whatsapp-action-btn-icon {
+  width: 40px;
+  height: 40px;
+  background: #f3f4f6;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+}
+
+.whatsapp-action-btn-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: var(--whatsapp-primary);
+}
+
+.whatsapp-action-btn-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.whatsapp-action-btn-subtitle {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* Input de Mensagem */
+.whatsapp-input-wrapper {
+  padding: 15px 20px 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.whatsapp-input-form {
+  display: flex;
+  gap: 10px;
+}
+
+.whatsapp-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 25px;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.whatsapp-input:focus {
+  border-color: var(--whatsapp-primary);
+}
+
+.whatsapp-send-btn {
+  width: 45px;
+  height: 45px;
+  background: var(--whatsapp-primary);
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.whatsapp-send-btn:hover {
+  transform: scale(1.05);
+}
+
+.whatsapp-send-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: white;
+}
+
+/* Footer */
+.whatsapp-footer {
+  padding: 12px 20px;
+  text-align: center;
+  font-size: 11px;
+  color: #9ca3af;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .whatsapp-widget {
+    bottom: 15px;
+    right: 15px;
+  }
   
+  .whatsapp-chat-box {
+    width: calc(100vw - 30px);
+    max-width: 360px;
+  }
+  
+  .whatsapp-float-btn {
+    width: 55px;
+    height: 55px;
+  }
+  
+  .whatsapp-float-btn svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Indicador de digitação */
+.whatsapp-typing-indicator {
+  display: none;
+  background: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  width: fit-content;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.whatsapp-typing-dots {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.whatsapp-typing-dots span {
+  width: 8px;
+  height: 8px;
+  background: #9ca3af;
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.whatsapp-typing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.whatsapp-typing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.7;
+  }
+  30% {
+    transform: translateY(-10px);
+    opacity: 1;
+  }
+}
+
+/* Mensagens automáticas */
+.whatsapp-auto-message {
+  background: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  animation: messageSlideIn 0.3s ease-out;
+  display: none;
+}
+
+.whatsapp-auto-message p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--whatsapp-text);
+  line-height: 1.5;
+}
+
+.whatsapp-auto-message-time {
+  display: block;
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 6px;
+  text-align: right;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.whatsapp-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.whatsapp-body::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+.whatsapp-body::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 3px;
+}
+
+.whatsapp-body::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
 </style>
 
-{% if settings.show_online_icon %}<div class="online-icon"></div>{% endif %}
-<input class="chat-menu hidden" id="offchat-menu" type="checkbox"/>
-  <div class="sticky-button" id="sticky-button">
-	<label for="offchat-menu">
-
-{% if settings.zap_icon_type == 'original' %}
-  <img loading="lazy" src="//cdn.shopify.com/s/files/1/0629/7449/2915/t/6/assets/whatsapp.svg?v=8122552569372891836" alt="WhatsApp" height="55px" width="55px">
-{% endif %}
-{% if settings.zap_icon_type == 'img' %}
-  <img loading="lazy" src="{{ settings.zap_icon| img_url: '360x' }}" alt="WhatsApp" height="55px" width="55px">
-  <style>.sticky-button { overflow: hidden;  }</style>
-{% endif %}
-		<svg class="close-icon" viewBox="0 0 512 512">
-			<path d="M278.6 256l68.2-68.2c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-68.2-68.2c-6.2-6.2-16.4-6.2-22.6 0-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3l68.2 68.2-68.2 68.2c-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3 6.2 6.2 16.4 6.2 22.6 0l68.2-68.2 68.2 68.2c6.2 6.2 16.4 6.2 22.6 0 6.2-6.2 6.2-16.4 0-22.6L278.6 256z"/>
-		</svg>
-  	 </label>
+<div class="whatsapp-widget">
+  <!-- Indicador de digitação externo -->
+  <div class="whatsapp-external-typing" id="whatsapp-external-typing">
+    <div class="whatsapp-external-typing-dots">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
   </div>
-<div class="sticky-chat">
-	<div class="chat-content">
-		<div class="chat-header">
 
-          {% if settings.zap_img_type == 'icone' %}
-			<svg viewBox="0 0 32 32">
-				<path d="M24,22a1,1,0,0,1-.64-.23L18.84,18H17A8,8,0,0,1,17,2h6a8,8,0,0,1,2,15.74V21a1,1,0,0,1-.58.91A1,1,0,0,1,24,22ZM17,4a6,6,0,0,0,0,12h2.2a1,1,0,0,1,.64.23L23,18.86V16.92a1,1,0,0,1,.86-1A6,6,0,0,0,23,4Z"/>
-				<rect height="2" width="2" x="19" y="9"></rect>
-				<rect height="2" width="2" x="14" y="9"></rect>
-				<rect height="2" width="2" x="24" y="9"></rect>
-				<path d="M8,30a1,1,0,0,1-.42-.09A1,1,0,0,1,7,29V25.74a8,8,0,0,1-1.28-15,1,1,0,1,1,.82,1.82,6,6,0,0,0,1.6,11.4,1,1,0,0,1,.86,1v1.94l3.16-2.63A1,1,0,0,1,12.8,24H15a5.94,5.94,0,0,0,4.29-1.82,1,1,0,0,1,1.44,1.4A8,8,0,0,1,15,26H13.16L8.64,29.77A1,1,0,0,1,8,30Z"/>
-			</svg>
-          {% endif %}
-          {% if settings.zap_img_type == 'img' %}
-			<img loading="lazy" src="{{ settings.zap_img| img_url: '360x' }}" alt="WhatsApp Perfil" height="52px" width="52px" style="border-radius: 48px;height: 52px;width: 52px;">
-          {% endif %}
-          
-			<div class="title">{{settings.titlezap}}<span>{{settings.txtzap}}</span></div>
-          
-		</div>
-      
-		<div class="chat-text"><span>{{settings.chatzap}}</span>
-      <span class="typing">
-        <svg viewBox="0 0 512 512">
-          <circle cx="256" cy="256" r="48"></circle>
-          <circle cx="416" cy="256" r="48"></circle>
-          <circle cx="96" cy="256" r="48"></circle>
-        </svg>
-       </span>
-      </div>
-	  </div>
+  <!-- Balão de mensagem externo -->
+  <div class="whatsapp-external-message" id="whatsapp-external-message">
+    <button class="whatsapp-external-close" id="whatsapp-external-close">×</button>
+    <span class="whatsapp-external-message-text" id="whatsapp-external-text"></span>
+    <span class="whatsapp-external-message-time" id="whatsapp-external-time"></span>
+  </div>
 
-        <div class="chat-button wa-chat-widget-send">
-          
-      <!--<form autocomplete="off" target="_blank" method="get" action="https://wa.me/{{settings.numberzap}}">-->
-
-          <div class="form-zap">
-            <input type="text" name="text" placeholder="{{settings.digizap}}" />
-
-            <a href="{{settings.numberzap}}">
-            <button type="submit"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-            <path
-              d="M24 0l-6 22-8.129-7.239 7.802-8.234-10.458 7.227-7.215-1.754 24-12zm-15 16.668v7.332l3.258-4.431-3.258-2.901z" />
-            </svg>
-            </button>
-            </a>
-          </div>
-              
-      <!--</form>-->
-    </div>    
+  <!-- Botão Flutuante -->
+  <div class="whatsapp-float-btn" id="whatsapp-toggle">
+    {% if settings.show_online_icon %}
+      <div class="whatsapp-online-indicator"></div>
+    {% endif %}
     
+    <svg class="whatsapp-icon" viewBox="0 0 24 24">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+    </svg>
+    
+    <svg class="whatsapp-close-icon" viewBox="0 0 24 24" style="display: none;">
+      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+    </svg>
   </div>
+
+  <!-- Chat Box -->
+  <div class="whatsapp-chat-box" id="whatsapp-chat">
+    <!-- Header -->
+    <div class="whatsapp-header">
+      <div class="whatsapp-header-left">
+        <div class="whatsapp-avatar">
+          {% if settings.zap_img_type == 'img' and settings.zap_img %}
+            <img src="{{ settings.zap_img | img_url: '100x' }}" alt="Avatar" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+          {% else %}
+            <svg viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+            </svg>
+          {% endif %}
+          {% if settings.show_online_icon %}
+            <div class="whatsapp-avatar-online"></div>
+          {% endif %}
+        </div>
+        <div class="whatsapp-header-info">
+          <h3>{{ settings.titlezap | default: 'Atendimento' }}</h3>
+          <p id="whatsapp-status">● Online</p>
+        </div>
+      </div>
+      <button class="whatsapp-close-btn" id="whatsapp-close">×</button>
+    </div>
+
+    <!-- Body -->
+    <div class="whatsapp-body">
+      <!-- Mensagem de Boas-vindas -->
+      <div class="whatsapp-welcome-message">
+        <p id="whatsapp-greeting">{{ settings.chatzap | default: 'Olá! Bem-vindo. Como posso ajudar você hoje?' }}</p>
+        <span class="whatsapp-welcome-time" id="whatsapp-time-greeting">Boa noite! 👍</span>
+      </div>
+
+      <!-- Indicador de digitação -->
+      <div class="whatsapp-typing-indicator" id="whatsapp-typing">
+        <div class="whatsapp-typing-dots">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+
+      <!-- Container para mensagens automáticas -->
+      <div id="whatsapp-auto-messages"></div>
+
+      <!-- Botões de Ação -->
+      <div class="whatsapp-action-buttons">
+        {% if settings.whatsapp_show_tracking %}
+        <a href="#" class="whatsapp-action-btn" id="whatsapp-tracking-btn">
+          <div class="whatsapp-action-btn-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+            </svg>
+          </div>
+          <div class="whatsapp-action-btn-title">Rastrear</div>
+          <div class="whatsapp-action-btn-subtitle">Meu pedido</div>
+        </a>
+        {% endif %}
+        
+        {% if settings.whatsapp_show_shipping %}
+        <a href="#" class="whatsapp-action-btn" id="whatsapp-shipping-btn">
+          <div class="whatsapp-action-btn-icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+            </svg>
+          </div>
+          <div class="whatsapp-action-btn-title">Calcular</div>
+          <div class="whatsapp-action-btn-subtitle">Frete</div>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="whatsapp-input-wrapper">
+      <form class="whatsapp-input-form" id="whatsapp-form">
+        <input 
+          type="text" 
+          class="whatsapp-input" 
+          id="whatsapp-message"
+          placeholder="{{ settings.digizap | default: 'Digite sua mensagem...' }}"
+        >
+        <button type="submit" class="whatsapp-send-btn">
+          <svg viewBox="0 0 24 24">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+
+    <!-- Footer -->
+    <div class="whatsapp-footer" id="whatsapp-footer">
+      Resposta em até 2 horas durante horário comercial
+    </div>
+  </div>
+
+  <!-- Modal de Rastreio -->
+  <div class="whatsapp-modal-overlay" id="whatsapp-tracking-modal">
+    <div class="whatsapp-modal">
+      <div class="whatsapp-modal-header">
+        <h3>Rastrear Pedido</h3>
+        <button class="whatsapp-modal-close" data-modal="tracking">×</button>
+      </div>
+      <div class="whatsapp-modal-body">
+        <form class="whatsapp-modal-form" id="tracking-form">
+          <div class="whatsapp-modal-input-group">
+            <label class="whatsapp-modal-label">Código de Rastreio</label>
+            <input 
+              type="text" 
+              class="whatsapp-modal-input" 
+              id="tracking-code"
+              placeholder="Ex: AA123456789BR"
+              maxlength="13"
+              required
+            >
+          </div>
+          <button type="submit" class="whatsapp-modal-button">Rastrear</button>
+        </form>
+        
+        <div class="whatsapp-modal-loading" id="tracking-loading">
+          <div class="whatsapp-modal-loading-spinner"></div>
+          <p>Buscando informações...</p>
+        </div>
+        
+        <div class="whatsapp-modal-result" id="tracking-result"></div>
+        <div class="whatsapp-modal-error" id="tracking-error"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Cálculo de Frete -->
+  <div class="whatsapp-modal-overlay" id="whatsapp-shipping-modal">
+    <div class="whatsapp-modal">
+      <div class="whatsapp-modal-header">
+        <h3>Calcular Frete</h3>
+        <button class="whatsapp-modal-close" data-modal="shipping">×</button>
+      </div>
+      <div class="whatsapp-modal-body">
+        <form class="whatsapp-modal-form" id="shipping-form">
+          <div class="whatsapp-modal-input-group">
+            <label class="whatsapp-modal-label">CEP de Destino</label>
+            <input 
+              type="text" 
+              class="whatsapp-modal-input" 
+              id="shipping-cep"
+              placeholder="00000-000"
+              maxlength="9"
+              required
+            >
+          </div>
+          <button type="submit" class="whatsapp-modal-button">Calcular</button>
+        </form>
+        
+        <div class="whatsapp-modal-loading" id="shipping-loading">
+          <div class="whatsapp-modal-loading-spinner"></div>
+          <p>Calculando frete...</p>
+        </div>
+        
+        <div class="whatsapp-modal-result" id="shipping-result"></div>
+        <div class="whatsapp-modal-error" id="shipping-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+  
+  var toggle = document.getElementById('whatsapp-toggle');
+  var chatBox = document.getElementById('whatsapp-chat');
+  var closeBtn = document.getElementById('whatsapp-close');
+  var form = document.getElementById('whatsapp-form');
+  var messageInput = document.getElementById('whatsapp-message');
+  var whatsappIcon = toggle.querySelector('.whatsapp-icon');
+  var closeIcon = toggle.querySelector('.whatsapp-close-icon');
+  var statusElement = document.getElementById('whatsapp-status');
+  var greetingElement = document.getElementById('whatsapp-greeting');
+  var timeGreetingElement = document.getElementById('whatsapp-time-greeting');
+  var footerElement = document.getElementById('whatsapp-footer');
+  var onlineIndicator = toggle.querySelector('.whatsapp-online-indicator');
+  var avatarOnline = chatBox.querySelector('.whatsapp-avatar-online');
+  
+  var whatsappNumber = '{{ settings.numberzap }}';
+  
+  // Mensagens automáticas configuradas
+  var autoMessages = [];
+  {% if settings.whatsapp_auto_message_1 != blank %}
+    autoMessages.push('{{ settings.whatsapp_auto_message_1 | escape }}');
+  {% endif %}
+  {% if settings.whatsapp_auto_message_2 != blank %}
+    autoMessages.push('{{ settings.whatsapp_auto_message_2 | escape }}');
+  {% endif %}
+  {% if settings.whatsapp_auto_message_3 != blank %}
+    autoMessages.push('{{ settings.whatsapp_auto_message_3 | escape }}');
+  {% endif %}
+  {% if settings.whatsapp_auto_message_4 != blank %}
+    autoMessages.push('{{ settings.whatsapp_auto_message_4 | escape }}');
+  {% endif %}
+  {% if settings.whatsapp_auto_message_5 != blank %}
+    autoMessages.push('{{ settings.whatsapp_auto_message_5 | escape }}');
+  {% endif %}
+  
+  // Configurações de mensagens automáticas
+  var autoMessageConfig = {
+    enabled: {{ settings.whatsapp_auto_messages_enabled | default: false | json }},
+    interval: {{ settings.whatsapp_auto_message_interval | default: 5 | json }} * 1000, // segundos para ms
+    pauseAfterCycle: {{ settings.whatsapp_auto_message_pause | default: 20 | json }} * 60 * 1000, // minutos para ms
+    typingDuration: 2000 // 2 segundos de digitação
+  };
+  
+  var currentMessageIndex = 0;
+  var cycleTimeout = null;
+  var messageTimeout = null;
+  var hasShownCycle = false;
+  
+  // Recupera estado do ciclo do localStorage
+  var cycleState = localStorage.getItem('whatsapp_cycle_state');
+  if (cycleState) {
+    try {
+      var state = JSON.parse(cycleState);
+      var timeSinceLastMessage = Date.now() - state.timestamp;
+      
+      // Se completou o ciclo, verifica se ainda está na pausa
+      if (state.completed) {
+        if (timeSinceLastMessage < autoMessageConfig.pauseAfterCycle) {
+          // Ainda em pausa, não faz nada agora
+          hasShownCycle = true;
+          currentMessageIndex = 0;
+        } else {
+          // Pausa terminou, reinicia
+          localStorage.removeItem('whatsapp_cycle_state');
+          hasShownCycle = false;
+          currentMessageIndex = 0;
+        }
+      } else {
+        // Ciclo não completou, continua de onde parou
+        // Avança para próxima mensagem (pois a atual já foi mostrada)
+        currentMessageIndex = state.index + 1;
+        hasShownCycle = false;
+      }
+    } catch (e) {
+      localStorage.removeItem('whatsapp_cycle_state');
+    }
+  }
+  
+  // Configurações de horário
+  var config = {
+    enabled: {{ settings.whatsapp_schedule_enabled | default: false | json }},
+    timezone: {{ settings.whatsapp_timezone | default: -3 | json }}, // UTC offset
+    weekdayStart: '{{ settings.whatsapp_weekday_start | default: "09:00" }}',
+    weekdayEnd: '{{ settings.whatsapp_weekday_end | default: "18:00" }}',
+    saturdayStart: '{{ settings.whatsapp_saturday_start | default: "09:00" }}',
+    saturdayEnd: '{{ settings.whatsapp_saturday_end | default: "13:00" }}',
+    sundayEnabled: {{ settings.whatsapp_sunday_enabled | default: false | json }},
+    sundayStart: '{{ settings.whatsapp_sunday_start | default: "09:00" }}',
+    sundayEnd: '{{ settings.whatsapp_sunday_end | default: "13:00" }}',
+    offlineMessage: '{{ settings.whatsapp_offline_message | default: "No momento estamos offline. Deixe sua mensagem!" }}'
+  };
+  
+  // Função para obter horário atual
+  function getCurrentTime() {
+    var now = new Date();
+    var utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+    var localTime = new Date(utc + (3600000 * config.timezone));
+    return localTime;
+  }
+  
+  // Função para verificar se está no horário de atendimento
+  function isOnline() {
+    if (!config.enabled) return true; // Se não configurado, sempre online
+    
+    var now = getCurrentTime();
+    var day = now.getDay(); // 0 = Domingo, 6 = Sábado
+    var currentTime = now.getHours() * 60 + now.getMinutes();
+    
+    var start, end;
+    
+    // Domingo
+    if (day === 0) {
+      if (!config.sundayEnabled) return false;
+      start = timeToMinutes(config.sundayStart);
+      end = timeToMinutes(config.sundayEnd);
+    }
+    // Sábado
+    else if (day === 6) {
+      start = timeToMinutes(config.saturdayStart);
+      end = timeToMinutes(config.saturdayEnd);
+    }
+    // Segunda a Sexta
+    else {
+      start = timeToMinutes(config.weekdayStart);
+      end = timeToMinutes(config.weekdayEnd);
+    }
+    
+    return currentTime >= start && currentTime <= end;
+  }
+  
+  // Converte hora (HH:MM) para minutos
+  function timeToMinutes(time) {
+    var parts = time.split(':');
+    return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+  }
+  
+  // Função para obter saudação baseada no horário
+  function getGreeting() {
+    var now = getCurrentTime();
+    var hour = now.getHours();
+    
+    if (hour >= 6 && hour < 12) {
+      return { text: 'Bom dia!', emoji: '☀️' };
+    } else if (hour >= 12 && hour < 18) {
+      return { text: 'Boa tarde!', emoji: '🌤️' };
+    } else {
+      return { text: 'Boa noite!', emoji: '🌙' };
+    }
+  }
+  
+  // Função para formatar horário de atendimento
+  function getScheduleText() {
+    if (!config.enabled) {
+      return 'Resposta em até 2 horas durante horário comercial';
+    }
+    
+    var now = getCurrentTime();
+    var day = now.getDay();
+    
+    if (day === 0 && !config.sundayEnabled) {
+      return 'Fechado aos domingos. Retornamos na segunda-feira às ' + config.weekdayStart;
+    }
+    
+    if (day === 0) {
+      return 'Horário de domingo: ' + config.sundayStart + ' às ' + config.sundayEnd;
+    } else if (day === 6) {
+      return 'Horário de sábado: ' + config.saturdayStart + ' às ' + config.saturdayEnd;
+    } else {
+      return 'Horário de atendimento: ' + config.weekdayStart + ' às ' + config.weekdayEnd;
+    }
+  }
+  
+  // Atualiza status online/offline
+  function updateStatus() {
+    var online = isOnline();
+    var greeting = getGreeting();
+    
+    // Atualiza status no header
+    if (online) {
+      statusElement.textContent = '● Online';
+      statusElement.style.color = 'white';
+      if (onlineIndicator) onlineIndicator.style.display = 'block';
+      if (avatarOnline) avatarOnline.style.display = 'block';
+    } else {
+      statusElement.textContent = 'Offline';
+      statusElement.style.color = 'rgba(255,255,255,0.7)';
+      if (onlineIndicator) onlineIndicator.style.display = 'none';
+      if (avatarOnline) avatarOnline.style.display = 'none';
+    }
+    
+    // Atualiza saudação
+    if (timeGreetingElement) {
+      timeGreetingElement.textContent = greeting.text + ' ' + greeting.emoji;
+    }
+    
+    // Atualiza mensagem se offline
+    if (!online && config.enabled && greetingElement) {
+      greetingElement.textContent = config.offlineMessage;
+    }
+    
+    // Atualiza footer com horário
+    if (footerElement) {
+      footerElement.textContent = getScheduleText();
+    }
+  }
+  
+  // Atualiza status ao carregar
+  updateStatus();
+  
+  // Atualiza status a cada minuto
+  setInterval(updateStatus, 60000);
+  
+  // Sistema de mensagens automáticas
+  var typingIndicator = document.getElementById('whatsapp-typing');
+  var autoMessagesContainer = document.getElementById('whatsapp-auto-messages');
+  var externalTyping = document.getElementById('whatsapp-external-typing');
+  var externalMessage = document.getElementById('whatsapp-external-message');
+  var externalText = document.getElementById('whatsapp-external-text');
+  var externalTime = document.getElementById('whatsapp-external-time');
+  var externalClose = document.getElementById('whatsapp-external-close');
+  
+  // Fechar mensagem externa
+  if (externalClose) {
+    externalClose.addEventListener('click', function(e) {
+      e.stopPropagation();
+      hideExternalMessage();
+    });
+  }
+  
+  function showExternalTyping() {
+    if (externalTyping) {
+      externalTyping.classList.add('show');
+    }
+  }
+  
+  function hideExternalTyping() {
+    if (externalTyping) {
+      externalTyping.classList.remove('show');
+    }
+  }
+  
+  function showExternalMessage(message) {
+    if (!externalMessage || !externalText || !externalTime) return;
+    
+    var now = getCurrentTime();
+    var timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                  now.getMinutes().toString().padStart(2, '0');
+    
+    externalText.textContent = message;
+    externalTime.textContent = timeStr;
+    externalMessage.classList.add('show');
+  }
+  
+  function hideExternalMessage() {
+    if (externalMessage) {
+      externalMessage.classList.remove('show');
+    }
+  }
+  
+  function showTypingIndicator() {
+    if (typingIndicator) {
+      typingIndicator.style.display = 'block';
+      // Scroll para baixo
+      if (chatBox.querySelector('.whatsapp-body')) {
+        var body = chatBox.querySelector('.whatsapp-body');
+        body.scrollTop = body.scrollHeight;
+      }
+    }
+  }
+  
+  function hideTypingIndicator() {
+    if (typingIndicator) {
+      typingIndicator.style.display = 'none';
+    }
+  }
+  
+  function showAutoMessage(message) {
+    if (!autoMessagesContainer) return;
+    
+    var messageDiv = document.createElement('div');
+    messageDiv.className = 'whatsapp-auto-message';
+    messageDiv.style.display = 'block';
+    
+    var now = getCurrentTime();
+    var timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                  now.getMinutes().toString().padStart(2, '0');
+    
+    messageDiv.innerHTML = '<p>' + message + '</p><span class="whatsapp-auto-message-time">' + timeStr + '</span>';
+    
+    autoMessagesContainer.appendChild(messageDiv);
+    
+    // Scroll para baixo
+    if (chatBox.querySelector('.whatsapp-body')) {
+      var body = chatBox.querySelector('.whatsapp-body');
+      setTimeout(function() {
+        body.scrollTop = body.scrollHeight;
+      }, 100);
+    }
+  }
+  
+  function showNextMessage() {
+    if (!autoMessageConfig.enabled || autoMessages.length === 0) return;
+    if (currentMessageIndex >= autoMessages.length) {
+      // Terminou o ciclo, aguarda pausa
+      hasShownCycle = true;
+      currentMessageIndex = 0;
+      
+      // Salva estado: ciclo completo
+      localStorage.setItem('whatsapp_cycle_state', JSON.stringify({
+        index: 0,
+        completed: true,
+        timestamp: Date.now()
+      }));
+      
+      // Agenda próximo ciclo após pausa
+      cycleTimeout = setTimeout(function() {
+        localStorage.removeItem('whatsapp_cycle_state');
+        hasShownCycle = false;
+        startMessageCycle();
+      }, autoMessageConfig.pauseAfterCycle);
+      
+      return;
+    }
+    
+    // Salva estado atual antes de mostrar mensagem
+    localStorage.setItem('whatsapp_cycle_state', JSON.stringify({
+      index: currentMessageIndex,
+      completed: false,
+      timestamp: Date.now()
+    }));
+    
+    // Se chat estiver aberto, mostra dentro do chat
+    var isChatOpen = chatBox.classList.contains('active');
+    
+    if (isChatOpen) {
+      // Mostra indicador de digitação interno
+      showTypingIndicator();
+      
+      // Após duração de digitação, mostra mensagem
+      messageTimeout = setTimeout(function() {
+        hideTypingIndicator();
+        showAutoMessage(autoMessages[currentMessageIndex]);
+        currentMessageIndex++;
+        
+        // Agenda próxima mensagem
+        messageTimeout = setTimeout(function() {
+          showNextMessage();
+        }, autoMessageConfig.interval);
+        
+      }, autoMessageConfig.typingDuration);
+    } else {
+      // Mostra balão externo (fora do chat)
+      hideExternalMessage(); // Esconde mensagem anterior
+      showExternalTyping();
+      
+      // Após duração de digitação, mostra mensagem externa
+      messageTimeout = setTimeout(function() {
+        hideExternalTyping();
+        showExternalMessage(autoMessages[currentMessageIndex]);
+        currentMessageIndex++;
+        
+        // Agenda próxima mensagem (esconde balão antes)
+        messageTimeout = setTimeout(function() {
+          hideExternalMessage();
+          
+          // Aguarda um pouco antes da próxima
+          setTimeout(function() {
+            showNextMessage();
+          }, 1000);
+          
+        }, autoMessageConfig.interval);
+        
+      }, autoMessageConfig.typingDuration);
+    }
+  }
+  
+  function startMessageCycle() {
+    if (!autoMessageConfig.enabled || autoMessages.length === 0) return;
+    
+    // Limpa mensagens anteriores do chat
+    if (autoMessagesContainer) {
+      autoMessagesContainer.innerHTML = '';
+    }
+    
+    currentMessageIndex = 0;
+    showNextMessage();
+  }
+  
+  function stopMessageCycle() {
+    if (cycleTimeout) clearTimeout(cycleTimeout);
+    if (messageTimeout) clearTimeout(messageTimeout);
+    hideTypingIndicator();
+    hideExternalTyping();
+    hideExternalMessage();
+    // Não limpa localStorage aqui para manter estado ao recarregar
+  }
+  
+  // Inicia ciclo automaticamente após 3 segundos (sem precisar abrir chat)
+  // Só inicia se não completou o ciclo ou se passou o tempo de pausa
+  if (autoMessageConfig.enabled && autoMessages.length > 0) {
+    if (!hasShownCycle) {
+      // Não completou ainda, continua de onde parou
+      var delayTime = currentMessageIndex === 0 ? 3000 : 1000; // 3s na primeira, 1s nas demais
+      setTimeout(function() {
+        showNextMessage();
+      }, delayTime);
+    } else {
+      // Completou, agenda para quando a pausa terminar
+      var state = JSON.parse(localStorage.getItem('whatsapp_cycle_state') || '{}');
+      if (state.completed && state.timestamp) {
+        var timeRemaining = autoMessageConfig.pauseAfterCycle - (Date.now() - state.timestamp);
+        if (timeRemaining > 0) {
+          cycleTimeout = setTimeout(function() {
+            localStorage.removeItem('whatsapp_cycle_state');
+            hasShownCycle = false;
+            currentMessageIndex = 0;
+            startMessageCycle();
+          }, timeRemaining);
+        } else {
+          // Pausa já passou, reinicia
+          localStorage.removeItem('whatsapp_cycle_state');
+          hasShownCycle = false;
+          currentMessageIndex = 0;
+          setTimeout(function() {
+            startMessageCycle();
+          }, 3000);
+        }
+      }
+    }
+  }
+  
+  // Toggle chat
+  toggle.addEventListener('click', function() {
+    var isActive = chatBox.classList.contains('active');
+    
+    if (isActive) {
+      chatBox.classList.remove('active');
+      toggle.classList.remove('active');
+      whatsappIcon.style.display = 'block';
+      closeIcon.style.display = 'none';
+    } else {
+      chatBox.classList.add('active');
+      toggle.classList.add('active');
+      whatsappIcon.style.display = 'none';
+      closeIcon.style.display = 'block';
+      updateStatus(); // Atualiza ao abrir
+      
+      // Esconde balões externos ao abrir chat
+      hideExternalMessage();
+      hideExternalTyping();
+    }
+  });
+  
+  // Close button
+  closeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    chatBox.classList.remove('active');
+    toggle.classList.remove('active');
+    whatsappIcon.style.display = 'block';
+    closeIcon.style.display = 'none';
+  });
+  
+  // Send message
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    var message = messageInput.value.trim();
+    if (message) {
+      var url = whatsappNumber + '?text=' + encodeURIComponent(message);
+      window.open(url, '_blank');
+      messageInput.value = '';
+    }
+  });
+  
+  // Modais de Rastreio e Frete
+  var trackingModal = document.getElementById('whatsapp-tracking-modal');
+  var shippingModal = document.getElementById('whatsapp-shipping-modal');
+  var trackingBtn = document.getElementById('whatsapp-tracking-btn');
+  var shippingBtn = document.getElementById('whatsapp-shipping-btn');
+  
+  // Abrir modais
+  if (trackingBtn) {
+    trackingBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      trackingModal.classList.add('active');
+    });
+  }
+  
+  if (shippingBtn) {
+    shippingBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      shippingModal.classList.add('active');
+    });
+  }
+  
+  // Fechar modais
+  document.querySelectorAll('.whatsapp-modal-close').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var modal = this.getAttribute('data-modal');
+      if (modal === 'tracking') {
+        trackingModal.classList.remove('active');
+      } else if (modal === 'shipping') {
+        shippingModal.classList.remove('active');
+      }
+    });
+  });
+  
+  // Fechar ao clicar fora
+  [trackingModal, shippingModal].forEach(function(modal) {
+    if (modal) {
+      modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+          modal.classList.remove('active');
+        }
+      });
+    }
+  });
+  
+  // Rastreamento
+  var trackingForm = document.getElementById('tracking-form');
+  if (trackingForm) {
+    trackingForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      var code = document.getElementById('tracking-code').value.trim().toUpperCase();
+      var loading = document.getElementById('tracking-loading');
+      var result = document.getElementById('tracking-result');
+      var error = document.getElementById('tracking-error');
+      
+      // Limpa resultados anteriores
+      result.classList.remove('show');
+      error.classList.remove('show');
+      result.innerHTML = '';
+      error.textContent = '';
+      
+      // Mostra loading
+      loading.classList.add('show');
+      
+      // URL da API do Google Sheets (mesma do frete)
+      var sheetsApiUrl = '{{ settings.sheets_frete_url }}';
+      
+      if (!sheetsApiUrl || sheetsApiUrl === '') {
+        loading.classList.remove('show');
+        error.textContent = 'API não configurada. Configure em: Temas > Cálculo de Frete > URL da API.';
+        error.classList.add('show');
+        return;
+      }
+      
+      // Chama API com parâmetro codigo
+      var url = sheetsApiUrl + '?codigo=' + encodeURIComponent(code);
+      
+      fetch(url)
+        .then(function(response) {
+          if (!response.ok) {
+            throw new Error('Erro na API: ' + response.status);
+          }
+          return response.json();
+        })
+        .then(function(data) {
+          console.log('Resposta rastreamento:', data);
+          loading.classList.remove('show');
+          
+          if (data.success === false || data.error) {
+            error.textContent = data.error || 'Código de rastreio não encontrado.';
+            error.classList.add('show');
+            return;
+          }
+          
+          if (!data.eventos || data.eventos.length === 0) {
+            error.textContent = 'Nenhuma informação de rastreamento disponível.';
+            error.classList.add('show');
+            return;
+          }
+          
+          var html = '<h4>Status do Pedido</h4>';
+          data.eventos.forEach(function(evento) {
+            html += '<div class="whatsapp-tracking-status">';
+            html += '<div class="whatsapp-tracking-date">' + evento.data + ' - ' + evento.hora + '</div>';
+            html += '<div class="whatsapp-tracking-text">' + evento.status + '</div>';
+            if (evento.local || evento.cidade) {
+              var localizacao = [];
+              if (evento.local) localizacao.push(evento.local);
+              if (evento.cidade) localizacao.push(evento.cidade);
+              html += '<div class="whatsapp-tracking-text" style="font-size: 12px; color: #9ca3af; margin-top: 4px;">' + localizacao.join(' - ') + '</div>';
+            }
+            html += '</div>';
+          });
+          
+          result.innerHTML = html;
+          result.classList.add('show');
+        })
+        .catch(function(err) {
+          loading.classList.remove('show');
+          console.error('Erro no rastreamento:', err);
+          error.textContent = 'Erro ao buscar rastreamento. Verifique o código e tente novamente.';
+          error.classList.add('show');
+        });
+    });
+  }
+  
+  // Cálculo de Frete
+  var shippingForm = document.getElementById('shipping-form');
+  if (shippingForm) {
+    shippingForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      var cepFormatado = document.getElementById('shipping-cep').value; // Com hífen
+      var cep = cepFormatado.replace(/\D/g, ''); // Sem hífen para validação
+      var loading = document.getElementById('shipping-loading');
+      var result = document.getElementById('shipping-result');
+      var error = document.getElementById('shipping-error');
+      
+      if (cep.length !== 8) {
+        error.textContent = 'CEP inválido. Digite um CEP válido.';
+        error.classList.add('show');
+        return;
+      }
+      
+      // Limpa resultados anteriores
+      result.classList.remove('show');
+      error.classList.remove('show');
+      result.innerHTML = '';
+      error.textContent = '';
+      
+      // Mostra loading
+      loading.classList.add('show');
+      
+      // URL da API do Google Sheets configurada
+      var sheetsApiUrl = '{{ settings.sheets_frete_url }}';
+      var cepOrigem = '{{ settings.correios_cep_origem | default: "74550050" }}'; // CEP de origem
+      
+      if (!sheetsApiUrl || sheetsApiUrl === '') {
+        loading.classList.remove('show');
+        error.textContent = 'API de frete não configurada. Configure em: Temas > Cálculo de Frete > URL da API.';
+        error.classList.add('show');
+        return;
+      }
+      
+      // Remove hífen dos CEPs para enviar à API
+      var cepOrigemLimpo = cepOrigem.replace(/\D/g, '');
+      var cepDestinoLimpo = cep; // Já está sem hífen
+      
+      // Parâmetros conforme esperado pelo script do Google Sheets
+      // O script espera: cep ou destination_cep, cep_origem ou origin_cep, peso ou cart_weight
+      var params = {
+        cep: cepDestinoLimpo,
+        cep_origem: cepOrigemLimpo,
+        peso: 0.5 // peso em kg
+      };
+      
+      // Monta URL com parâmetros
+      var url = sheetsApiUrl + '?';
+      for (var key in params) {
+        url += key + '=' + encodeURIComponent(params[key]) + '&';
+      }
+      url = url.slice(0, -1); // Remove último &
+      
+      // Chama API do Google Sheets
+      fetch(url)
+        .then(function(response) {
+          if (!response.ok) {
+            console.error('Erro HTTP:', response.status);
+            throw new Error('Erro na API: ' + response.status);
+          }
+          return response.json();
+        })
+        .then(function(data) {
+          console.log('Resposta da API:', data); // Debug
+          loading.classList.remove('show');
+          
+          // Verifica se houve erro
+          if (data.success === false || data.error) {
+            var mensagemErro = data.error || 'Não foi possível calcular o frete para este CEP.';
+            error.textContent = mensagemErro;
+            error.classList.add('show');
+            return;
+          }
+          
+          // Verifica se tem opções de frete
+          if (!data.options || data.options.length === 0) {
+            error.textContent = 'Nenhum serviço de frete disponível para este CEP.';
+            error.classList.add('show');
+            return;
+          }
+          
+          // Busca informações do CEP para mostrar cidade
+          fetch('https://viacep.com.br/ws/' + cep + '/json/')
+            .then(function(r) { return r.json(); })
+            .then(function(cepData) {
+              var cidade = cepData.localidade || '';
+              var uf = cepData.uf || '';
+              
+              var html = '<h4>Opções de Frete';
+              if (cidade && uf) {
+                html += ' para ' + cidade + ' - ' + uf;
+              }
+              html += '</h4>';
+              
+              // Processa cada opção de frete
+              data.options.forEach(function(option) {
+                var nome = option.name || 'Correios';
+                var valor = parseFloat(option.price || 0);
+                var prazo = option.estimated_days || 'Consultar';
+                
+                html += '<div class="whatsapp-shipping-option">';
+                html += '<div>';
+                html += '<div class="whatsapp-shipping-name">' + nome + '</div>';
+                html += '<div class="whatsapp-shipping-time">' + prazo + '</div>';
+                html += '</div>';
+                html += '<div class="whatsapp-shipping-price">R$ ' + valor.toFixed(2).replace('.', ',') + '</div>';
+                html += '</div>';
+              });
+              
+              html += '<p style="font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center;">Valores calculados pelos Correios</p>';
+              
+              result.innerHTML = html;
+              result.classList.add('show');
+            })
+            .catch(function() {
+              // Se falhar buscar CEP, mostra sem cidade
+              var html = '<h4>Opções de Frete</h4>';
+              
+              data.options.forEach(function(option) {
+                var nome = option.name || 'Correios';
+                var valor = parseFloat(option.price || 0);
+                var prazo = option.estimated_days || 'Consultar';
+                
+                html += '<div class="whatsapp-shipping-option">';
+                html += '<div>';
+                html += '<div class="whatsapp-shipping-name">' + nome + '</div>';
+                html += '<div class="whatsapp-shipping-time">' + prazo + '</div>';
+                html += '</div>';
+                html += '<div class="whatsapp-shipping-price">R$ ' + valor.toFixed(2).replace('.', ',') + '</div>';
+                html += '</div>';
+              });
+              
+              html += '<p style="font-size: 11px; color: #9ca3af; margin-top: 12px; text-align: center;">Valores calculados pelos Correios</p>';
+              
+              result.innerHTML = html;
+              result.classList.add('show');
+            });
+        })
+        .catch(function(err) {
+          loading.classList.remove('show');
+          console.error('Erro no cálculo de frete:', err);
+          error.textContent = 'Erro ao calcular frete. Verifique a configuração da API ou tente novamente.';
+          error.classList.add('show');
+        });
+    });
+  }
+  
+  // Máscara de CEP
+  var cepInput = document.getElementById('shipping-cep');
+  if (cepInput) {
+    cepInput.addEventListener('input', function(e) {
+      var value = e.target.value.replace(/\D/g, '');
+      if (value.length > 5) {
+        value = value.substring(0, 5) + '-' + value.substring(5, 8);
+      }
+      e.target.value = value;
+    });
+  }
+  
+})();
+</script>

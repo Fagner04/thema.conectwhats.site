@@ -1,0 +1,183 @@
+{%- comment -%}
+  Script para ocultar cores e tamanhos sem estoque
+  - Oculta CORES que não têm nenhum tamanho disponível
+  - Oculta TAMANHOS que não têm nenhuma cor disponível
+{%- endcomment -%}
+
+<script>
+(function() {
+  'use strict';
+  
+  function hideUnavailableOptions() {
+    console.log('🎨 Iniciando verificação de cores e tamanhos sem estoque...');
+    
+    // Verifica se o produto tem variantes
+    if (!window.theme || !window.theme.product || !window.theme.product.variants) {
+      console.log('❌ Dados do produto não encontrados');
+      return;
+    }
+    
+    var variants = window.theme.product.variants;
+    var options = window.theme.product.options;
+    
+    console.log('📦 Produto:', window.theme.product.id);
+    console.log('📋 Opções:', options);
+    console.log('🔢 Total de variantes:', variants.length);
+    
+    var colorOption = null;
+    var sizeOption = null;
+    var colorIndex = -1;
+    var sizeIndex = -1;
+    
+    // Identifica qual opção é cor e qual é tamanho
+    if (options) {
+      options.forEach(function(option, index) {
+        var optionName = option.toLowerCase();
+        console.log('Opção ' + (index + 1) + ':', option);
+        
+        if (optionName.includes('cor') || optionName.includes('color') || optionName.includes('colour')) {
+          colorOption = 'option' + (index + 1);
+          colorIndex = index;
+          console.log('✅ Cor encontrada na opção ' + (index + 1));
+        }
+        if (optionName.includes('tamanho') || optionName.includes('size') || optionName.includes('talla')) {
+          sizeOption = 'option' + (index + 1);
+          sizeIndex = index;
+          console.log('✅ Tamanho encontrado na opção ' + (index + 1));
+        }
+      });
+    }
+    
+    // Se não encontrou cor e tamanho, não faz nada
+    if (!colorOption || !sizeOption) {
+      console.log('⚠️ Produto não tem Cor e Tamanho configurados');
+      return;
+    }
+    
+    // Agrupa variantes por cor
+    var colorAvailability = {};
+    
+    // Agrupa variantes por tamanho
+    var sizeAvailability = {};
+    
+    variants.forEach(function(variant) {
+      var color = variant[colorOption];
+      var size = variant[sizeOption];
+      
+      // Processa cores
+      if (!colorAvailability[color]) {
+        colorAvailability[color] = {
+          hasStock: false,
+          sizes: []
+        };
+      }
+      
+      if (variant.available) {
+        colorAvailability[color].hasStock = true;
+      }
+      
+      colorAvailability[color].sizes.push({
+        size: size,
+        available: variant.available
+      });
+      
+      // Processa tamanhos
+      if (!sizeAvailability[size]) {
+        sizeAvailability[size] = {
+          hasStock: false,
+          colors: []
+        };
+      }
+      
+      if (variant.available) {
+        sizeAvailability[size].hasStock = true;
+      }
+      
+      sizeAvailability[size].colors.push({
+        color: color,
+        available: variant.available
+      });
+    });
+    
+    console.log('📊 Disponibilidade por cor:', colorAvailability);
+    console.log('📏 Disponibilidade por tamanho:', sizeAvailability);
+    
+    // Oculta cores sem estoque
+    var hiddenColors = 0;
+    Object.keys(colorAvailability).forEach(function(color) {
+      if (!colorAvailability[color].hasStock) {
+        console.log('🚫 Ocultando cor:', color);
+        
+        // Encontra o input radio da cor
+        var colorInputs = document.querySelectorAll('.color-swatch__radio, .product-form__single-selector');
+        
+        colorInputs.forEach(function(input) {
+          var inputValue = input.value || input.getAttribute('value');
+          
+          if (inputValue && inputValue.toLowerCase() === color.toLowerCase()) {
+            // Oculta o container da cor
+            var colorSwatch = input.closest('.color-swatch');
+            if (colorSwatch) {
+              colorSwatch.style.display = 'none';
+              colorSwatch.setAttribute('data-hidden-no-stock', 'true');
+              hiddenColors++;
+              console.log('✅ Cor "' + color + '" ocultada');
+            }
+          }
+        });
+      }
+    });
+    
+    // Oculta tamanhos sem estoque
+    var hiddenSizes = 0;
+    Object.keys(sizeAvailability).forEach(function(size) {
+      if (!sizeAvailability[size].hasStock) {
+        console.log('🚫 Ocultando tamanho:', size);
+        
+        // Encontra todos os inputs/botões de tamanho
+        var sizeSelectors = document.querySelectorAll('.size-swatch__radio, .product-form__single-selector, input[type="radio"]');
+        
+        sizeSelectors.forEach(function(input) {
+          var inputValue = input.value || input.getAttribute('value');
+          
+          if (inputValue && inputValue.toLowerCase() === size.toLowerCase()) {
+            // Oculta o container do tamanho
+            var sizeContainer = input.closest('.size-swatch') || input.closest('label') || input.parentElement;
+            if (sizeContainer) {
+              sizeContainer.style.display = 'none';
+              sizeContainer.setAttribute('data-hidden-no-stock', 'true');
+              hiddenSizes++;
+              console.log('✅ Tamanho "' + size + '" ocultado');
+            }
+          }
+        });
+      }
+    });
+    
+    console.log('🎯 Total de cores ocultadas:', hiddenColors);
+    console.log('🎯 Total de tamanhos ocultados:', hiddenSizes);
+  }
+  
+  // Executa quando a página carregar
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hideUnavailableOptions);
+  } else {
+    hideUnavailableOptions();
+  }
+  
+  // Re-executa se houver mudanças no produto (para temas dinâmicos)
+  setTimeout(hideUnavailableOptions, 500);
+  setTimeout(hideUnavailableOptions, 1000);
+  setTimeout(hideUnavailableOptions, 2000);
+  
+})();
+</script>
+
+<style>
+/* Oculta cores e tamanhos sem estoque */
+.color-swatch[data-hidden-no-stock="true"],
+.size-swatch[data-hidden-no-stock="true"],
+label[data-hidden-no-stock="true"] {
+  display: none !important;
+}
+</style>

@@ -1,0 +1,411 @@
+{%- comment -%} BARRA DE PROGRESSO ATACADO + CÁLCULO TOTAL {%- endcomment -%}
+{%- if settings.conectwhats_atacado_enabled -%}
+{%- assign wholesale_min = settings.conectwhats_atacado_min_qty | default: 6 -%}
+{%- assign total_items = cart.item_count -%}
+{%- assign progress = total_items | times: 100 | divided_by: wholesale_min -%}
+{%- if progress > 100 -%}
+  {%- assign progress = 100 -%}
+{%- endif -%}
+{%- assign remaining = wholesale_min | minus: total_items -%}
+{%- assign wholesale_active = false -%}
+{%- if remaining <= 0 -%}
+  {%- assign wholesale_active = true -%}
+{%- endif -%}
+
+{%- comment -%} CALCULAR TOTAL COM PREÇOS DE ATACADO {%- endcomment -%}
+{%- assign wholesale_total = 0 -%}
+{%- assign original_total = 0 -%}
+{%- assign has_wholesale_prices = false -%}
+
+{%- if wholesale_active -%}
+  {%- for item in cart.items -%}
+    {%- assign ws_price = item.product.metafields.custom.wholesale_price.value -%}
+    {%- unless ws_price -%}
+      {%- assign ws_price = item.product.metafields.custom.wholesale_price -%}
+    {%- endunless -%}
+    
+    {%- if ws_price and ws_price > 0 -%}
+      {%- assign has_wholesale_prices = true -%}
+      {%- if ws_price < 1000 -%}
+        {%- assign ws_price_cents = ws_price | times: 100 -%}
+      {%- else -%}
+        {%- assign ws_price_cents = ws_price -%}
+      {%- endif -%}
+      {%- assign item_ws_total = ws_price_cents | times: item.quantity -%}
+      {%- assign wholesale_total = wholesale_total | plus: item_ws_total -%}
+      {%- assign original_total = original_total | plus: item.final_line_price -%}
+    {%- else -%}
+      {%- assign wholesale_total = wholesale_total | plus: item.final_line_price -%}
+      {%- assign original_total = original_total | plus: item.final_line_price -%}
+    {%- endif -%}
+  {%- endfor -%}
+  
+  {%- assign savings = original_total | minus: wholesale_total -%}
+{%- endif -%}
+
+<style>
+.cw-new-total {
+  background: #F0FDF4;
+  border: 2px solid #86EFAC;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 12px 0;
+}
+.cw-new-total-label {
+  font-size: 12px;
+  color: #166534;
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+.cw-new-total-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #15803D;
+  margin: 0;
+}
+.cw-badge-atacado {
+  display: inline-block;
+  background: #DCFCE7;
+  color: #166534;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  margin-left: 4px;
+}
+
+/* Responsivo para mobile */
+@media (max-width: 768px) {
+  .cw-wholesale-progress {
+    padding: 8px 10px !important;
+    margin: 8px 0 !important;
+    font-size: 11px;
+  }
+  
+  .cw-wholesale-progress p {
+    font-size: 10px !important;
+  }
+  
+  .cw-wholesale-progress span {
+    font-size: 11px !important;
+  }
+  
+  .cw-new-total {
+    padding: 10px;
+    margin: 10px 0;
+  }
+  
+  .cw-new-total-label {
+    font-size: 11px;
+  }
+  
+  .cw-new-total-price {
+    font-size: 16px;
+  }
+  
+  .cw-badge-atacado {
+    font-size: 8px !important;
+    padding: 1px 4px !important;
+    margin-left: 2px !important;
+  }
+  
+  /* Ajustar preços no carrinho mobile - coluna Produto */
+  .line-item__price-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    align-items: flex-start !important;
+  }
+  
+  .line-item__price-list .line-item__price--compare {
+    font-size: 11px !important;
+    display: block !important;
+  }
+  
+  .line-item__price-list .line-item__price--highlight {
+    font-size: 13px !important;
+    display: block !important;
+  }
+  
+  /* Ajustar mini-cart mobile */
+  .mini-cart__price-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+  
+  .mini-cart__price-list .price--compare {
+    font-size: 11px !important;
+  }
+  
+  .mini-cart__price-list .price--highlight {
+    font-size: 13px !important;
+  }
+  
+  /* Ajustar coluna Total mobile (quando visível) */
+  [data-line-total] span {
+    font-size: 12px !important;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cw-wholesale-progress {
+    padding: 10px 12px !important;
+  }
+  
+  .cw-new-total-price {
+    font-size: 18px;
+  }
+  
+  .cw-badge-atacado {
+    font-size: 9px !important;
+  }
+}
+</style>
+
+<div class="cw-wholesale-progress" style="margin: 12px 0; padding: 10px 14px; background: linear-gradient(135deg, #FFFBEB, #FFF7ED); border: 1px solid #FDBA74; border-radius: 8px; font-family: inherit;">
+  {%- if wholesale_active -%}
+    <div style="display: flex; align-items: center; gap: 6px;">
+      <span style="font-size: 18px;">🎉</span>
+      <div>
+        <p style="font-size: 13px; font-weight: 700; color: #15803D; margin: 0;">🏷 Atacado Ativo!</p>
+        <p style="font-size: 11px; color: #166534; margin: 2px 0 0;">✓ Você está economizando com preços de atacado!</p>
+      </div>
+      <span style="margin-left: auto; font-size: 12px; font-weight: 600; color: #15803D;">{{ total_items }}/{{ wholesale_min }} peças</span>
+    </div>
+    <div style="width: 100%; height: 8px; background: #BBF7D0; border-radius: 99px; overflow: hidden; margin-top: 6px;">
+      <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #22C55E, #16A34A); border-radius: 99px;"></div>
+    </div>
+    
+    {%- if has_wholesale_prices and wholesale_total > 0 -%}
+      <div class="cw-new-total">
+        <p class="cw-new-total-label">💰 Total com Atacado:</p>
+        <p class="cw-new-total-price">{{ wholesale_total | money }}</p>
+        {%- if savings > 0 -%}
+          <p style="font-size: 11px; color: #166534; margin: 4px 0 0;">
+            Preço normal: <span style="text-decoration: line-through;">{{ original_total | money }}</span>
+            <br>Você economiza: <strong>{{ savings | money }}</strong>
+          </p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  {%- else -%}
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+      <span style="font-size: 12px; font-weight: 600; color: #92400E;">🛒 Faltam <strong style="color: #C2410C;">{{ remaining }}</strong> peça(s) para atacado!</span>
+      <span style="font-size: 11px; color: #B45309;">{{ total_items }}/{{ wholesale_min }}</span>
+    </div>
+    <div style="width: 100%; height: 8px; background: #FDE68A; border-radius: 99px; overflow: hidden;">
+      <div style="width: {{ progress }}%; height: 100%; background: linear-gradient(90deg, #F59E0B, #D97706); border-radius: 99px; transition: width 0.4s ease;"></div>
+    </div>
+    <p style="font-size: 10px; color: #92400E; margin: 4px 0 0; text-align: center;">Adicione mais itens e pague preço de atacado 💰</p>
+  {%- endif -%}
+</div>
+
+<script>
+(function() {
+  var wholesaleActive = {{ wholesale_active | json }};
+  var hasWholesalePrices = {{ has_wholesale_prices | json }};
+  
+  if (wholesaleActive && hasWholesalePrices) {
+    // Criar mapa de preços de atacado por produto
+    var wholesalePrices = {};
+    {%- for item in cart.items -%}
+      {%- assign ws_price = item.product.metafields.custom.wholesale_price.value -%}
+      {%- unless ws_price -%}
+        {%- assign ws_price = item.product.metafields.custom.wholesale_price -%}
+      {%- endunless -%}
+      {%- if ws_price and ws_price > 0 -%}
+        {%- if ws_price < 1000 -%}
+          {%- assign ws_price_cents = ws_price | times: 100 -%}
+        {%- else -%}
+          {%- assign ws_price_cents = ws_price -%}
+        {%- endif -%}
+        {%- assign item_ws_total = ws_price_cents | times: item.quantity -%}
+        wholesalePrices['{{ item.product.id }}'] = {
+          unitPrice: {{ ws_price_cents | json }},
+          quantity: {{ item.quantity | json }},
+          total: {{ item_ws_total | json }},
+          originalTotal: {{ item.final_line_price | json }}
+        };
+      {%- endif -%}
+    {%- endfor -%}
+    
+    function formatMoney(cents) {
+      return 'R$ ' + (cents / 100).toFixed(2).replace('.', ',');
+    }
+    
+    function updateProductPrices() {
+      // Detectar se está em mobile
+      var isMobile = window.innerWidth <= 768;
+      
+      // Atualizar preços de cada produto no mini-cart
+      var priceElements = document.querySelectorAll('[data-line-item-price]');
+      
+      priceElements.forEach(function(priceEl) {
+        var productId = priceEl.getAttribute('data-product-id');
+        
+        if (wholesalePrices[productId]) {
+          var wsData = wholesalePrices[productId];
+          var newHTML = '';
+          
+          // Container flex para alinhar preços
+          newHTML += '<div style="display: flex; flex-direction: column; gap: 2px;">';
+          
+          // Preço original riscado
+          newHTML += '<span class="price price--compare" style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + ';">';
+          newHTML += formatMoney(wsData.originalTotal);
+          newHTML += '</span>';
+          
+          // Preço de atacado em verde
+          newHTML += '<span class="price price--highlight" style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '13px' : '15px') + ';">';
+          newHTML += formatMoney(wsData.total);
+          newHTML += '</span>';
+          
+          newHTML += '</div>';
+          
+          // Badge atacado
+          newHTML += '<span class="cw-badge-atacado" style="margin-top: 2px;">🏷 Atacado</span>';
+          
+          priceEl.innerHTML = newHTML;
+        }
+      });
+      
+      // Atualizar preço unitário na coluna "Produto" da página do carrinho (desktop e mobile)
+      var productRows = document.querySelectorAll('tr[data-line-item-key]');
+      
+      productRows.forEach(function(row) {
+        var productId = row.getAttribute('data-product-id');
+        
+        if (wholesalePrices[productId]) {
+          var wsData = wholesalePrices[productId];
+          
+          // Encontrar TODOS os elementos de preço (desktop e mobile)
+          var unitPriceElements = row.querySelectorAll('.line-item__price-list');
+          
+          unitPriceElements.forEach(function(unitPriceEl) {
+            var newHTML = '';
+            
+            // Preço unitário original riscado (inline)
+            newHTML += '<div style="margin-bottom: 2px;"><span class="line-item__price line-item__price--compare" style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + ';">';
+            newHTML += formatMoney(wsData.originalTotal / wsData.quantity);
+            newHTML += '</span></div>';
+            
+            // Preço unitário de atacado em verde (inline)
+            newHTML += '<div style="margin-bottom: 2px;"><span class="line-item__price line-item__price--highlight" style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '13px' : '15px') + ';">';
+            newHTML += formatMoney(wsData.unitPrice);
+            newHTML += '</span></div>';
+            
+            // Badge atacado
+            newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
+            
+            unitPriceEl.innerHTML = newHTML;
+          });
+        }
+      });
+      
+      // Atualizar coluna "Total" na página do carrinho (apenas desktop - hidden-phone)
+      var totalCells = document.querySelectorAll('[data-line-total]');
+      
+      totalCells.forEach(function(totalCell) {
+        var productId = totalCell.getAttribute('data-product-id');
+        
+        if (wholesalePrices[productId]) {
+          var wsData = wholesalePrices[productId];
+          var newHTML = '';
+          
+          // Preço original riscado (inline)
+          newHTML += '<div style="margin-bottom: 4px;"><span style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + ';">';
+          newHTML += formatMoney(wsData.originalTotal);
+          newHTML += '</span></div>';
+          
+          // Preço de atacado em verde (inline)
+          newHTML += '<div style="margin-bottom: 4px;"><span style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '14px' : '16px') + ';">';
+          newHTML += formatMoney(wsData.total);
+          newHTML += '</span></div>';
+          
+          // Badge atacado
+          newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
+          
+          totalCell.innerHTML = newHTML;
+        }
+      });
+      
+      // Atualizar o TOTAL GERAL do mini-cart
+      var miniCartTotal = document.getElementById('mini-cart-total-price');
+      if (miniCartTotal) {
+        var wholesaleTotal = {{ wholesale_total | json }};
+        var originalTotal = {{ original_total | json }};
+        
+        if (wholesaleTotal > 0 && wholesaleTotal < originalTotal) {
+          var newHTML = '';
+          
+          // Total original riscado (inline)
+          newHTML += '<div style="margin-bottom: 2px;"><span style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '12px' : '14px') + ';">';
+          newHTML += formatMoney(originalTotal);
+          newHTML += '</span></div>';
+          
+          // Total com atacado em verde
+          newHTML += '<span style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '16px' : '18px') + ';">';
+          newHTML += formatMoney(wholesaleTotal);
+          newHTML += '</span>';
+          
+          miniCartTotal.innerHTML = newHTML;
+        }
+      }
+      
+      // Atualizar o TOTAL GERAL da página do carrinho
+      var cartTotal = document.getElementById('cart-total-original');
+      if (cartTotal) {
+        var wholesaleTotal = {{ wholesale_total | json }};
+        var originalTotal = {{ original_total | json }};
+        
+        if (wholesaleTotal > 0 && wholesaleTotal < originalTotal) {
+          var newHTML = '';
+          
+          // Total original riscado (inline)
+          newHTML += '<div style="margin-bottom: 2px;"><span style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '13px' : '15px') + ';">';
+          newHTML += formatMoney(originalTotal);
+          newHTML += '</span></div>';
+          
+          // Total com atacado em verde
+          newHTML += '<span style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '18px' : '20px') + ';">';
+          newHTML += formatMoney(wholesaleTotal);
+          newHTML += '</span>';
+          
+          cartTotal.innerHTML = newHTML;
+        }
+      }
+    }
+    
+    // Executar quando carregar
+    setTimeout(updateProductPrices, 100);
+    setTimeout(updateProductPrices, 500);
+    
+    // Atualizar ao redimensionar (rotação de tela mobile)
+    var resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function() {
+        updateProductPrices();
+      }, 250);
+    });
+    
+    // Observar mudanças no carrinho
+    var observer = new MutationObserver(function() {
+      setTimeout(updateProductPrices, 200);
+    });
+    
+    var miniCart = document.querySelector('.mini-cart');
+    if (miniCart) {
+      observer.observe(miniCart, { childList: true, subtree: true });
+    }
+    
+    var cartWrapper = document.querySelector('.cart-wrapper');
+    if (cartWrapper) {
+      observer.observe(cartWrapper, { childList: true, subtree: true });
+    }
+  }
+})();
+</script>
+{%- endif -%}

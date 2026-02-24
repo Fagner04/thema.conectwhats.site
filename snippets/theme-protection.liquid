@@ -1,0 +1,119 @@
+{%- comment -%}
+  Sistema de Proteção do Tema - Versão Melhorada
+  Só bloqueia quando detectar tentativa de roubo/cópia
+{%- endcomment -%}
+
+<script>
+(function() {
+  'use strict';
+  
+  // CONFIGURAÇÃO
+  var SENHA_CORRETA = 'Fagner2020@';
+  var LOJAS_AUTORIZADAS = [
+    'emporiobody.myshopify.com',
+    'emporiobody.com.br',
+    'www.emporiobody.com.br'
+  ];
+  var TEMA_ATIVADO_KEY = 'tema_conectwhats_ativado';
+  
+  // Verifica se está em loja autorizada
+  function isLojaAutorizada() {
+    var shopDomain = window.Shopify ? window.Shopify.shop : '';
+    var currentDomain = window.location.hostname;
+    
+    // Verifica se o domínio atual ou shop está na lista de autorizados
+    for (var i = 0; i < LOJAS_AUTORIZADAS.length; i++) {
+      if (shopDomain === LOJAS_AUTORIZADAS[i] || currentDomain.includes(LOJAS_AUTORIZADAS[i].replace('.myshopify.com', ''))) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  // Verifica se já foi ativado nesta loja
+  function verificarAtivacao() {
+    var ativado = localStorage.getItem(TEMA_ATIVADO_KEY);
+    return ativado === 'true';
+  }
+  
+  // Detecta tentativa de cópia/roubo
+  function detectarTentativaRoubo() {
+    var shopDomain = window.Shopify ? window.Shopify.shop : '';
+    
+    // Se não está na loja autorizada E não está ativado = possível roubo
+    if (!isLojaAutorizada() && !verificarAtivacao()) {
+      return true;
+    }
+    
+    return false;
+  }
+  
+  // Solicita senha
+  function solicitarSenha() {
+    var senha = prompt('🔒 TEMA PROTEGIDO\n\nEste tema pertence a ' + LOJA_AUTORIZADA + '\n\nPara usar em outra loja, digite a senha de autorização:');
+    
+    if (!senha) {
+      bloquearTema('Tema não autorizado para esta loja.');
+      return;
+    }
+    
+    if (senha === SENHA_CORRETA) {
+      ativarTema();
+    } else {
+      bloquearTema('Senha incorreta. Entre em contato com o proprietário do tema.');
+    }
+  }
+  
+  // Ativa o tema
+  function ativarTema() {
+    localStorage.setItem(TEMA_ATIVADO_KEY, 'true');
+    alert('✅ Tema autorizado para esta loja!');
+    location.reload();
+  }
+  
+  // Bloqueia o tema
+  function bloquearTema(mensagem) {
+    document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif; padding: 20px;"><div style="max-width: 500px; background: white; padding: 40px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); text-align: center;"><div style="font-size: 64px; margin-bottom: 20px;">🔒</div><h1 style="color: #333; font-size: 28px; margin-bottom: 15px; font-weight: 600;">Tema Protegido</h1><p style="color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">' + mensagem + '</p><div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;"><p style="margin: 5px 0; color: #555; font-size: 14px;"><strong>Tema:</strong> ConectWhats Classic</p><p style="margin: 5px 0; color: #555; font-size: 14px;"><strong>Lojas Autorizadas:</strong> emporiobody.com.br</p></div><p style="color: #999; font-size: 13px; margin-bottom: 15px;">Para autorizar este tema em sua loja, entre em contato:</p><a href="mailto:suporteconectwhats@gmail.com" style="display: inline-block; padding: 12px 24px; background: #667eea; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; margin-top: 10px;">📧 suporteconectwhats@gmail.com</a></div></div>';
+  }
+  
+  // Adiciona marca d\'água discreta
+  function adicionarMarcaDagua() {
+    if (!isLojaAutorizada()) {
+      var watermark = document.createElement('div');
+      watermark.innerHTML = '© ConectWhats Theme - Não Autorizado';
+      watermark.style.cssText = 'position: fixed; bottom: 5px; right: 5px; font-size: 9px; color: rgba(255,0,0,0.4); z-index: 99999; pointer-events: none; background: rgba(255,255,255,0.8); padding: 2px 5px; border-radius: 3px;';
+      document.body.appendChild(watermark);
+    }
+  }
+  
+  // Inicializa proteção
+  function iniciar() {
+    // Se está na loja autorizada, não faz nada
+    if (isLojaAutorizada()) {
+      console.log('✅ Tema rodando na loja autorizada');
+      return;
+    }
+    
+    // Se detectar tentativa de roubo
+    if (detectarTentativaRoubo()) {
+      console.warn('⚠️ Tema detectado em loja não autorizada');
+      
+      // Aguarda 3 segundos antes de pedir senha (para não atrapalhar preview rápido)
+      setTimeout(function() {
+        solicitarSenha();
+      }, 3000);
+      
+      adicionarMarcaDagua();
+    }
+  }
+  
+  // Aguarda o DOM carregar
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', iniciar);
+  } else {
+    iniciar();
+  }
+  
+})();
+</script>
