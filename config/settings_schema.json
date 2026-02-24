@@ -1019,7 +1019,7 @@
         "type": "text",
         "id": "numberzap",
         "label": "Número do WhatsApp",
-        "info": "Crie seu link na [Umbler Contate Me](https:\/\/www.contate.me\/)"
+        "info": "Cole o link completo (https://wa.me/...) OU apenas o número com DDI (5562999999999). Crie seu link na [Umbler Contate Me](https://www.contate.me/)"
       },
       {
         "type": "select",

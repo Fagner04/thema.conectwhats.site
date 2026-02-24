@@ -1034,7 +1034,16 @@
   var onlineIndicator = toggle.querySelector('.whatsapp-online-indicator');
   var avatarOnline = chatBox.querySelector('.whatsapp-avatar-online');
   
-  var whatsappNumber = '{{ settings.numberzap }}';
+  // Número ou link do WhatsApp
+  var whatsappInput = '{{ settings.numberzap }}';
+  var whatsappNumber = whatsappInput;
+  
+  // Se não for um link completo, formata como link
+  if (whatsappInput && !whatsappInput.startsWith('http')) {
+    // Remove caracteres não numéricos
+    var cleanNumber = whatsappInput.replace(/\D/g, '');
+    whatsappNumber = 'https://wa.me/' + cleanNumber;
+  }
   
   // Mensagens automáticas configuradas
   var autoMessages = [];
