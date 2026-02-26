@@ -265,30 +265,40 @@
 /* Tamanho menor para desktop */
 @media (min-width: 769px) {
   .sticky-button {
-    width: 45px;
-    height: 45px;
+    width: 38px;
+    height: 38px;
   }
   
   .sticky-button a,
   .sticky-button label {
-    width: 45px;
-    height: 45px;
+    width: 38px;
+    height: 38px;
   }
   
-  .sticky-button svg,
+  .sticky-button svg {
+    width: 24px;
+    height: 24px;
+  }
+  
   .sticky-button img {
-    width: 28px !important;
-    height: 28px !important;
+    width: 38px;
+    height: 38px;
+    object-fit: cover;
   }
   
   .online-icon {
-    bottom: 18px;
-    right: 18px;
+    bottom: 16px;
+    right: 16px;
   }
   
   .online-icon::after {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--background);
+  }
+  
+  .chat-menu:checked+.sticky-button+.sticky-chat {
+    bottom: 75px;
   }
 }
 
