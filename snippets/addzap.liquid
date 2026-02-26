@@ -11,6 +11,7 @@
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 .sticky-button {
     position: fixed;
     background: none var(--imagezap-background);
@@ -309,25 +310,26 @@
 
 .online-icon {
 =======
+=======
+>>>>>>> de382b069b59353ea5c72a9ff266ce11d24d4af5
 .whatsapp-widget {
->>>>>>> 5cf243451390bd75a19e88c96ed26b42987378c6
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 9999;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 9999 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
 /* Balão de mensagem externa */
 .whatsapp-external-message {
-  position: absolute;
-  bottom: 0;
-  right: 80px;
-  background: white;
-  border-radius: 20px;
-  padding: 12px 16px;
-  max-width: 320px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  position: absolute !important;
+  bottom: 0 !important;
+  right: 80px !important;
+  background: white !important;
+  border-radius: 20px !important;
+  padding: 12px 16px !important;
+  max-width: 320px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
   opacity: 0;
   visibility: hidden;
   transform: translateX(20px);
@@ -1334,7 +1336,16 @@
   var onlineIndicator = toggle.querySelector('.whatsapp-online-indicator');
   var avatarOnline = chatBox.querySelector('.whatsapp-avatar-online');
   
-  var whatsappNumber = '{{ settings.numberzap }}';
+  // Número ou link do WhatsApp
+  var whatsappInput = '{{ settings.numberzap }}';
+  var whatsappNumber = whatsappInput;
+  
+  // Se não for um link completo, formata como link
+  if (whatsappInput && !whatsappInput.startsWith('http')) {
+    // Remove caracteres não numéricos
+    var cleanNumber = whatsappInput.replace(/\D/g, '');
+    whatsappNumber = 'https://wa.me/' + cleanNumber;
+  }
   
   // Mensagens automáticas configuradas
   var autoMessages = [];
