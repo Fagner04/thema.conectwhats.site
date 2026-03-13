@@ -994,7 +994,7 @@
         "id": "conectwhats_atacado_min_qty",
         "label": "Quantidade mínima para atacado",
         "info": "Número de itens necessários para ativar preços de atacado",
-        "min": 2,
+        "min": 1,
         "max": 50,
         "step": 1,
         "default": 6
