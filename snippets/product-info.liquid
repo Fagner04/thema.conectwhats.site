@@ -1016,6 +1016,42 @@
             $(this).val(1);
         }
     });
+
+    // Atualizar data-max quando a variante muda
+    function updateQtyMaxForVariant(variantId) {
+        var productJsonEl = document.querySelector('[data-product-json]');
+        if (!productJsonEl) return;
+        try {
+            var data = JSON.parse(productJsonEl.textContent);
+            var inventories = data.variant_inventories;
+            if (!inventories || !inventories[variantId]) return;
+            var inv = inventories[variantId];
+            var $qtyInput = $('input.qty');
+            if (inv.inventory_management === 'shopify' && inv.inventory_policy === 'deny') {
+                var maxQty = inv.inventory_quantity > 0 ? inv.inventory_quantity : 0;
+                $qtyInput.attr('data-max', maxQty);
+                // Se o valor atual for maior que o novo max, corrigir
+                var currentVal = parseInt($qtyInput.val());
+                if (currentVal > maxQty) {
+                    $qtyInput.val(maxQty > 0 ? maxQty : 1);
+                }
+            } else {
+                $qtyInput.attr('data-max', 9999);
+            }
+        } catch(e) {}
+    }
+
+    // Escutar evento de mudança de variante do tema
+    document.addEventListener('variant:changed', function(e) {
+        if (e.detail && e.detail.variant) {
+            updateQtyMaxForVariant(e.detail.variant.id);
+        }
+    });
+
+    // Fallback: observar mudança no input hidden de variant id
+    $(document).on('change', 'input[name="id"]', function() {
+        updateQtyMaxForVariant($(this).val());
+    });
 });
 
   </script>
@@ -1024,7 +1060,16 @@
     {
       "product": {{ product | json }},
       "options_with_values": {{ product.options_with_values | json }},
-      "selected_variant_id": {{ selected_variant.id }}
+      "selected_variant_id": {{ selected_variant.id }},
+      "variant_inventories": {
+        {%- for variant in product.variants -%}
+          "{{ variant.id }}": {
+            "inventory_management": {{ variant.inventory_management | json }},
+            "inventory_policy": {{ variant.inventory_policy | json }},
+            "inventory_quantity": {{ variant.inventory_quantity | json }}
+          }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      }
       {%- if section.settings.show_inventory_quantity -%}
         ,"inventories": {
           {%- for variant in product.variants -%}
