@@ -9559,6 +9559,23 @@ iframe {
   border-radius: 10px;
 }
 
+.product-item--horizontal .product-item__image-wrapper,
+.product-item--list .product-item__image-wrapper {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.product-item--horizontal .product-item__image-wrapper .aspect-ratio,
+.product-item--list .product-item__image-wrapper .aspect-ratio {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.product-item--horizontal .product-item__primary-image,
+.product-item--list .product-item__primary-image {
+  border-radius: 10px;
+}
+
 .product-item__image-wrapper .placeholder-svg {
   height: auto;
 }
