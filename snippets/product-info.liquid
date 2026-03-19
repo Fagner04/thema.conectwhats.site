@@ -972,15 +972,19 @@
         e.preventDefault();
         // Get the field name
         fieldName = $(this).attr('field');
+        var $input = $('input[name='+fieldName+']');
         // Get its current value
-        var currentVal = parseInt($('input[name='+fieldName+']').val());
+        var currentVal = parseInt($input.val());
+        var maxVal = parseInt($input.attr('data-max'));
         // If is not undefined
         if (!isNaN(currentVal)) {
-            // Increment
-            $('input[name='+fieldName+']').val(currentVal + 1);
+            // Increment only if below max stock
+            if (isNaN(maxVal) || currentVal < maxVal) {
+                $input.val(currentVal + 1);
+            }
         } else {
             // Otherwise put a 0 there
-            $('input[name='+fieldName+']').val(0);
+            $input.val(0);
         }
     });
     // This button will decrement the value till 0
@@ -998,6 +1002,18 @@
         } else {
             // Otherwise put a 0 there
             $('input[name='+fieldName+']').val(0);
+        }
+    });
+
+    // Bloquear digitação manual acima do estoque
+    $(document).on('change input', 'input.qty', function() {
+        var maxVal = parseInt($(this).attr('data-max'));
+        var currentVal = parseInt($(this).val());
+        if (!isNaN(maxVal) && !isNaN(currentVal) && currentVal > maxVal) {
+            $(this).val(maxVal);
+        }
+        if (!isNaN(currentVal) && currentVal < 1) {
+            $(this).val(1);
         }
     });
 });

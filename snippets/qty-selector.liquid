@@ -1,4 +1,8 @@
           {%- if section.settings.show_quantity_selector -%}
+            {%- assign qty_max = 9999 -%}
+            {%- if selected_variant.inventory_management == 'shopify' and selected_variant.inventory_policy == 'deny' -%}
+              {%- assign qty_max = selected_variant.inventory_quantity -%}
+            {%- endif -%}
              <div class="product-form__info-item product-form__info-item--quantity qty-border">
 
               <div class="product-form__info-content" style="display: block;">
@@ -6,7 +10,7 @@
                 
                 <div id='myform2' class="qty-align" method='POST' action='#'>
                   <input type='button' value='-' class='qtyminus' field='quantity' />
-                  <input type='text' name='quantity' value='1' class='qty' />
+                  <input type='text' name='quantity' value='1' class='qty' data-max="{{ qty_max }}" max="{{ qty_max }}" />
                   <input type='button' value='+' class='qtyplus' field='quantity' />
                 </div>
                 
