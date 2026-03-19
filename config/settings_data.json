@@ -102,7 +102,7 @@
     "atacado_enabled": false,
     "conectwhats_atacado_enabled": false,
     "conectwhats_atacado_min_qty": 1,
-    "addzap": true,
+    "addzap": false,
     "numberzap": "556292320606",
     "zap_icon_type": "original",
     "zap_icon": "shopify://shop_images/Screenshot_1.png",
