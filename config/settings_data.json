@@ -447,7 +447,7 @@
         ],
         "custom_css": [],
         "settings": {
-          "edge_to_edge": true,
+          "edge_to_edge": false,
           "section_size": "preserve_ratio",
           "carousel_effect": "slide",
           "autoplay": true,
