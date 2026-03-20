@@ -351,23 +351,6 @@
       "slideshow": {
         "type": "slideshow",
         "blocks": {
-          "image_RxPPmx": {
-            "type": "image",
-            "settings": {
-              "image": "shopify://shop_images/Paradise_1.png",
-              "mobile_image": "shopify://shop_images/Paradise-fag.png",
-              "show_overlay": false,
-              "overlay_opacity": 30,
-              "text_color": "#ffffff",
-              "title": "",
-              "content": "",
-              "content_position": "middle_center",
-              "button_background": "#ffffff",
-              "button_text_color": "#000000",
-              "button_text": "",
-              "link": "shopify://collections/paradise"
-            }
-          },
           "image_gAgiPF": {
             "type": "image",
             "settings": {
@@ -379,6 +362,23 @@
               "title": "",
               "content": "",
               "content_position": "top_right",
+              "button_background": "#ffffff",
+              "button_text_color": "#000000",
+              "button_text": "",
+              "link": "shopify://collections/paradise"
+            }
+          },
+          "image_RxPPmx": {
+            "type": "image",
+            "settings": {
+              "image": "shopify://shop_images/Paradise_1.png",
+              "mobile_image": "shopify://shop_images/Paradise-fag.png",
+              "show_overlay": false,
+              "overlay_opacity": 30,
+              "text_color": "#ffffff",
+              "title": "",
+              "content": "",
+              "content_position": "middle_center",
               "button_background": "#ffffff",
               "button_text_color": "#000000",
               "button_text": "",
@@ -439,8 +439,8 @@
           }
         },
         "block_order": [
-          "image_RxPPmx",
           "image_gAgiPF",
+          "image_RxPPmx",
           "image_m3g6aV",
           "image_JNQazk",
           "image_AE3LBD"
@@ -451,7 +451,7 @@
           "section_size": "preserve_ratio",
           "carousel_effect": "slide",
           "autoplay": true,
-          "cycle_speed": 5
+          "cycle_speed": 6
         }
       },
       "collection-list": {
