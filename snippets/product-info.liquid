@@ -1028,15 +1028,17 @@
             var inv = inventories[variantId];
             var $qtyInput = $('input.qty');
             if (inv.inventory_management === 'shopify' && inv.inventory_policy === 'deny') {
-                var maxQty = inv.inventory_quantity > 0 ? inv.inventory_quantity : 0;
-                $qtyInput.attr('data-max', maxQty);
-                // Se o valor atual for maior que o novo max, corrigir
+                var maxQty = inv.inventory_quantity > 0 ? inv.inventory_quantity : 1;
+                $qtyInput.attr('data-max', maxQty).attr('max', maxQty);
+                // Corrigir valor atual se ultrapassar o estoque
                 var currentVal = parseInt($qtyInput.val());
-                if (currentVal > maxQty) {
-                    $qtyInput.val(maxQty > 0 ? maxQty : 1);
+                if (isNaN(currentVal) || currentVal < 1) {
+                    $qtyInput.val(1);
+                } else if (currentVal > maxQty) {
+                    $qtyInput.val(maxQty);
                 }
             } else {
-                $qtyInput.attr('data-max', 9999);
+                $qtyInput.attr('data-max', 9999).attr('max', 9999);
             }
         } catch(e) {}
     }
@@ -1052,6 +1054,17 @@
     $(document).on('change', 'input[name="id"]', function() {
         updateQtyMaxForVariant($(this).val());
     });
+
+    // Inicializar com a variante já selecionada ao carregar a página
+    (function initQtyMax() {
+        var productJsonEl = document.querySelector('[data-product-json]');
+        if (!productJsonEl) return;
+        try {
+            var data = JSON.parse(productJsonEl.textContent);
+            var variantId = data.selected_variant_id;
+            if (variantId) updateQtyMaxForVariant(variantId);
+        } catch(e) {}
+    })();
 });
 
   </script>
