@@ -447,11 +447,11 @@
         ],
         "custom_css": [],
         "settings": {
-          "edge_to_edge": false,
+          "edge_to_edge": true,
           "section_size": "preserve_ratio",
-          "carousel_effect": "fade",
+          "carousel_effect": "slide",
           "autoplay": true,
-          "cycle_speed": 3
+          "cycle_speed": 5
         }
       },
       "collection-list": {
