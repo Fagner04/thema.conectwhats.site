@@ -100,7 +100,7 @@
     "enable_category_installments": true,
     "promo_qty_vezes": 3,
     "atacado_enabled": false,
-    "conectwhats_atacado_enabled": true,
+    "conectwhats_atacado_enabled": false,
     "conectwhats_atacado_min_qty": 1,
     "addzap": true,
     "numberzap": "556292320606",
