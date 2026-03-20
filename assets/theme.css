@@ -12896,6 +12896,10 @@ iframe {
   text-align: center;
   border: none;
   background: transparent;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
 }
 
 .quantity-selector__value:focus {
