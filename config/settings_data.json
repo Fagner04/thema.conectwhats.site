@@ -9,7 +9,7 @@
  */
 {
   "current": {
-    "popup_home": false,
+    "popup_home": true,
     "popup_image": "shopify://shop_images/frete.png",
     "img_popup": "shopify://collections/beachwear",
     "cookie_time": 60,
