@@ -354,8 +354,8 @@
           "image_gAgiPF": {
             "type": "image",
             "settings": {
-              "image": "shopify://shop_images/1920x1080_1.png",
-              "mobile_image": "shopify://shop_images/semana.png",
+              "image": "shopify://shop_images/BANNER_SITE.svg",
+              "mobile_image": "shopify://shop_images/MOBILE.svg",
               "show_overlay": true,
               "overlay_opacity": 30,
               "text_color": "#ffffff",
@@ -365,7 +365,7 @@
               "button_background": "#ffffff",
               "button_text_color": "#000000",
               "button_text": "",
-              "link": "shopify://collections/paradise"
+              "link": "shopify://collections/made-in-brasil-1"
             }
           },
           "image_RxPPmx": {
