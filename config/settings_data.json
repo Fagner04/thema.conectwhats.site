@@ -9,7 +9,7 @@
  */
 {
   "current": {
-    "popup_home": true,
+    "popup_home": false,
     "popup_image": "shopify://shop_images/frete.png",
     "img_popup": "shopify://collections/beachwear",
     "cookie_time": 60,
@@ -68,7 +68,7 @@
     "corstars": "#ffce00",
     "mostrar_bfimg": false,
     "bfimg_mode": "categories",
-    "bfimg_categories": "blackfriday,promoca",
+    "bfimg_categories": "blackfriday,promoca,Made in brasil",
     "bfimg_tags": "",
     "show_vendor": false,
     "show_secondary_image": true,
