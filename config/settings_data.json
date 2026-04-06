@@ -50,7 +50,7 @@
     "product_sold_out_color": "#f84343",
     "border_radius_theme": 16,
     "border_radius_btn": 24,
-    "free_shipping_enable": false,
+    "free_shipping_enable": true,
     "free_shipping_min_value": "0",
     "free_shipping_display_mode": "text",
     "free_shipping_bg_color": "#342f3d",
