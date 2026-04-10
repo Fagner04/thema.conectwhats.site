@@ -450,7 +450,7 @@
           "section_size": "preserve_ratio",
           "carousel_effect": "fade",
           "autoplay": true,
-          "cycle_speed": 7
+          "cycle_speed": 8
         }
       },
       "collection-list": {
