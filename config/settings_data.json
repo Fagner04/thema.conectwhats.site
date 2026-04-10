@@ -354,8 +354,8 @@
           "image_AE3LBD": {
             "type": "image",
             "settings": {
-              "image": "shopify://shop_images/BANNER_SITE_2_1.png",
-              "mobile_image": "shopify://shop_images/MOBILE_1.png",
+              "image": "shopify://shop_images/BANNER_SITE_2_1.svg",
+              "mobile_image": "shopify://shop_images/MOBILE_1_1.svg",
               "show_overlay": true,
               "overlay_opacity": 15,
               "text_color": "#ffffff",
