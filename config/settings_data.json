@@ -448,9 +448,9 @@
         "settings": {
           "edge_to_edge": false,
           "section_size": "preserve_ratio",
-          "carousel_effect": "slide",
+          "carousel_effect": "fade",
           "autoplay": true,
-          "cycle_speed": 6
+          "cycle_speed": 7
         }
       },
       "collection-list": {
