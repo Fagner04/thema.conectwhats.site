@@ -948,6 +948,7 @@
       },
       "featured_collection_G43GCf": {
         "type": "featured-collection",
+        "disabled": true,
         "settings": {
           "collection": "promocao",
           "title": "Produto em ofertas",
