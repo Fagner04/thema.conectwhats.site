@@ -351,6 +351,23 @@
       "slideshow": {
         "type": "slideshow",
         "blocks": {
+          "image_AE3LBD": {
+            "type": "image",
+            "settings": {
+              "image": "shopify://shop_images/BANNER_SITE_2_1.png",
+              "mobile_image": "shopify://shop_images/MOBILE_1.png",
+              "show_overlay": true,
+              "overlay_opacity": 30,
+              "text_color": "#ffffff",
+              "title": "",
+              "content": "",
+              "content_position": "middle_center",
+              "button_background": "#ffffff",
+              "button_text_color": "#000000",
+              "button_text": "",
+              "link": "shopify://collections/essence"
+            }
+          },
           "image_gAgiPF": {
             "type": "image",
             "settings": {
@@ -418,32 +435,14 @@
               "button_text": "",
               "link": "shopify://collections/mirage"
             }
-          },
-          "image_AE3LBD": {
-            "type": "image",
-            "disabled": true,
-            "settings": {
-              "image": "shopify://shop_images/BANNER_SITE_2_1.png",
-              "mobile_image": "shopify://shop_images/MOBILE_1.png",
-              "show_overlay": true,
-              "overlay_opacity": 30,
-              "text_color": "#ffffff",
-              "title": "",
-              "content": "",
-              "content_position": "middle_center",
-              "button_background": "#ffffff",
-              "button_text_color": "#000000",
-              "button_text": "",
-              "link": "shopify://collections/essence"
-            }
           }
         },
         "block_order": [
+          "image_AE3LBD",
           "image_gAgiPF",
           "image_RxPPmx",
           "image_m3g6aV",
-          "image_JNQazk",
-          "image_AE3LBD"
+          "image_JNQazk"
         ],
         "custom_css": [],
         "settings": {
