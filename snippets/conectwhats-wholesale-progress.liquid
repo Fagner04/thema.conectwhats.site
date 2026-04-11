@@ -281,7 +281,9 @@
     }
     
     function updateProductPrices() {
-      // Detectar se está em mobile
+      // Pausa o observer para não disparar loop
+      if (window._cwObserver) window._cwObserver.disconnect();
+      
       var isMobile = window.innerWidth <= 768;
       
       // Atualizar preços de cada produto no mini-cart
@@ -425,6 +427,9 @@
           cartTotal.innerHTML = newHTML;
         }
       }
+      
+      // Reconecta o observer após atualizar o DOM
+      setTimeout(setupObserver, 100);
     }
     
     // Mapa estático de preços de atacado por produto (do Liquid) - inclui TODOS os produtos possíveis
@@ -550,6 +555,11 @@
     
     document.addEventListener('cart:refresh', function() {
       setTimeout(refreshCartData, 300);
+    });
+
+    // Também atualiza quando o mini-cart abre
+    document.addEventListener('theme:cart:open', function() {
+      setTimeout(refreshCartData, 200);
     });
 
     // Atualizar ao redimensionar (rotação de tela mobile)
