@@ -340,12 +340,12 @@
             
             // Preço unitário original riscado (inline)
             newHTML += '<div style="margin-bottom: 2px;"><span class="line-item__price line-item__price--compare" style="text-decoration: line-through; color: #9CA3AF; font-size: ' + (isMobile ? '11px' : '13px') + ';">';
-            newHTML += formatMoney(wsData.originalTotal / wsData.quantity);
+            newHTML += formatMoney(wsData.originalTotal);
             newHTML += '</span></div>';
             
-            // Preço unitário de atacado em verde (inline)
+            // Preço de atacado total em verde (inline)
             newHTML += '<div style="margin-bottom: 2px;"><span class="line-item__price line-item__price--highlight" style="color: #16A34A; font-weight: 700; font-size: ' + (isMobile ? '13px' : '15px') + ';">';
-            newHTML += formatMoney(wsData.unitPrice);
+            newHTML += formatMoney(wsData.total);
             newHTML += '</span></div>';
             
             // Badge atacado
