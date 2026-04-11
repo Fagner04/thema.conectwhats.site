@@ -161,7 +161,7 @@
     "social_proof_min_delay": 25,
     "social_proof_max_delay": 45,
     "social_proof_display_time": 11,
-    "exit_popup_enabled": true,
+    "exit_popup_enabled": false,
     "social_facebook": "http://",
     "social_twitter": "",
     "social_pinterest": "",
