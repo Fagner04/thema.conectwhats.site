@@ -3166,7 +3166,8 @@ img.lazyload[data-sizes=auto] {
     left: auto;
     right: 0;
     top: calc(100% + 14px);
-    max-height: none;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
     width: 470px;
     height: auto;
     border-radius: 10px;
@@ -3179,6 +3180,8 @@ img.lazyload[data-sizes=auto] {
   .mini-cart {
     width: 500px;
     max-width: 500px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
   }
 
   .mini-cart__content > * {
