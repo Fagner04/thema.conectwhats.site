@@ -312,10 +312,7 @@
           
           newHTML += '</div>';
           
-          // Badge atacado - só mostra se não é acessório ou se atingiu o mínimo
-          if (!isAcessorio(productId) || acessorioReached) {
-            newHTML += '<span class="cw-badge-atacado" style="margin-top: 2px;">🏷 Atacado</span>';
-          }
+          // Badge atacado removido
           
           priceEl.innerHTML = newHTML;
         }
@@ -348,10 +345,7 @@
             newHTML += formatMoney(wsData.total);
             newHTML += '</span></div>';
             
-            // Badge atacado
-            if (!isAcessorio(productId) || acessorioReached) {
-              newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
-            }
+            // Badge atacado removido
             
             unitPriceEl.innerHTML = newHTML;
           });
@@ -380,10 +374,7 @@
           newHTML += formatMoney(wsData.total);
           newHTML += '</span></div>';
           
-          // Badge atacado
-          if (!isAcessorio(productId) || acessorioReached) {
-            newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
-          }
+          // Badge atacado removido
           
           totalCell.innerHTML = newHTML;
         }
