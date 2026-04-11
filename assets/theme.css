@@ -14708,3 +14708,18 @@ label.color-swatch__item,
 @media screen and (min-width: 641px) {
   .mini-cart__mobile-header { display: none; }
 }
+
+/* Fix risco do preço no mini-cart mobile */
+@media screen and (max-width: 640px) {
+  .mini-cart .line-item__price--compare::before,
+  .mini-cart .price--compare::before {
+    display: none;
+  }
+  .mini-cart .line-item__price--compare,
+  .mini-cart .price--compare {
+    text-decoration: line-through;
+    margin-left: 0;
+    font-size: 11px;
+    color: #9CA3AF;
+  }
+}
