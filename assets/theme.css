@@ -15063,3 +15063,17 @@ label.color-swatch__item,
   .mini-cart__close-btn { display: none !important; }
   .mini-cart__mobile-header { pointer-events: none; }
 }
+
+/* Remove scroll duplo no mini-cart desktop */
+@media screen and (min-width: 641px) {
+  .mini-cart__line-item-list {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  .mini-cart__content:not(.mini-cart__content--empty) {
+    overflow-y: visible !important;
+  }
+  .mini-cart[aria-hidden=false] {
+    overflow-y: auto !important;
+  }
+}
