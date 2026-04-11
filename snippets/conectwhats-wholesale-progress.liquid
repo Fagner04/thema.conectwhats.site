@@ -562,19 +562,31 @@
     });
     
     // Observar mudanças no carrinho
-    var observer = new MutationObserver(function() {
-      setTimeout(refreshCartData, 300);
-    });
-    
-    var miniCart = document.querySelector('.mini-cart');
-    if (miniCart) {
-      observer.observe(miniCart, { childList: true, subtree: true });
+    var observerTimer;
+    function setupObserver() {
+      if (window._cwObserver) {
+        window._cwObserver.disconnect();
+      }
+      var miniCart = document.querySelector('.mini-cart');
+      var cartWrapper = document.querySelector('.cart-wrapper');
+      
+      window._cwObserver = new MutationObserver(function(mutations) {
+        clearTimeout(observerTimer);
+        observerTimer = setTimeout(function() {
+          refreshCartData();
+          // Re-observa após re-render
+          setTimeout(setupObserver, 600);
+        }, 300);
+      });
+      
+      if (miniCart) {
+        window._cwObserver.observe(miniCart, { childList: true, subtree: true });
+      }
+      if (cartWrapper) {
+        window._cwObserver.observe(cartWrapper, { childList: true, subtree: true });
+      }
     }
-    
-    var cartWrapper = document.querySelector('.cart-wrapper');
-    if (cartWrapper) {
-      observer.observe(cartWrapper, { childList: true, subtree: true });
-    }
+    setupObserver();
   }
 })();
 </script>
