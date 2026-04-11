@@ -431,6 +431,37 @@
     setTimeout(updateProductPrices, 100);
     setTimeout(updateProductPrices, 500);
     
+    // Função para recarregar dados do carrinho e re-aplicar preços
+    function refreshCartData() {
+      fetch('/cart.js')
+        .then(function(r) { return r.json(); })
+        .then(function(cart) {
+          // Recalcula total de acessórios
+          if (acessorioMinEnabled && acessorioTag) {
+            var newAcessorioTotal = 0;
+            cart.items.forEach(function(item) {
+              var tags = (item.product_tags || []).join(',').toLowerCase();
+              if (tags.indexOf(acessorioTag) !== -1) {
+                newAcessorioTotal += item.final_line_price;
+              }
+            });
+            acessorioReached = newAcessorioTotal >= acessorioMinCents;
+          }
+          // Recalcula wholesaleActive
+          wholesaleActive = cart.item_count >= {{ settings.conectwhats_atacado_min_qty | default: 6 | json }};
+          setTimeout(updateProductPrices, 100);
+        });
+    }
+    
+    // Atualizar quando produto é adicionado ou carrinho atualiza
+    document.addEventListener('product:added', function() {
+      setTimeout(refreshCartData, 400);
+    });
+    
+    document.addEventListener('cart:refresh', function() {
+      setTimeout(refreshCartData, 300);
+    });
+
     // Atualizar ao redimensionar (rotação de tela mobile)
     var resizeTimer;
     window.addEventListener('resize', function() {
