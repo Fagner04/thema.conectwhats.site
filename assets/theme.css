@@ -15156,3 +15156,39 @@ th.table__cell--center { display: none !important; }
   font-size: 13px !important;
   color: #9CA3AF !important;
 }
+
+/* ===== FIX DEFINITIVO: botão finalizar sempre visível no mobile ===== */
+@media screen and (max-width: 640px) {
+  .mini-cart[aria-hidden=false] {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+
+  .mini-cart__inner {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    overflow: hidden !important;
+    min-height: 0 !important;
+  }
+
+  .mini-cart__content:not(.mini-cart__content--empty) {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    min-height: 0 !important;
+  }
+
+  .mini-cart__recap {
+    flex-shrink: 0 !important;
+    position: relative !important;
+    bottom: auto !important;
+    background: #fff !important;
+    border-top: 1px solid #EFEFEF !important;
+    padding: 12px 16px 24px !important;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08) !important;
+    z-index: 20 !important;
+  }
+}
