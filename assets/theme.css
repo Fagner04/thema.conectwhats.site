@@ -3177,8 +3177,8 @@ img.lazyload[data-sizes=auto] {
 
 @media screen and (min-width: 1024px) {
   .mini-cart {
-    width: 80vw;
-    max-width: 900px;
+    width: 500px;
+    max-width: 500px;
   }
 
   .mini-cart__content > * {
