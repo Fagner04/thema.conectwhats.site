@@ -82,6 +82,7 @@
                   {%- endunless -%}
 
                   <a href="{{ line_item.url }}" class="mini-cart__product-title text--strong link">{{ line_item.title }}</a>
+                  <span style="font-size:12px;color:#6B7280;display:block;margin:2px 0 4px;">Qtd: {{ line_item.quantity }}x</span>
 
                   {%- unless line_item.properties == blank -%}
                     <ul class="mini-cart__property-list">
