@@ -213,38 +213,36 @@
                                 </ul>
                               {%- endif -%}
 
-                              {%- if settings.acessorio_min_enabled -%}
-                                {%- assign ct_acessorio_tag = settings.acessorio_min_tag | strip | downcase -%}
-                                {%- assign ct_item_tags = line_item.product.tags | join: ',' | downcase -%}
-                                {%- if ct_item_tags contains ct_acessorio_tag -%}
-                                  {%- assign ct_min_cents = settings.acessorio_min_value | plus: 0 | times: 100 | round -%}
-                                  {%- assign ct_acessorio_total = 0 -%}
-                                  {%- for ci in cart.items -%}
-                                    {%- assign ci_tags2 = ci.product.tags | join: ',' | downcase -%}
-                                    {%- if ci_tags2 contains ct_acessorio_tag -%}
-                                      {%- assign ct_acessorio_total = ct_acessorio_total | plus: ci.final_line_price -%}
-                                    {%- endif -%}
-                                  {%- endfor -%}
-                                  {%- assign ct_progress = ct_acessorio_total | times: 100 | divided_by: ct_min_cents -%}
-                                  {%- if ct_progress > 100 -%}{%- assign ct_progress = 100 -%}{%- endif -%}
-                                  {%- assign ct_remaining = ct_min_cents | minus: ct_acessorio_total -%}
-                                  {%- assign ct_reached = false -%}
-                                  {%- if ct_acessorio_total >= ct_min_cents -%}{%- assign ct_reached = true -%}{%- endif -%}
-                                  <div style="margin-top:8px;max-width:320px;">
-                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:8px;">
-                                      <span style="font-size:12px;color:#F97316;font-weight:600;flex:1;">{{ settings.acessorio_min_message | default: 'Valor mínimo deste produto' }}</span>
-                                      {%- if ct_reached -%}
-                                        <span style="font-size:12px;font-weight:700;color:#16A34A;white-space:nowrap;flex-shrink:0;">✓ Atacado!</span>
-                                      {%- else -%}
-                                        <span style="font-size:12px;font-weight:700;color:#EA580C;white-space:nowrap;flex-shrink:0;">Faltam {{ ct_remaining | money }}</span>
+                                {%- if settings.acessorio_min_enabled -%}
+                                  {%- assign ct_acessorio_tag = settings.acessorio_min_tag | strip | downcase -%}
+                                  {%- assign ct_item_tags = line_item.product.tags | join: ',' | downcase -%}
+                                  {%- if ct_item_tags contains ct_acessorio_tag -%}
+                                    {%- assign ct_min_cents = settings.acessorio_min_value | plus: 0 | times: 100 | round -%}
+                                    {%- assign ct_acessorio_total = 0 -%}
+                                    {%- for ci in cart.items -%}
+                                      {%- assign ci_tags2 = ci.product.tags | join: ',' | downcase -%}
+                                      {%- if ci_tags2 contains ct_acessorio_tag -%}
+                                        {%- assign ct_acessorio_total = ct_acessorio_total | plus: ci.final_line_price -%}
                                       {%- endif -%}
+                                    {%- endfor -%}
+                                    {%- assign ct_progress = ct_acessorio_total | times: 100 | divided_by: ct_min_cents -%}
+                                    {%- if ct_progress > 100 -%}{%- assign ct_progress = 100 -%}{%- endif -%}
+                                    {%- assign ct_remaining = ct_min_cents | minus: ct_acessorio_total -%}
+                                    {%- assign ct_reached = false -%}
+                                    {%- if ct_acessorio_total >= ct_min_cents -%}{%- assign ct_reached = true -%}{%- endif -%}
+                                    {%- unless ct_reached -%}
+                                    <div style="margin-top:8px;max-width:320px;">
+                                      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:8px;">
+                                        <span style="font-size:12px;color:#F97316;font-weight:600;flex:1;">{{ settings.acessorio_min_message | default: 'Valor mínimo deste produto' }}</span>
+                                        <span style="font-size:12px;font-weight:700;color:#EA580C;white-space:nowrap;flex-shrink:0;">Faltam {{ ct_remaining | money }}</span>
+                                      </div>
+                                      <div style="width:100%;height:6px;background:#FED7AA;border-radius:99px;overflow:hidden;">
+                                        <div style="width:{{ ct_progress }}%;height:100%;border-radius:99px;background:linear-gradient(90deg,#F97316,#EA580C);"></div>
+                                      </div>
                                     </div>
-                                    <div style="width:100%;height:6px;background:#FED7AA;border-radius:99px;overflow:hidden;">
-                                      <div style="width:{{ ct_progress }}%;height:100%;border-radius:99px;background:{% if ct_reached %}linear-gradient(90deg,#22C55E,#16A34A){% else %}linear-gradient(90deg,#F97316,#EA580C){% endif %};"></div>
-                                    </div>
-                                  </div>
+                                    {%- endunless -%}
+                                  {%- endif -%}
                                 {%- endif -%}
-                              {%- endif -%}
 
                               <div class="line-item__quantity hidden-tablet-and-up">
                                 {%- comment -%}If the product has the tag "__gift", we remove the price{%- endcomment -%}
