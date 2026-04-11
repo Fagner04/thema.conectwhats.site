@@ -101,7 +101,7 @@
     "promo_qty_vezes": 3,
     "atacado_enabled": true,
     "atacado_min_qty": 6,
-    "conectwhats_atacado_enabled": false,
+    "conectwhats_atacado_enabled": true,
     "conectwhats_atacado_min_qty": 6,
     "acessorio_min_enabled": true,
     "addzap": true,
