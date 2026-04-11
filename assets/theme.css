@@ -3171,7 +3171,14 @@ img.lazyload[data-sizes=auto] {
     height: auto;
     border-radius: 10px;
     box-shadow: 0 1px 5px 2px rgb(0 0 0 / 5%);
-    border: 3px solid var(--primary-button-background);
+    border: none;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .mini-cart {
+    width: 80vw;
+    max-width: 900px;
   }
 
   .mini-cart__content > * {
