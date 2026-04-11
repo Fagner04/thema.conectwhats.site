@@ -291,6 +291,9 @@
         var productId = priceEl.getAttribute('data-product-id');
         
         if (wholesalePrices[productId]) {
+          // Se é acessório e não atingiu o mínimo de valor, não aplica atacado
+          if (isAcessorio(productId) && !acessorioReached) return;
+
           var wsData = wholesalePrices[productId];
           var newHTML = '';
           
@@ -325,6 +328,8 @@
         var productId = row.getAttribute('data-product-id');
         
         if (wholesalePrices[productId]) {
+          if (isAcessorio(productId) && !acessorioReached) return;
+
           var wsData = wholesalePrices[productId];
           
           // Encontrar TODOS os elementos de preço (desktop e mobile)
@@ -360,6 +365,8 @@
         var productId = totalCell.getAttribute('data-product-id');
         
         if (wholesalePrices[productId]) {
+          if (isAcessorio(productId) && !acessorioReached) return;
+
           var wsData = wholesalePrices[productId];
           var newHTML = '';
           
