@@ -14904,3 +14904,141 @@ label.color-swatch__item,
     box-shadow: 0 -4px 16px rgba(0,0,0,0.08) !important;
   }
 }
+
+/* ===== MINI-CART DESKTOP MODERNO ===== */
+@media screen and (min-width: 641px) {
+  .mini-cart[aria-hidden=false] {
+    background: #f5f5f5 !important;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 80px);
+  }
+
+  /* Header */
+  .mini-cart__mobile-header {
+    display: flex !important;
+    background: #fff !important;
+    padding: 16px 20px !important;
+    border-bottom: 1px solid #EFEFEF !important;
+    border-radius: 16px 16px 0 0 !important;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  /* Área de conteúdo */
+  .mini-cart__inner {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .mini-cart__content:not(.mini-cart__content--empty) {
+    background: #fff;
+    margin: 12px 12px 0;
+    border-radius: 16px;
+    overflow-y: auto;
+    flex: 1;
+    padding: 0 !important;
+  }
+
+  .mini-cart__content:not(.mini-cart__content--empty) > * {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Cada item */
+  .mini-cart__line-item {
+    padding: 12px 16px !important;
+    align-items: center !important;
+    gap: 12px;
+    border-bottom: 1px solid #F3F4F6 !important;
+  }
+
+  .mini-cart__line-item + .mini-cart__line-item {
+    border-top: none !important;
+  }
+
+  /* Foto quadrada */
+  .mini-cart__image-wrapper {
+    min-width: 64px !important;
+    width: 64px !important;
+    height: 64px !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    flex-shrink: 0;
+  }
+
+  .mini-cart__image-wrapper .aspect-ratio {
+    padding-bottom: 100% !important;
+    border-radius: 10px !important;
+  }
+
+  .mini-cart__image-wrapper img {
+    object-fit: cover !important;
+    border-radius: 10px !important;
+  }
+
+  /* Info */
+  .mini-cart__item-wrapper {
+    padding-right: 40px !important;
+  }
+
+  .mini-cart__product-title {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #111 !important;
+    margin-bottom: 2px !important;
+  }
+
+  .mini-cart__price-list .price--highlight {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #C2410C !important;
+  }
+
+  .mini-cart__price-list .price--compare {
+    font-size: 11px !important;
+    color: #9CA3AF !important;
+    text-decoration: line-through !important;
+    margin-left: 4px;
+  }
+
+  /* Lixeira */
+  .mini-cart__quantity-remove {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    right: 14px !important;
+    background: transparent !important;
+    color: #9CA3AF !important;
+    width: 28px !important;
+    height: 28px !important;
+  }
+
+  /* Recap fixo no rodapé */
+  .mini-cart__recap {
+    background: #fff !important;
+    border-top: 1px solid #EFEFEF !important;
+    border-radius: 0 0 16px 16px !important;
+    margin: 0 12px 12px !important;
+    padding: 14px 16px 16px !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06) !important;
+  }
+
+  .mini-cart__recap-price-line {
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  /* Barra atacado */
+  .cw-wholesale-progress {
+    margin: 12px 12px 0 !important;
+    border-radius: 12px !important;
+  }
+
+  /* Esconde triângulo no desktop também */
+  .mini-cart .icon--nav-triangle-borderless {
+    display: none !important;
+  }
+}
