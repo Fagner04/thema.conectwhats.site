@@ -104,6 +104,7 @@
     "conectwhats_atacado_enabled": true,
     "conectwhats_atacado_min_qty": 6,
     "acessorio_min_enabled": true,
+    "acessorio_min_value": "50",
     "addzap": true,
     "numberzap": "556292320606",
     "zap_icon_type": "original",
