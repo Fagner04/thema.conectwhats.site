@@ -280,6 +280,7 @@
       return 'R$ ' + (cents / 100).toFixed(2).replace('.', ',');
     }
     
+    var updateTimer;
     function updateProductPrices() {
       // Pausa o observer para não disparar loop
       if (window._cwObserver) window._cwObserver.disconnect();
@@ -287,7 +288,7 @@
       var isMobile = window.innerWidth <= 768;
       
       // Atualizar preços de cada produto no mini-cart
-      var priceElements = document.querySelectorAll('[data-line-item-price]');
+      var priceElements = document.querySelectorAll('[data-line-item-price]:not([data-cw-processed])');
       
       priceElements.forEach(function(priceEl) {
         var productId = priceEl.getAttribute('data-product-id');
@@ -296,6 +297,7 @@
           // Se é acessório e não atingiu o mínimo de valor, não aplica atacado
           if (isAcessorio(productId) && !acessorioReached) return;
 
+          priceEl.setAttribute('data-cw-processed', '1');
           var wsData = wholesalePrices[productId];
           var newHTML = '';
           
@@ -313,8 +315,6 @@
           newHTML += '</span>';
           
           newHTML += '</div>';
-          
-          // Badge atacado removido
           
           priceEl.innerHTML = newHTML;
         }
@@ -485,10 +485,14 @@
           if (missingProducts.length > 0) {
             fetchMissingMetafields(cart, function(updatedCart) {
               rebuildWholesalePrices(updatedCart);
+              // Limpa flags de processado para re-aplicar
+              document.querySelectorAll('[data-cw-processed]').forEach(function(el) { el.removeAttribute('data-cw-processed'); });
               setTimeout(updateProductPrices, 100);
             });
           } else {
             rebuildWholesalePrices(cart);
+            // Limpa flags de processado para re-aplicar
+            document.querySelectorAll('[data-cw-processed]').forEach(function(el) { el.removeAttribute('data-cw-processed'); });
             setTimeout(updateProductPrices, 100);
           }
         });
