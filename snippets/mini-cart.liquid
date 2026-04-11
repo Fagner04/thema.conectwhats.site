@@ -57,29 +57,39 @@
             {%- assign mc_wholesale_active = true -%}
           {%- endif -%}
           {%- for line_item in cart.items -%}
-            {%- comment -%} Verifica se item tem tag de acessório com mínimo {%- endcomment -%}
+            {%- comment -%} Verifica mínimo por produto (metafield) ou por categoria (settings) {%- endcomment -%}
             {%- assign item_has_min = false -%}
             {%- assign item_min_cents = 0 -%}
+            {%- assign item_reached = false -%}
+            {%- assign item_progress = 0 -%}
+            {%- assign item_remaining = 0 -%}
+
             {%- if settings.acessorio_min_enabled -%}
               {%- assign acessorio_tag_check = settings.acessorio_min_tag | strip | downcase -%}
               {%- assign item_tags_check = line_item.product.tags | join: ',' | downcase -%}
               {%- if item_tags_check contains acessorio_tag_check -%}
                 {%- assign item_has_min = true -%}
-                {%- assign item_min_value = settings.acessorio_min_value | plus: 0 -%}
-                {%- assign item_min_cents = item_min_value | times: 100 | round -%}
-                {%- comment -%} Calcula total dos acessórios no carrinho {%- endcomment -%}
-                {%- assign acessorio_cart_total = 0 -%}
+
+                {%- comment -%} Verifica se produto tem mínimo individual via metafield {%- endcomment -%}
+                {%- assign product_min_value = line_item.product.metafields.custom.min_order_value.value | plus: 0 -%}
+                {%- if product_min_value > 0 -%}
+                  {%- assign item_min_cents = product_min_value | times: 100 | round -%}
+                {%- else -%}
+                  {%- assign item_min_cents = settings.acessorio_min_value | plus: 0 | times: 100 | round -%}
+                {%- endif -%}
+
+                {%- comment -%} Calcula total DESTE PRODUTO ESPECÍFICO no carrinho {%- endcomment -%}
+                {%- assign product_cart_total = 0 -%}
                 {%- for ci in cart.items -%}
-                  {%- assign ci_tags = ci.product.tags | join: ',' | downcase -%}
-                  {%- if ci_tags contains acessorio_tag_check -%}
-                    {%- assign acessorio_cart_total = acessorio_cart_total | plus: ci.final_line_price -%}
+                  {%- if ci.product.id == line_item.product.id -%}
+                    {%- assign product_cart_total = product_cart_total | plus: ci.final_line_price -%}
                   {%- endif -%}
                 {%- endfor -%}
-                {%- assign item_progress = acessorio_cart_total | times: 100 | divided_by: item_min_cents -%}
+
+                {%- assign item_progress = product_cart_total | times: 100 | divided_by: item_min_cents -%}
                 {%- if item_progress > 100 -%}{%- assign item_progress = 100 -%}{%- endif -%}
-                {%- assign item_remaining = item_min_cents | minus: acessorio_cart_total -%}
-                {%- assign item_reached = false -%}
-                {%- if acessorio_cart_total >= item_min_cents -%}{%- assign item_reached = true -%}{%- endif -%}
+                {%- assign item_remaining = item_min_cents | minus: product_cart_total -%}
+                {%- if product_cart_total >= item_min_cents -%}{%- assign item_reached = true -%}{%- endif -%}
               {%- endif -%}
             {%- endif -%}
 

@@ -216,19 +216,25 @@
                                   {%- assign ct_acessorio_tag = settings.acessorio_min_tag | strip | downcase -%}
                                   {%- assign ct_item_tags = line_item.product.tags | join: ',' | downcase -%}
                                   {%- if ct_item_tags contains ct_acessorio_tag -%}
-                                    {%- assign ct_min_cents = settings.acessorio_min_value | plus: 0 | times: 100 | round -%}
-                                    {%- assign ct_acessorio_total = 0 -%}
+                                    {%- comment -%} Mínimo individual por produto via metafield {%- endcomment -%}
+                                    {%- assign ct_product_min = line_item.product.metafields.custom.min_order_value.value | plus: 0 -%}
+                                    {%- if ct_product_min > 0 -%}
+                                      {%- assign ct_min_cents = ct_product_min | times: 100 | round -%}
+                                    {%- else -%}
+                                      {%- assign ct_min_cents = settings.acessorio_min_value | plus: 0 | times: 100 | round -%}
+                                    {%- endif -%}
+                                    {%- comment -%} Calcula total DESTE PRODUTO no carrinho {%- endcomment -%}
+                                    {%- assign ct_product_total = 0 -%}
                                     {%- for ci in cart.items -%}
-                                      {%- assign ci_tags2 = ci.product.tags | join: ',' | downcase -%}
-                                      {%- if ci_tags2 contains ct_acessorio_tag -%}
-                                        {%- assign ct_acessorio_total = ct_acessorio_total | plus: ci.final_line_price -%}
+                                      {%- if ci.product.id == line_item.product.id -%}
+                                        {%- assign ct_product_total = ct_product_total | plus: ci.final_line_price -%}
                                       {%- endif -%}
                                     {%- endfor -%}
-                                    {%- assign ct_progress = ct_acessorio_total | times: 100 | divided_by: ct_min_cents -%}
+                                    {%- assign ct_progress = ct_product_total | times: 100 | divided_by: ct_min_cents -%}
                                     {%- if ct_progress > 100 -%}{%- assign ct_progress = 100 -%}{%- endif -%}
-                                    {%- assign ct_remaining = ct_min_cents | minus: ct_acessorio_total -%}
+                                    {%- assign ct_remaining = ct_min_cents | minus: ct_product_total -%}
                                     {%- assign ct_reached = false -%}
-                                    {%- if ct_acessorio_total >= ct_min_cents -%}{%- assign ct_reached = true -%}{%- endif -%}
+                                    {%- if ct_product_total >= ct_min_cents -%}{%- assign ct_reached = true -%}{%- endif -%}
                                     {%- unless ct_reached -%}
                                     <div style="margin-top:8px;max-width:320px;">
                                       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:8px;">
