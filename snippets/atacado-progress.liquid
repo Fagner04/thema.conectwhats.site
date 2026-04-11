@@ -160,27 +160,7 @@
   document.addEventListener('product:added', function() {
     setTimeout(updateAtacadoProgress, 500);
   });
-  
-  // Observa mudancas nos inputs de quantidade
-  var observer = new MutationObserver(function() {
-    updateAtacadoProgress();
-  });
-  
-  setTimeout(function() {
-    var cartForm = document.querySelector('form[action*="cart"]');
-    if (cartForm) {
-      observer.observe(cartForm, { 
-        childList: true, 
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['value']
-      });
-    }
-  }, 1000);
-  
-  // Atualiza a cada 3 segundos (fallback)
-  setInterval(updateAtacadoProgress, 3000);
-  
+
 })();
 </script>
 {% endif %}
