@@ -143,19 +143,9 @@
 
                 {%- unless line_item.product.tags contains '__gift' -%}
                   <div class="mini-cart__quantity">
-                    <div class="quantity-selector">
-                      {%- assign allow_to_add_more = true -%}
-
-                      {%- if line_item.variant.inventory_management and line_item.variant.inventory_policy == 'deny' and line_item.quantity == line_item.variant.inventory_quantity -%}
-                        {%- assign allow_to_add_more = false -%}
-                      {%- endif -%}
-
-                      <button class="quantity-selector__button" data-action="decrease-quantity" data-quantity="{{ line_item.quantity | minus: 1 }}" data-line-id="{{ line_item.key }}" aria-label="{{ 'cart.items.decrease_quantity' | t }}" title="{{ 'cart.items.decrease_quantity' | t }}">{% render 'icon', icon: 'minus' %}</button>
-                      <input aria-label="{{ 'product.form.quantity' | t }}" class="quantity-selector__value" pattern="[0-9]*" readonly tabindex="-1" data-current-value="{{ line_item.quantity }}" data-line-id="{{ line_item.id }}" value="{{ line_item.quantity }}" size="{{ line_item.quantity | append: '' | size | at_least: 2 }}">
-                      <button class="quantity-selector__button" data-action="increase-quantity" data-quantity="{{ line_item.quantity | plus: 1 }}" data-line-id="{{ line_item.key }}" {% if allow_to_add_more %}aria-label="{{ 'cart.items.increase_quantity' | t }}" title="{{ 'cart.items.increase_quantity' | t }}"{% else %}disabled="disabled" aria-label="{{ 'cart.items.no_more_stock' | t }}" data-tooltip="{{ 'cart.items.no_more_stock' | t }}" data-tooltip-position="bottom-left"{% endif %}>{% render 'icon', icon: 'plus' %}</button>
-                    </div>
-
-                    <a href="{{ routes.cart_change_url }}?quantity=0&id={{ line_item.key }}" data-action="decrease-quantity" data-quantity="0" data-line-id="{{ line_item.key }}" class="mini-cart__quantity-remove link">{{ 'cart.items.remove' | t }}</a>
+                    <a href="{{ routes.cart_change_url }}?quantity=0&id={{ line_item.key }}" data-action="decrease-quantity" data-quantity="0" data-line-id="{{ line_item.key }}" class="mini-cart__quantity-remove link" aria-label="{{ 'cart.items.remove' | t }}" title="{{ 'cart.items.remove' | t }}" style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:99px;background:#FEE2E2;color:#DC2626;border:none;">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+                    </a>
                   </div>
                 {%- endunless -%}
               </div>
