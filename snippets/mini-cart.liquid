@@ -51,6 +51,11 @@
         {%- endif -%}
 
         <div class="mini-cart__line-item-list">
+          {%- assign mc_wholesale_min = settings.conectwhats_atacado_min_qty | default: 6 -%}
+          {%- assign mc_wholesale_active = false -%}
+          {%- if settings.conectwhats_atacado_enabled and cart.item_count >= mc_wholesale_min -%}
+            {%- assign mc_wholesale_active = true -%}
+          {%- endif -%}
           {%- for line_item in cart.items -%}
             {%- comment -%} Verifica se item tem tag de acessório com mínimo {%- endcomment -%}
             {%- assign item_has_min = false -%}
@@ -131,7 +136,7 @@
                   <div class="mini-cart__price-list" data-line-item-price="{{ line_item.key }}" data-product-id="{{ line_item.product.id }}">
                     {%- assign ws_price = line_item.product.metafields.custom.wholesale_price.value -%}
                     {%- unless ws_price -%}{%- assign ws_price = line_item.product.metafields.custom.wholesale_price -%}{%- endunless -%}
-                    {%- if ws_price and ws_price > 0 and wholesale_active -%}
+                    {%- if ws_price and ws_price > 0 and mc_wholesale_active -%}
                       {%- if ws_price < 1000 -%}{%- assign ws_price_cents = ws_price | times: 100 -%}
                       {%- else -%}{%- assign ws_price_cents = ws_price -%}{%- endif -%}
                       {%- assign ws_line_total = ws_price_cents | times: line_item.quantity -%}
