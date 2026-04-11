@@ -14874,3 +14874,33 @@ label.color-swatch__item,
     border-radius: 12px !important;
   }
 }
+
+/* ===== BOTÃO FIXO NO RODAPÉ MOBILE ===== */
+@media screen and (max-width: 640px) {
+  .mini-cart__inner {
+    display: flex !important;
+    flex-direction: column !important;
+    height: calc(100vh - 57px) !important;
+  }
+
+  .mini-cart__content:not(.mini-cart__content--empty) {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin-bottom: 0 !important;
+  }
+
+  .mini-cart__recap {
+    position: sticky !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: #fff !important;
+    border-top: 1px solid #EFEFEF !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 14px 20px 24px !important;
+    z-index: 20 !important;
+    box-shadow: 0 -4px 16px rgba(0,0,0,0.08) !important;
+  }
+}
