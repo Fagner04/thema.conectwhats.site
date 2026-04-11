@@ -173,7 +173,7 @@
                                   {%- else -%}{%- assign ws_cents_ct = ws_price_ct -%}{%- endif -%}
                                   {%- assign ws_total_ct = ws_cents_ct | times: line_item.quantity -%}
                                   <div style="display:flex;flex-direction:column;gap:1px;">
-                                    <span class="line-item__price line-item__price--compare" style="text-decoration:line-through;color:#9CA3AF;font-size:11px;">{{ line_item.final_line_price | money }}</span>
+                                    <span class="line-item__price line-item__price--compare" style="text-decoration:line-through;color:#9CA3AF;font-size:13px;">{{ line_item.final_line_price | money }}</span>
                                     <span class="line-item__price line-item__price--highlight" style="color:#16A34A;font-weight:700;font-size:14px;">{{ ws_total_ct | money }}</span>
                                   </div>
                                 {%- elsif line_item.original_price > line_item.final_price -%}

@@ -141,7 +141,7 @@
                       {%- else -%}{%- assign ws_price_cents = ws_price -%}{%- endif -%}
                       {%- assign ws_line_total = ws_price_cents | times: line_item.quantity -%}
                       <div style="display:flex;flex-direction:column;gap:1px;">
-                        <span style="text-decoration:line-through;color:#9CA3AF;font-size:11px;">{{ line_item.final_line_price | money }}</span>
+                        <span style="text-decoration:line-through;color:#9CA3AF;font-size:13px;">{{ line_item.final_line_price | money }}</span>
                         <span style="color:#16A34A;font-weight:700;font-size:14px;">{{ ws_line_total | money }}</span>
                       </div>
                     {%- elsif line_item.final_line_price < line_item.original_line_price -%}
