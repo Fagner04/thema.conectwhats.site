@@ -364,7 +364,7 @@
               "content_position": "bottom_right",
               "button_background": "#ffffff",
               "button_text_color": "#000000",
-              "button_text": "Disponivel amanhã as 09h00",
+              "button_text": "",
               "link": "shopify://collections/essence"
             }
           },
