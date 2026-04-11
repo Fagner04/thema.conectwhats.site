@@ -1,0 +1,46 @@
+{%- comment -%} Barra de progresso mínimo para acessórios {%- endcomment -%}
+{%- if settings.acessorio_min_enabled -%}
+
+{%- assign acessorio_tag = settings.acessorio_min_tag | strip | downcase -%}
+{%- assign acessorio_min = settings.acessorio_min_value | plus: 0 -%}
+{%- assign acessorio_min_cents = acessorio_min | times: 100 | round -%}
+{%- assign acessorio_message = settings.acessorio_min_message | default: 'Valor mínimo deste produto' -%}
+
+{%- comment -%} Calcula total dos itens com a tag de acessório {%- endcomment -%}
+{%- assign acessorio_total_cents = 0 -%}
+{%- assign has_acessorio = false -%}
+
+{%- for item in cart.items -%}
+  {%- assign item_tags = item.product.tags | join: ',' | downcase -%}
+  {%- if item_tags contains acessorio_tag -%}
+    {%- assign has_acessorio = true -%}
+    {%- assign acessorio_total_cents = acessorio_total_cents | plus: item.final_line_price -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- if has_acessorio -%}
+  {%- assign progress_pct = acessorio_total_cents | times: 100 | divided_by: acessorio_min_cents -%}
+  {%- if progress_pct > 100 -%}{%- assign progress_pct = 100 -%}{%- endif -%}
+  {%- assign remaining_cents = acessorio_min_cents | minus: acessorio_total_cents -%}
+  {%- assign reached_min = false -%}
+  {%- if acessorio_total_cents >= acessorio_min_cents -%}{%- assign reached_min = true -%}{%- endif -%}
+
+<div class="acessorio-min-progress" style="background:white;border:1.5px solid #E5E7EB;border-radius:14px;padding:12px 14px;margin:10px 0;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+    <span style="font-size:12px;color:#6B7280;">{{ acessorio_message }}</span>
+    {%- if reached_min -%}
+      <span style="font-size:12px;font-weight:700;color:#16A34A;">✓ Atacado ativo!</span>
+    {%- else -%}
+      <span style="font-size:12px;font-weight:700;color:#DC2626;">Faltam {{ remaining_cents | money }}</span>
+    {%- endif -%}
+  </div>
+  <div style="width:100%;height:8px;background:#F3F4F6;border-radius:99px;overflow:hidden;">
+    <div style="width:{{ progress_pct }}%;height:100%;border-radius:99px;background:{% if reached_min %}linear-gradient(90deg,#22C55E,#16A34A){% else %}linear-gradient(90deg,#F97316,#EA580C){% endif %};transition:width 0.4s ease;"></div>
+  </div>
+  {%- unless reached_min -%}
+    <p style="font-size:11px;color:#9CA3AF;margin:5px 0 0;">Mín. {{ acessorio_min_cents | money }} • Atual {{ acessorio_total_cents | money }}</p>
+  {%- endunless -%}
+</div>
+{%- endif -%}
+
+{%- endif -%}

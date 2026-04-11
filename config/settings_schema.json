@@ -998,6 +998,37 @@
         "max": 50,
         "step": 1,
         "default": 6
+      },
+      {
+        "type": "header",
+        "content": "Acessórios — Regra de Mínimo",
+        "info": "Acessórios com a tag abaixo só recebem preço de atacado se o valor total deles no carrinho atingir o mínimo configurado. Abaixo do mínimo, cobra preço de varejo."
+      },
+      {
+        "type": "checkbox",
+        "id": "acessorio_min_enabled",
+        "label": "Ativar regra de mínimo para acessórios",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "acessorio_min_tag",
+        "label": "Tag dos produtos acessórios",
+        "default": "acessorio",
+        "info": "Adicione esta tag nos produtos acessórios no painel do Shopify"
+      },
+      {
+        "type": "text",
+        "id": "acessorio_min_value",
+        "label": "Valor mínimo de acessórios para atacado (R$)",
+        "default": "100.00",
+        "info": "Ex: 100.00 — abaixo deste valor cobra preço de varejo"
+      },
+      {
+        "type": "text",
+        "id": "acessorio_min_message",
+        "label": "Mensagem de aviso no carrinho",
+        "default": "Valor mínimo deste produto"
       }
     ]
   },
