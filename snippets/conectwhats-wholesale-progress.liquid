@@ -427,6 +427,18 @@
       }
     }
     
+    // Mapa estático de preços de atacado por produto (do Liquid)
+    var wholesalePriceMap = {};
+    {%- for item in cart.items -%}
+      {%- assign ws_price = item.product.metafields.custom.wholesale_price.value -%}
+      {%- unless ws_price -%}{%- assign ws_price = item.product.metafields.custom.wholesale_price -%}{%- endunless -%}
+      {%- if ws_price and ws_price > 0 -%}
+        {%- if ws_price < 1000 -%}{%- assign ws_price_cents = ws_price | times: 100 -%}
+        {%- else -%}{%- assign ws_price_cents = ws_price -%}{%- endif -%}
+        wholesalePriceMap['{{ item.product.id }}'] = {{ ws_price_cents | json }};
+      {%- endif -%}
+    {%- endfor -%}
+
     // Executar quando carregar
     setTimeout(updateProductPrices, 100);
     setTimeout(updateProductPrices, 500);
@@ -436,19 +448,41 @@
       fetch('/cart.js')
         .then(function(r) { return r.json(); })
         .then(function(cart) {
+          var minQty = {{ settings.conectwhats_atacado_min_qty | default: 6 | json }};
+          wholesaleActive = cart.item_count >= minQty;
+
           // Recalcula total de acessórios
+          var newAcessorioTotal = 0;
           if (acessorioMinEnabled && acessorioTag) {
-            var newAcessorioTotal = 0;
             cart.items.forEach(function(item) {
-              var tags = (item.product_tags || []).join(',').toLowerCase();
+              var tags = (item.tags || '').toLowerCase();
               if (tags.indexOf(acessorioTag) !== -1) {
                 newAcessorioTotal += item.final_line_price;
               }
             });
             acessorioReached = newAcessorioTotal >= acessorioMinCents;
           }
-          // Recalcula wholesaleActive
-          wholesaleActive = cart.item_count >= {{ settings.conectwhats_atacado_min_qty | default: 6 | json }};
+
+          // Reconstrói wholesalePrices com quantidades atuais
+          wholesalePrices = {};
+          cart.items.forEach(function(item) {
+            var pid = String(item.product_id);
+            var unitPrice = wholesalePriceMap[pid];
+            if (unitPrice) {
+              wholesalePrices[pid] = {
+                unitPrice: unitPrice,
+                quantity: item.quantity,
+                total: unitPrice * item.quantity,
+                originalTotal: item.final_line_price
+              };
+            }
+          });
+
+          // Atualiza productTags
+          cart.items.forEach(function(item) {
+            productTags[String(item.product_id)] = (item.tags || '').toLowerCase();
+          });
+
           setTimeout(updateProductPrices, 100);
         });
     }
@@ -473,7 +507,7 @@
     
     // Observar mudanças no carrinho
     var observer = new MutationObserver(function() {
-      setTimeout(updateProductPrices, 200);
+      setTimeout(refreshCartData, 300);
     });
     
     var miniCart = document.querySelector('.mini-cart');
