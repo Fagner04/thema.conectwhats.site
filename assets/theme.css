@@ -14723,3 +14723,27 @@ label.color-swatch__item,
     color: #9CA3AF;
   }
 }
+
+/* Mini-cart mobile: botão fixo no rodapé */
+@media screen and (max-width: 640px) {
+  .mini-cart__inner {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 57px); /* descontando o header */
+  }
+
+  .mini-cart__content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mini-cart__recap {
+    position: sticky;
+    bottom: 0;
+    background: var(--secondary-background);
+    border-top: 1px solid var(--border-color);
+    z-index: 10;
+    padding: 12px 16px 20px;
+  }
+}
