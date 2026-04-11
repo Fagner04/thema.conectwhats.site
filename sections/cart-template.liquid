@@ -163,28 +163,25 @@
                               {%- endunless -%}
 
                               <div class="line-item__price-list">
-                                {%- if line_item.original_price > line_item.final_price -%}
-                                  {%- if line_item.final_price == 0 -%}
-                                    <span class="line-item__price line-item__price--highlight">{{ 'cart.general.free' | t }}</span>
-                                  {%- else -%}
-                                    <span class="line-item__price line-item__price--highlight">{{ line_item.final_price | money }}</span>
-                                  {%- endif -%}
-
+                                {%- assign ws_price_ct = line_item.product.metafields.custom.wholesale_price.value -%}
+                                {%- unless ws_price_ct -%}{%- assign ws_price_ct = line_item.product.metafields.custom.wholesale_price -%}{%- endunless -%}
+                                {%- assign wholesale_active_ct = false -%}
+                                {%- assign wholesale_min_ct = settings.conectwhats_atacado_min_qty | default: 6 -%}
+                                {%- if cart.item_count >= wholesale_min_ct -%}{%- assign wholesale_active_ct = true -%}{%- endif -%}
+                                {%- if ws_price_ct and ws_price_ct > 0 and wholesale_active_ct -%}
+                                  {%- if ws_price_ct < 1000 -%}{%- assign ws_cents_ct = ws_price_ct | times: 100 -%}
+                                  {%- else -%}{%- assign ws_cents_ct = ws_price_ct -%}{%- endif -%}
+                                  {%- assign ws_total_ct = ws_cents_ct | times: line_item.quantity -%}
+                                  <span class="line-item__price line-item__price--compare" style="text-decoration:line-through;color:#9CA3AF;font-size:12px;">{{ line_item.final_line_price | money }}</span>
+                                  <span class="line-item__price line-item__price--highlight" style="color:#16A34A;font-weight:700;">{{ ws_total_ct | money }}</span>
+                                {%- elsif line_item.original_price > line_item.final_price -%}
+                                  <span class="line-item__price line-item__price--highlight">{{ line_item.final_price | money }}</span>
                                   <span class="line-item__price line-item__price--compare">{{ line_item.original_price | money }}</span>
                                 {%- elsif line_item.variant.compare_at_price > line_item.variant.price -%}
-                                  {%- if line_item.final_price == 0 -%}
-                                    <span class="line-item__price line-item__price--highlight">{{ 'cart.general.free' | t }}</span>
-                                  {%- else -%}
-                                    <span class="line-item__price line-item__price--highlight">{{ line_item.final_price | money }}</span>
-                                  {%- endif -%}
-
+                                  <span class="line-item__price line-item__price--highlight">{{ line_item.final_price | money }}</span>
                                   <span class="line-item__price line-item__price--compare">{{ line_item.variant.compare_at_price | money }}</span>
                                 {%- else -%}
-                                  {%- if line_item.final_price == 0 -%}
-                                    <span class="line-item__price">{{ 'cart.general.free' | t }}</span>
-                                  {%- else -%}
-                                    <span class="line-item__price">{{ line_item.final_price | money }}</span>
-                                  {%- endif -%}
+                                  <span class="line-item__price">{{ line_item.final_price | money }}</span>
                                 {%- endif -%}
                               </div>
 
