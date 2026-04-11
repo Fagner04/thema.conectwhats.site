@@ -427,7 +427,7 @@
       }
     }
     
-    // Mapa estático de preços de atacado por produto (do Liquid)
+    // Mapa estático de preços de atacado por produto (do Liquid) - inclui TODOS os produtos possíveis
     var wholesalePriceMap = {};
     {%- for item in cart.items -%}
       {%- assign ws_price = item.product.metafields.custom.wholesale_price.value -%}
@@ -451,11 +451,16 @@
           var minQty = {{ settings.conectwhats_atacado_min_qty | default: 6 | json }};
           wholesaleActive = cart.item_count >= minQty;
 
+          // Atualiza productTags
+          cart.items.forEach(function(item) {
+            productTags[String(item.product_id)] = (item.tags || '').toLowerCase();
+          });
+
           // Recalcula total de acessórios
           var newAcessorioTotal = 0;
           if (acessorioMinEnabled && acessorioTag) {
             cart.items.forEach(function(item) {
-              var tags = (item.tags || '').toLowerCase();
+              var tags = productTags[String(item.product_id)] || '';
               if (tags.indexOf(acessorioTag) !== -1) {
                 newAcessorioTotal += item.final_line_price;
               }
@@ -463,30 +468,81 @@
             acessorioReached = newAcessorioTotal >= acessorioMinCents;
           }
 
-          // Reconstrói wholesalePrices com quantidades atuais
-          wholesalePrices = {};
+          // Busca metafields dos produtos que não estão no mapa ainda
+          var missingProducts = [];
           cart.items.forEach(function(item) {
             var pid = String(item.product_id);
-            var unitPrice = wholesalePriceMap[pid];
-            if (unitPrice) {
-              wholesalePrices[pid] = {
-                unitPrice: unitPrice,
-                quantity: item.quantity,
-                total: unitPrice * item.quantity,
-                originalTotal: item.final_line_price
-              };
+            if (!wholesalePriceMap[pid]) {
+              missingProducts.push(item.handle);
             }
           });
 
-          // Atualiza productTags
-          cart.items.forEach(function(item) {
-            productTags[String(item.product_id)] = (item.tags || '').toLowerCase();
-          });
-
-          setTimeout(updateProductPrices, 100);
+          if (missingProducts.length > 0) {
+            fetchMissingMetafields(cart, function(updatedCart) {
+              rebuildWholesalePrices(updatedCart);
+              setTimeout(updateProductPrices, 100);
+            });
+          } else {
+            rebuildWholesalePrices(cart);
+            setTimeout(updateProductPrices, 100);
+          }
         });
     }
-    
+
+    function rebuildWholesalePrices(cart) {
+      wholesalePrices = {};
+      cart.items.forEach(function(item) {
+        var pid = String(item.product_id);
+        var unitPrice = wholesalePriceMap[pid];
+        if (unitPrice && wholesaleActive) {
+          var isAcess = isAcessorio(pid);
+          if (!isAcess || acessorioReached) {
+            wholesalePrices[pid] = {
+              unitPrice: unitPrice,
+              quantity: item.quantity,
+              total: unitPrice * item.quantity,
+              originalTotal: item.final_line_price
+            };
+          }
+        }
+      });
+    }
+
+    // Busca metafields de produtos não mapeados via section render API
+    function fetchMissingMetafields(cart, callback) {
+      var missingHandles = [];
+      cart.items.forEach(function(item) {
+        var pid = String(item.product_id);
+        if (wholesalePriceMap[pid] === undefined) {
+          missingHandles.push({ pid: pid, handle: item.handle });
+        }
+      });
+
+      if (missingHandles.length === 0) {
+        callback(cart);
+        return;
+      }
+
+      // Usa sections API para re-renderizar e pegar metafields
+      var sectionUrl = '/cart?sections=conectwhats-wholesale-progress';
+      fetch(sectionUrl, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data && data['conectwhats-wholesale-progress']) {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(data['conectwhats-wholesale-progress'], 'text/html');
+            var script = doc.querySelector('script[data-wholesale-map]');
+            if (script) {
+              try {
+                var newMap = JSON.parse(script.textContent);
+                Object.assign(wholesalePriceMap, newMap);
+              } catch(e) {}
+            }
+          }
+          callback(cart);
+        })
+        .catch(function() { callback(cart); });
+    }    
     // Atualizar quando produto é adicionado ou carrinho atualiza
     document.addEventListener('product:added', function() {
       setTimeout(refreshCartData, 400);
