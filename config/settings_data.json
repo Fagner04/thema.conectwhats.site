@@ -131,7 +131,7 @@
     "underline_links": true,
     "animation_image_zoom": true,
     "search_mode": "product",
-    "cart_type": "page",
+    "cart_type": "drawer",
     "cart_empty_button_link": "shopify://collections/all",
     "cart_show_free_shipping_threshold": false,
     "cart_free_shipping_threshold": "0",

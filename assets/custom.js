@@ -207,28 +207,20 @@ document.addEventListener('variant:changed', function(event) {
     
     if (cartToggle) {
       cartToggle.addEventListener('click', function(e) {
-        // Para carrinho tipo page, mostra o popup antes de redirecionar
         const hasDrawerAction = cartToggle.getAttribute('data-action') === 'toggle-mini-cart';
         
         if (!hasDrawerAction) {
           // É carrinho tipo page
-          e.preventDefault(); // Previne o redirecionamento imediato
-          
-          // Armazena o URL para redirecionamento após fechar o popup
+          e.preventDefault();
           window.cartWarningPendingRedirect = cartToggle.href;
-          
           triggerCartWarning();
-          
-          // Fallback: redireciona após 5 segundos se o popup não for fechado
           setTimeout(function() {
             if (window.cartWarningPendingRedirect) {
               window.location.href = window.cartWarningPendingRedirect;
             }
           }, 5000);
-        } else {
-          // É carrinho tipo drawer
-          triggerCartWarning();
         }
+        // drawer: não intercepta, deixa o tema abrir normalmente
       });
     }
     
