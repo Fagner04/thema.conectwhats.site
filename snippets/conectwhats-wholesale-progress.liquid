@@ -224,6 +224,34 @@
   var wholesaleActive = {{ wholesale_active | json }};
   var hasWholesalePrices = {{ has_wholesale_prices | json }};
   
+  {%- comment -%} Verifica mínimo de acessórios {%- endcomment -%}
+  var acessorioMinEnabled = {{ settings.acessorio_min_enabled | json }};
+  var acessorioTag = {{ settings.acessorio_min_tag | default: '' | strip | downcase | json }};
+  var acessorioMinCents = {{ settings.acessorio_min_value | plus: 0 | times: 100 | round | json }};
+  var acessorioTotalCents = 0;
+  {%- if settings.acessorio_min_enabled -%}
+    {%- assign acessorio_tag_js = settings.acessorio_min_tag | strip | downcase -%}
+    {%- for item in cart.items -%}
+      {%- assign item_tags_js = item.product.tags | join: ',' | downcase -%}
+      {%- if item_tags_js contains acessorio_tag_js -%}
+        acessorioTotalCents += {{ item.final_line_price | json }};
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+  var acessorioReached = acessorioMinEnabled ? (acessorioTotalCents >= acessorioMinCents) : true;
+
+  // Mapa de tags por produto
+  var productTags = {};
+  {%- for item in cart.items -%}
+    productTags['{{ item.product.id }}'] = {{ item.product.tags | join: ',' | downcase | json }};
+  {%- endfor -%}
+
+  function isAcessorio(productId) {
+    if (!acessorioMinEnabled || !acessorioTag) return false;
+    var tags = productTags[productId] || '';
+    return tags.indexOf(acessorioTag) !== -1;
+  }
+
   if (wholesaleActive && hasWholesalePrices) {
     // Criar mapa de preços de atacado por produto
     var wholesalePrices = {};
@@ -281,8 +309,10 @@
           
           newHTML += '</div>';
           
-          // Badge atacado
-          newHTML += '<span class="cw-badge-atacado" style="margin-top: 2px;">🏷 Atacado</span>';
+          // Badge atacado - só mostra se não é acessório ou se atingiu o mínimo
+          if (!isAcessorio(productId) || acessorioReached) {
+            newHTML += '<span class="cw-badge-atacado" style="margin-top: 2px;">🏷 Atacado</span>';
+          }
           
           priceEl.innerHTML = newHTML;
         }
@@ -314,7 +344,9 @@
             newHTML += '</span></div>';
             
             // Badge atacado
-            newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
+            if (!isAcessorio(productId) || acessorioReached) {
+              newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
+            }
             
             unitPriceEl.innerHTML = newHTML;
           });
@@ -342,7 +374,9 @@
           newHTML += '</span></div>';
           
           // Badge atacado
-          newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
+          if (!isAcessorio(productId) || acessorioReached) {
+            newHTML += '<span class="cw-badge-atacado">🏷 Atacado</span>';
+          }
           
           totalCell.innerHTML = newHTML;
         }
