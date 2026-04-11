@@ -15057,3 +15057,9 @@ label.color-swatch__item,
     color: #9CA3AF !important;
   }
 }
+
+/* Esconde botão X no desktop */
+@media screen and (min-width: 641px) {
+  .mini-cart__close-btn { display: none !important; }
+  .mini-cart__mobile-header { pointer-events: none; }
+}
