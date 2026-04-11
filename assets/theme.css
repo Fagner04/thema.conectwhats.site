@@ -15114,3 +15114,32 @@ label.color-swatch__item,
     z-index: 10 !important;
   }
 }
+
+/* Remove seletor de quantidade e coluna Total na página do carrinho */
+.line-item__quantity.hidden-tablet-and-up { display: none !important; }
+.line-item__quantity.table__cell--center { display: none !important; }
+td.line-item__line-price.hidden-phone { display: none !important; }
+th.table__cell--right { display: none !important; }
+th.table__cell--center { display: none !important; }
+
+/* Troca texto Remover por lixeira */
+.line-item__quantity-remove {
+  font-size: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 99px !important;
+  background: #FEE2E2 !important;
+  color: #DC2626 !important;
+}
+.line-item__quantity-remove::after {
+  content: '';
+  display: block;
+  width: 15px;
+  height: 15px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='%23DC2626' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='3 6 5 6 21 6'/%3E%3Cpath d='M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6'/%3E%3Cpath d='M10 11v6'/%3E%3Cpath d='M14 11v6'/%3E%3Cpath d='M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+}
