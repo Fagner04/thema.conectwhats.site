@@ -15042,3 +15042,18 @@ label.color-swatch__item,
     display: none !important;
   }
 }
+
+/* Fix risco do preço no mini-cart desktop */
+@media screen and (min-width: 641px) {
+  .mini-cart .line-item__price--compare::before,
+  .mini-cart .price--compare::before {
+    display: none !important;
+  }
+  .mini-cart .line-item__price--compare,
+  .mini-cart .price--compare {
+    text-decoration: line-through !important;
+    margin-left: 0 !important;
+    font-size: 11px !important;
+    color: #9CA3AF !important;
+  }
+}
