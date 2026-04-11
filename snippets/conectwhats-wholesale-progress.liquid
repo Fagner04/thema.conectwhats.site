@@ -221,26 +221,69 @@
 
 <script>
 (function() {
-  // Apenas atualiza o total do mini-cart com preço de atacado
   function formatMoney(cents) {
     return 'R$ ' + (cents / 100).toFixed(2).replace('.', ',');
   }
 
-  var wholesaleTotal = {{ wholesale_total | json }};
-  var originalTotal = {{ original_total | json }};
+  // Mapa de preços de atacado por produto (do Liquid)
+  var wholesalePriceMap = {};
+  {%- for item in cart.items -%}
+    {%- assign ws_price = item.product.metafields.custom.wholesale_price.value -%}
+    {%- unless ws_price -%}{%- assign ws_price = item.product.metafields.custom.wholesale_price -%}{%- endunless -%}
+    {%- if ws_price and ws_price > 0 -%}
+      {%- if ws_price < 1000 -%}{%- assign ws_price_cents = ws_price | times: 100 -%}
+      {%- else -%}{%- assign ws_price_cents = ws_price -%}{%- endif -%}
+      wholesalePriceMap['{{ item.product.id }}'] = {{ ws_price_cents | json }};
+    {%- endif -%}
+  {%- endfor -%}
 
-  function updateMiniCartTotal() {
-    var miniCartTotal = document.getElementById('mini-cart-total-price');
-    if (miniCartTotal && wholesaleTotal > 0 && wholesaleTotal < originalTotal) {
-      miniCartTotal.innerHTML =
-        '<div style="margin-bottom:2px;"><span style="text-decoration:line-through;color:#9CA3AF;font-size:13px;">' + formatMoney(originalTotal) + '</span></div>' +
-        '<span style="color:#16A34A;font-weight:700;font-size:17px;">' + formatMoney(wholesaleTotal) + '</span>';
-    }
+  var minQty = {{ settings.conectwhats_atacado_min_qty | default: 6 | json }};
+
+  function calcAndUpdateTotal() {
+    fetch('/cart.js')
+      .then(function(r) { return r.json(); })
+      .then(function(cart) {
+        if (cart.item_count < minQty) return;
+
+        var wholesaleTotal = 0;
+        var originalTotal = 0;
+        var hasWholesale = false;
+
+        cart.items.forEach(function(item) {
+          var pid = String(item.product_id);
+          var wsPrice = wholesalePriceMap[pid];
+          originalTotal += item.final_line_price;
+          if (wsPrice) {
+            wholesaleTotal += wsPrice * item.quantity;
+            hasWholesale = true;
+          } else {
+            wholesaleTotal += item.final_line_price;
+          }
+        });
+
+        if (!hasWholesale || wholesaleTotal >= originalTotal) return;
+
+        // Atualiza total do mini-cart
+        var miniCartTotal = document.getElementById('mini-cart-total-price');
+        if (miniCartTotal) {
+          miniCartTotal.innerHTML =
+            '<div style="margin-bottom:2px;"><span style="text-decoration:line-through;color:#9CA3AF;font-size:13px;">' + formatMoney(originalTotal) + '</span></div>' +
+            '<span style="color:#16A34A;font-weight:700;font-size:17px;">' + formatMoney(wholesaleTotal) + '</span>';
+        }
+
+        // Atualiza total da página do carrinho
+        var cartTotal = document.getElementById('cart-total-original');
+        if (cartTotal) {
+          cartTotal.innerHTML =
+            '<div style="margin-bottom:2px;"><span style="text-decoration:line-through;color:#9CA3AF;font-size:14px;">' + formatMoney(originalTotal) + '</span></div>' +
+            '<span style="color:#16A34A;font-weight:700;font-size:20px;">' + formatMoney(wholesaleTotal) + '</span>';
+        }
+      });
   }
 
-  setTimeout(updateMiniCartTotal, 100);
-  document.addEventListener('cart:refresh', function() { setTimeout(updateMiniCartTotal, 300); });
-  document.addEventListener('product:added', function() { setTimeout(updateMiniCartTotal, 400); });
+  setTimeout(calcAndUpdateTotal, 200);
+  document.addEventListener('product:added', function() { setTimeout(calcAndUpdateTotal, 500); });
+  document.addEventListener('cart:refresh', function() { setTimeout(calcAndUpdateTotal, 400); });
 })();
 </script>
 {%- endif -%}
