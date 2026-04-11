@@ -15077,3 +15077,40 @@ label.color-swatch__item,
     overflow-y: auto !important;
   }
 }
+
+/* Fix desktop: scroll na lista, botão fixo no rodapé */
+@media screen and (min-width: 641px) {
+  .mini-cart[aria-hidden=false] {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  .mini-cart__inner {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+    overflow: hidden !important;
+    min-height: 0 !important;
+  }
+
+  .mini-cart__content:not(.mini-cart__content--empty) {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .mini-cart__line-item-list {
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .mini-cart__recap {
+    flex-shrink: 0 !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    background: #fff !important;
+    border-top: 1px solid #EFEFEF !important;
+    z-index: 10 !important;
+  }
+}
