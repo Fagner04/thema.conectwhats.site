@@ -231,12 +231,12 @@
                                   {%- assign ct_reached = false -%}
                                   {%- if ct_acessorio_total >= ct_min_cents -%}{%- assign ct_reached = true -%}{%- endif -%}
                                   <div style="margin-top:8px;max-width:320px;">
-                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                                      <span style="font-size:12px;color:#F97316;font-weight:600;">{{ settings.acessorio_min_message | default: 'Valor mínimo deste produto' }}</span>
+                                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;gap:8px;">
+                                      <span style="font-size:12px;color:#F97316;font-weight:600;flex:1;">{{ settings.acessorio_min_message | default: 'Valor mínimo deste produto' }}</span>
                                       {%- if ct_reached -%}
-                                        <span style="font-size:12px;font-weight:700;color:#16A34A;">✓ Atacado!</span>
+                                        <span style="font-size:12px;font-weight:700;color:#16A34A;white-space:nowrap;flex-shrink:0;">✓ Atacado!</span>
                                       {%- else -%}
-                                        <span style="font-size:12px;font-weight:700;color:#EA580C;">Faltam {{ ct_remaining | money }}</span>
+                                        <span style="font-size:12px;font-weight:700;color:#EA580C;white-space:nowrap;flex-shrink:0;">Faltam {{ ct_remaining | money }}</span>
                                       {%- endif -%}
                                     </div>
                                     <div style="width:100%;height:6px;background:#FED7AA;border-radius:99px;overflow:hidden;">
