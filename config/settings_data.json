@@ -9,7 +9,7 @@
  */
 {
   "current": {
-    "popup_home": false,
+    "popup_home": true,
     "popup_image": "shopify://shop_images/POP_UP.svg",
     "img_popup": "shopify://collections/fitness",
     "cookie_time": 60,
