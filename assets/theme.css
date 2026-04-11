@@ -15143,3 +15143,16 @@ th.table__cell--center { display: none !important; }
   background-repeat: no-repeat;
   background-size: contain;
 }
+
+/* Fix preço riscado no carrinho - remove linha longa, usa text-decoration */
+.cart-wrapper .line-item__price--compare::before,
+.line-item-table .line-item__price--compare::before {
+  display: none !important;
+}
+.cart-wrapper .line-item__price--compare,
+.line-item-table .line-item__price--compare {
+  text-decoration: line-through !important;
+  margin-left: 0 !important;
+  font-size: 13px !important;
+  color: #9CA3AF !important;
+}
