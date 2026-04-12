@@ -44,177 +44,194 @@
 {%- endif -%}
 
 <style>
-.cw-new-total {
-  background: white;
-  border: 1.5px solid #BBF7D0;
-  border-radius: 14px;
-  padding: 14px 16px;
-  margin: 12px 0 0;
-  box-shadow: 0 2px 8px rgba(34,197,94,0.08), 0 1px 3px rgba(0,0,0,0.06);
-}
-.cw-new-total-label {
-  font-size: 12px;
-  color: #166534;
-  margin: 0 0 6px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.cw-new-total-price {
-  font-size: 22px;
-  font-weight: 800;
-  color: #15803D;
-  margin: 0 0 6px;
-  letter-spacing: -0.5px;
-}
-.cw-badge-atacado {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  background: #DCFCE7;
-  color: #166534;
-  font-size: 10px;
-  padding: 2px 7px;
-  border-radius: 99px;
-  font-weight: 700;
-  margin-left: 4px;
-  border: 1px solid #86EFAC;
-  width: fit-content;
-  max-width: 90px;
-  white-space: nowrap;
-}
 .cw-wholesale-progress {
   font-family: inherit;
-  background: white !important;
-  border: 1.5px solid #E5E7EB !important;
-  border-radius: 16px !important;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.05) !important;
-  padding: 14px 16px !important;
-  margin: 0 0 16px !important;
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 0 0 14px;
 }
-.cw-progress-header {
+
+/* === ESTADO ATIVO === */
+.cw-card-active {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border: 1.5px solid #86EFAC;
+  border-radius: 14px;
+  padding: 14px 16px 12px;
+}
+.cw-card-active-top {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
-.cw-progress-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+.cw-icon-wrap-active {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #22C55E, #15803D);
+  box-shadow: 0 4px 12px rgba(34,197,94,0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-.cw-progress-icon--active {
-  background: linear-gradient(135deg, #22C55E, #16A34A);
-  box-shadow: 0 3px 8px rgba(34,197,94,0.35);
+.cw-icon-wrap-active svg {
+  width: 20px; height: 20px;
+  stroke: #fff; fill: none;
+  stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
 }
-.cw-progress-icon--pending {
-  background: linear-gradient(135deg, #F59E0B, #D97706);
-  box-shadow: 0 3px 8px rgba(245,158,11,0.35);
+.cw-active-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #14532D;
+  margin: 0 0 2px;
+  letter-spacing: -0.2px;
 }
-.cw-progress-icon svg {
-  width: 18px;
-  height: 18px;
-  stroke: white;
-  fill: none;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.cw-savings-row {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.cw-active-sub {
   font-size: 11px;
   color: #166534;
-  margin: 3px 0 0;
+  margin: 0;
+  line-height: 1.4;
 }
-.cw-savings-row svg {
-  width: 13px;
-  height: 13px;
-  stroke: #16A34A;
-  fill: none;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.cw-badge-count {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: #16A34A;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 99px;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(22,163,74,0.35);
+}
+.cw-bar-wrap-active {
+  margin-top: 10px;
+  height: 6px;
+  background: #BBF7D0;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.cw-bar-fill-active {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #4ADE80, #16A34A);
+  border-radius: 99px;
+}
+
+/* === ESTADO PENDENTE === */
+.cw-card-pending {
+  background: #fff;
+  border: 1.5px solid #E5E7EB;
+  border-radius: 14px;
+  padding: 14px 16px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.cw-card-pending-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cw-icon-wrap-pending {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #FCD34D, #D97706);
+  box-shadow: 0 4px 12px rgba(217,119,6,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
-
-/* Responsivo para mobile */
-@media (max-width: 768px) {
-  .cw-wholesale-progress {
-    padding: 8px 10px !important;
-    margin: 8px 0 !important;
-    font-size: 11px;
-  }
-  .cw-new-total { padding: 10px; margin: 10px 0; }
-  .cw-new-total-price { font-size: 17px; }
-  .cw-badge-atacado { font-size: 8px !important; padding: 1px 5px !important; margin-left: 2px !important; }
-  .line-item__price-list { display: flex !important; flex-direction: column !important; gap: 2px !important; align-items: flex-start !important; }
-  .line-item__price-list .line-item__price--compare { font-size: 11px !important; display: block !important; }
-  .line-item__price-list .line-item__price--highlight { font-size: 13px !important; display: block !important; }
-  .mini-cart__price-list { display: flex !important; flex-direction: column !important; gap: 2px !important; }
-  .mini-cart__price-list .price--compare { font-size: 11px !important; }
-  .mini-cart__price-list .price--highlight { font-size: 13px !important; }
-  [data-line-total] span { font-size: 12px !important; }
+.cw-icon-wrap-pending svg {
+  width: 20px; height: 20px;
+  stroke: #fff; fill: none;
+  stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
 }
-
-/* Tablet */
-@media (min-width: 769px) and (max-width: 1024px) {
-  .cw-wholesale-progress { padding: 10px 12px !important; }
-  .cw-new-total-price { font-size: 18px; }
-  .cw-badge-atacado { font-size: 9px !important; }
+.cw-pending-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1F2937;
+  margin: 0 0 2px;
+}
+.cw-pending-sub {
+  font-size: 11px;
+  color: #6B7280;
+  margin: 0;
+  line-height: 1.4;
+}
+.cw-badge-remaining {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: #FEF3C7;
+  color: #92400E;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1px solid #FDE68A;
+  white-space: nowrap;
+}
+.cw-bar-wrap-pending {
+  margin-top: 10px;
+  height: 6px;
+  background: #F3F4F6;
+  border-radius: 99px;
+  overflow: hidden;
+}
+.cw-bar-fill-pending {
+  height: 100%;
+  background: linear-gradient(90deg, #FCD34D, #F59E0B);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+.cw-bar-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+.cw-bar-labels span {
+  font-size: 10px;
+  color: #9CA3AF;
+  font-weight: 500;
 }
 </style>
 
 <div class="cw-wholesale-progress">
   {%- if wholesale_active -%}
-    <div class="cw-progress-header">
-      <div class="cw-progress-icon cw-progress-icon--active">
-        <!-- Lucide: tag -->
-        <svg viewBox="0 0 24 24"><path d="M12 2H7a2 2 0 0 0-2 2v5l9.29 9.29a2 2 0 0 0 2.83 0l4.88-4.88a2 2 0 0 0 0-2.83L12 2z"/><circle cx="7.5" cy="7.5" r="1.5" fill="white" stroke="none"/></svg>
+    <div class="cw-card-active">
+      <div class="cw-card-active-top">
+        <div class="cw-icon-wrap-active">
+          <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        </div>
+        <div>
+          <p class="cw-active-title">✓ Atacado Ativo!</p>
+          <p class="cw-active-sub">Você está pagando preço de atacado</p>
+        </div>
+        <span class="cw-badge-count">{{ total_items }}/{{ wholesale_min }} peças</span>
       </div>
-      <div style="flex:1;">
-        <p style="font-size: 13px; font-weight: 800; color: #15803D; margin: 0; display:flex; align-items:center; gap:5px;">
-          <!-- Lucide: check-circle -->
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
-          Atacado Ativo!
-        </p>
-        <p style="font-size: 11px; color: #166534; margin: 2px 0 0; display:flex; align-items:center; gap:4px;">
-          <!-- Lucide: trending-down -->
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/></svg>
-          Você está economizando com preços de atacado!
-        </p>
+      <div class="cw-bar-wrap-active">
+        <div class="cw-bar-fill-active"></div>
       </div>
-      <span style="font-size: 12px; font-weight: 700; color: #15803D; background: #DCFCE7; padding: 3px 8px; border-radius: 99px; border: 1px solid #86EFAC; white-space: nowrap;">{{ total_items }}/{{ wholesale_min }} peças</span>
     </div>
-    <div style="width: 100%; height: 7px; background: #BBF7D0; border-radius: 99px; overflow: hidden; margin-top: 10px;">
-      <div style="width: 100%; height: 100%; background: linear-gradient(90deg, #22C55E, #16A34A); border-radius: 99px;"></div>
-    </div>
-
-    {%- if has_wholesale_prices and wholesale_total > 0 -%}
-    {%- endif -%}
   {%- else -%}
-    <div class="cw-progress-header" style="margin-bottom: 8px;">
-      <div class="cw-progress-icon cw-progress-icon--pending">
-        <!-- Lucide: shopping-cart -->
-        <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    <div class="cw-card-pending">
+      <div class="cw-card-pending-top">
+        <div class="cw-icon-wrap-pending">
+          <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        </div>
+        <div>
+          <p class="cw-pending-title">Faltam <strong style="color:#D97706;">{{ remaining }} peça{% if remaining != 1 %}s{% endif %}</strong> para atacado</p>
+          <p class="cw-pending-sub">Adicione mais itens e economize!</p>
+        </div>
+        <span class="cw-badge-remaining">{{ total_items }}/{{ wholesale_min }}</span>
       </div>
-      <div style="flex:1;">
-        <p style="font-size: 12px; font-weight: 700; color: #92400E; margin: 0; display:flex; align-items:center; gap:4px;">
-          <!-- Lucide: lock -->
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B45309" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          Faltam <strong style="color: #C2410C; margin: 0 2px;">{{ remaining }}</strong> peça(s) para atacado!
-        </p>
-        <p style="font-size: 10px; color: #B45309; margin: 2px 0 0;">Adicione mais itens e pague preço de atacado</p>
+      <div class="cw-bar-wrap-pending">
+        <div class="cw-bar-fill-pending" style="width:{{ progress }}%;"></div>
       </div>
-      <span style="font-size: 11px; color: #B45309; font-weight: 600; background: #FEF3C7; padding: 3px 8px; border-radius: 99px; border: 1px solid #FDE68A; white-space: nowrap;">{{ total_items }}/{{ wholesale_min }}</span>
-    </div>
-    <div style="width: 100%; height: 7px; background: #FDE68A; border-radius: 99px; overflow: hidden;">
-      <div style="width: {{ progress }}%; height: 100%; background: linear-gradient(90deg, #F59E0B, #D97706); border-radius: 99px; transition: width 0.4s ease;"></div>
+      <div class="cw-bar-labels">
+        <span>{{ total_items }} peça{% if total_items != 1 %}s{% endif %}</span>
+        <span>Meta: {{ wholesale_min }} peças</span>
+      </div>
     </div>
   {%- endif -%}
 </div>
