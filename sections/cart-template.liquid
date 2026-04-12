@@ -168,7 +168,32 @@
                                 {%- assign wholesale_active_ct = false -%}
                                 {%- assign wholesale_min_ct = settings.conectwhats_atacado_min_qty | default: 6 -%}
                                 {%- if cart.item_count >= wholesale_min_ct -%}{%- assign wholesale_active_ct = true -%}{%- endif -%}
-                                {%- if ws_price_ct and ws_price_ct > 0 and wholesale_active_ct -%}
+
+                                {%- comment -%} Verifica regra de mínimo para acessórios {%- endcomment -%}
+                                {%- assign ct_acessorio_block = false -%}
+                                {%- if settings.acessorio_min_enabled and wholesale_active_ct -%}
+                                  {%- assign ct_acc_tag = settings.acessorio_min_tag | strip | downcase -%}
+                                  {%- assign ct_item_tags_check = line_item.product.tags | join: ',' | downcase -%}
+                                  {%- if ct_item_tags_check contains ct_acc_tag -%}
+                                    {%- assign ct_acc_product_min = line_item.product.metafields.custom.min_order_value.value | plus: 0 -%}
+                                    {%- if ct_acc_product_min > 0 -%}
+                                      {%- assign ct_acc_min_cents = ct_acc_product_min | times: 100 | round -%}
+                                    {%- else -%}
+                                      {%- assign ct_acc_min_cents = settings.acessorio_min_value | plus: 0 | times: 100 | round -%}
+                                    {%- endif -%}
+                                    {%- assign ct_acc_product_total = 0 -%}
+                                    {%- for ci in cart.items -%}
+                                      {%- if ci.product.id == line_item.product.id -%}
+                                        {%- assign ct_acc_product_total = ct_acc_product_total | plus: ci.final_line_price -%}
+                                      {%- endif -%}
+                                    {%- endfor -%}
+                                    {%- if ct_acc_product_total < ct_acc_min_cents -%}
+                                      {%- assign ct_acessorio_block = true -%}
+                                    {%- endif -%}
+                                  {%- endif -%}
+                                {%- endif -%}
+
+                                {%- if ws_price_ct and ws_price_ct > 0 and wholesale_active_ct and ct_acessorio_block == false -%}
                                   {%- if ws_price_ct < 1000 -%}{%- assign ws_cents_ct = ws_price_ct | times: 100 -%}
                                   {%- else -%}{%- assign ws_cents_ct = ws_price_ct -%}{%- endif -%}
                                   {%- assign ws_total_ct = ws_cents_ct | times: line_item.quantity -%}
