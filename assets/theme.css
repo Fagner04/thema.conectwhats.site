@@ -3217,10 +3217,12 @@ img.lazyload[data-sizes=auto] {
 
 @media screen and (min-width: 1024px) {
   .mini-cart {
-    width: 500px;
-    max-width: 500px;
+    width: 380px;
+    max-width: 380px;
     max-height: calc(100vh - 80px);
     overflow-y: auto;
+    transform: scale(0.8);
+    transform-origin: top right;
   }
 
   .mini-cart__content > * {
