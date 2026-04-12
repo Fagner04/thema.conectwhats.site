@@ -14914,6 +14914,8 @@ label.color-swatch__item,
     max-height: calc(100vh - 80px) !important;
     border-radius: 16px !important;
     box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important;
+    transform: scale(0.8) !important;
+    transform-origin: top right !important;
   }
 
   .mini-cart__mobile-header {
