@@ -15054,19 +15054,29 @@ td.line-item__line-price.hidden-phone { display: none !important; }
 th.table__cell--right { display: none !important; }
 th.table__cell--center { display: none !important; }
 
-/* Troca texto Remover por lixeira */
-.line-item__quantity-remove {
+/* Troca texto Remover por lixeira - posicionada à direita da linha */
+.cart-wrapper .line-item {
+  position: relative !important;
+}
+
+.cart-wrapper .line-item__quantity-remove {
   font-size: 0 !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  width: 30px !important;
-  height: 30px !important;
+  width: 32px !important;
+  height: 32px !important;
   border-radius: 99px !important;
   background: #FEE2E2 !important;
   color: #DC2626 !important;
+  position: absolute !important;
+  right: 16px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin: 0 !important;
 }
-.line-item__quantity-remove::after {
+
+.cart-wrapper .line-item__quantity-remove::after {
   content: '';
   display: block;
   width: 15px;
