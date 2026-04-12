@@ -15048,8 +15048,8 @@ label.color-swatch__item,
   }
 }
 /* Remove seletor de quantidade e coluna Total na página do carrinho */
-.line-item__quantity.hidden-tablet-and-up { display: none !important; }
-.line-item__quantity.table__cell--center { display: none !important; }
+.line-item__quantity.hidden-tablet-and-up .quantity-selector { display: none !important; }
+.line-item__quantity.table__cell--center .quantity-selector { display: none !important; }
 td.line-item__line-price.hidden-phone { display: none !important; }
 th.table__cell--right { display: none !important; }
 th.table__cell--center { display: none !important; }
