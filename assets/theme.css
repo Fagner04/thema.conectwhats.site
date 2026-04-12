@@ -3221,7 +3221,7 @@ img.lazyload[data-sizes=auto] {
     max-width: 380px;
     max-height: calc(100vh - 80px);
     overflow-y: auto;
-    transform: scale(0.8);
+    transform: scale(0.9);
     transform-origin: top right;
   }
 
@@ -14914,7 +14914,7 @@ label.color-swatch__item,
     max-height: calc(100vh - 80px) !important;
     border-radius: 16px !important;
     box-shadow: 0 8px 32px rgba(0,0,0,0.12) !important;
-    transform: scale(0.8) !important;
+    transform: scale(0.9) !important;
     transform-origin: top right !important;
   }
 
