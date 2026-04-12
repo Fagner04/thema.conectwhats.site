@@ -3233,7 +3233,7 @@ img.lazyload[data-sizes=auto] {
   }
 
   .mini-cart__line-item-list {
-    max-height: 300px;
+    max-height: 220px;
   }
 
   .mini-cart__item-wrapper {
