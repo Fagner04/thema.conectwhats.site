@@ -14092,21 +14092,9 @@ input.qtyminus {
 }
 
 @media(max-width: 768px){
- 
-  
   .botaoflutuante {
-      position: fixed;
-      bottom: 0;
-      background: var(--btn-primary-color-buy);
-      color: var(--btn-primary-color-buy-text);
-      z-index: 99;
-      width: 100%;
-      padding: 0px;
-	}
-  
-  .botaoflutuante button{
-	width: 100%;
-	}
+    display: none !important;
+  }
 }
 
 #clicar {
