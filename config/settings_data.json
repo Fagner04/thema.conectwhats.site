@@ -137,7 +137,7 @@
     "cart_empty_button_link": "shopify://collections/all",
     "cart_show_free_shipping_threshold": false,
     "cart_free_shipping_threshold": "0",
-    "cart_warning_enable": true,
+    "cart_warning_enable": false,
     "cart_warning_message": "\"Condições de compra: vendas no atacado para revenda, não realizamos trocas.\"",
     "cart_warning_type": "warning",
     "cart_warning_bg_color": "#ffffff",
