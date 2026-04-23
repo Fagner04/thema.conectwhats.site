@@ -1,0 +1,126 @@
+<div class="container" style="max-width:600px;margin:40px auto;padding:0 16px;">
+  <div style="text-align:center;margin-bottom:32px;">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#EA580C" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+    <h1 style="font-size:24px;font-weight:800;margin:0 0 8px;">Rastrear Pedido</h1>
+    <p style="color:#6B7280;font-size:14px;margin:0;">Digite o código de rastreio dos Correios para acompanhar seu pedido</p>
+  </div>
+
+  <div style="background:#fff;border-radius:16px;padding:28px;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+    <form id="rastreio-page-form">
+      <label style="display:block;font-size:13px;font-weight:600;color:#374151;margin-bottom:6px;">Código de Rastreio</label>
+      <input
+        type="text"
+        id="rastreio-page-input"
+        placeholder="Ex: AA123456789BR"
+        maxlength="13"
+        style="width:100%;padding:12px 14px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:15px;outline:none;box-sizing:border-box;transition:border-color 0.2s;"
+        onfocus="this.style.borderColor='#EA580C'"
+        onblur="this.style.borderColor='#E5E7EB'"
+      >
+      <button type="submit" style="width:100%;margin-top:12px;padding:14px;background:#EA580C;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='#C2410C'" onmouseout="this.style.background='#EA580C'">
+        Rastrear
+      </button>
+    </form>
+
+    <div id="rastreio-page-loading" style="display:none;text-align:center;padding:24px 0;">
+      <div style="width:32px;height:32px;border:3px solid #FED7AA;border-top-color:#EA580C;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
+      <p style="color:#6B7280;font-size:14px;margin:0;">Buscando informações...</p>
+    </div>
+
+    <div id="rastreio-page-error" style="display:none;margin-top:16px;padding:12px 16px;background:#FEF2F2;border-left:3px solid #EF4444;border-radius:6px;color:#DC2626;font-size:14px;"></div>
+
+    <div id="rastreio-page-result" style="display:none;margin-top:20px;"></div>
+  </div>
+
+  <p style="text-align:center;color:#9CA3AF;font-size:12px;margin-top:20px;">
+    Dados fornecidos pelos Correios. Pode haver atraso de até 24h na atualização.
+  </p>
+</div>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
+<script>
+(function() {
+  var apiUrl = '{{ settings.sheets_frete_url }}';
+
+  document.getElementById('rastreio-page-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var code = document.getElementById('rastreio-page-input').value.trim().toUpperCase();
+    var loading = document.getElementById('rastreio-page-loading');
+    var error = document.getElementById('rastreio-page-error');
+    var result = document.getElementById('rastreio-page-result');
+
+    error.style.display = 'none';
+    result.style.display = 'none';
+    result.innerHTML = '';
+    error.textContent = '';
+
+    if (!code) {
+      error.textContent = 'Digite o código de rastreio.';
+      error.style.display = 'block';
+      return;
+    }
+
+    if (!/^[A-Z]{2}\d{9}[A-Z]{2}$/.test(code)) {
+      error.textContent = 'Código inválido. Use o formato: AA123456789BR';
+      error.style.display = 'block';
+      return;
+    }
+
+    if (!apiUrl) {
+      error.textContent = 'API não configurada. Entre em contato com o suporte.';
+      error.style.display = 'block';
+      return;
+    }
+
+    loading.style.display = 'block';
+
+    fetch(apiUrl + '?codigo=' + encodeURIComponent(code))
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        loading.style.display = 'none';
+
+        if (!data.success || data.error) {
+          error.textContent = data.error || 'Código não encontrado.';
+          error.style.display = 'block';
+          return;
+        }
+
+        var html = '<h3 style="font-size:15px;font-weight:700;margin:0 0 16px;color:#111;">Código: ' + code + '</h3>';
+        html += '<div style="display:flex;flex-direction:column;gap:12px;">';
+
+        data.eventos.forEach(function(ev, i) {
+          var isFirst = i === 0;
+          html += '<div style="display:flex;gap:12px;align-items:flex-start;">';
+          html += '<div style="flex-shrink:0;width:10px;height:10px;border-radius:50%;background:' + (isFirst ? '#EA580C' : '#D1D5DB') + ';margin-top:4px;"></div>';
+          html += '<div style="flex:1;">';
+          html += '<p style="margin:0 0 2px;font-size:13px;font-weight:' + (isFirst ? '700' : '500') + ';color:' + (isFirst ? '#111' : '#374151') + ';">' + ev.status + '</p>';
+          if (ev.local || ev.cidade) {
+            html += '<p style="margin:0 0 2px;font-size:12px;color:#6B7280;">' + [ev.local, ev.cidade].filter(Boolean).join(' — ') + '</p>';
+          }
+          html += '<p style="margin:0;font-size:11px;color:#9CA3AF;">' + ev.data + (ev.hora ? ' às ' + ev.hora : '') + '</p>';
+          html += '</div></div>';
+        });
+
+        html += '</div>';
+        result.innerHTML = html;
+        result.style.display = 'block';
+      })
+      .catch(function() {
+        loading.style.display = 'none';
+        error.textContent = 'Erro ao buscar rastreamento. Tente novamente.';
+        error.style.display = 'block';
+      });
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Rastrear Pedido",
+  "settings": []
+}
+{% endschema %}
