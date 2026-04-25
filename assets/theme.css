@@ -15142,21 +15142,22 @@ th.table__cell--center { display: none !important; }
   background: #fff;
   width: 100%;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
-.mini-cart__progress-wrapper .cw-wholesale-progress {
-  width: 100%;
-  margin: 0;
-}
-
+.mini-cart__progress-wrapper .cw-wholesale-progress,
 .mini-cart__progress-wrapper .cw-card-pending {
   width: 100%;
+  max-width: 100%;
   box-sizing: border-box;
+  margin: 0;
 }
 
 @media screen and (max-width: 640px) {
   .mini-cart__progress-wrapper {
     padding: 8px 12px 0;
     background: #f5f5f5;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
