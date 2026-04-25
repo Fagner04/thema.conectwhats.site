@@ -101,7 +101,7 @@
     "enable_category_installments": true,
     "promo_qty_vezes": 3,
     "atacado_enabled": true,
-    "atacado_min_qty": 12,
+    "atacado_min_qty": 6,
     "conectwhats_atacado_enabled": true,
     "conectwhats_atacado_min_qty": 12,
     "acessorio_min_enabled": true,
