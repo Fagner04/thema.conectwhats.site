@@ -357,7 +357,7 @@
           "image_NBfmnA": {
             "type": "image",
             "settings": {
-              "image": "shopify://shop_images/PETIT_POA_1.png",
+              "image": "shopify://shop_images/BANNER_PETIT_POA_SVG.svg",
               "mobile_image": "shopify://shop_images/MOBILE_POA.svg",
               "show_overlay": false,
               "overlay_opacity": 30,
