@@ -15140,26 +15140,23 @@ th.table__cell--center { display: none !important; }
   flex-shrink: 0;
   padding: 10px 16px 0;
   background: #fff;
-  width: 100%;
   box-sizing: border-box;
-  overflow: hidden;
 }
 
 .mini-cart__progress-wrapper .cw-wholesale-progress,
 .mini-cart__progress-wrapper .cw-card-pending {
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
   margin: 0;
 }
 
 @media screen and (max-width: 640px) {
   .mini-cart__progress-wrapper {
-    padding: 0;
-    margin: 8px 12px 0;
-    width: calc(100% - 24px);
-    background: transparent;
+    padding: 8px 12px 0 12px;
+    background: #f5f5f5;
     box-sizing: border-box;
-    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    align-self: stretch;
   }
 }
