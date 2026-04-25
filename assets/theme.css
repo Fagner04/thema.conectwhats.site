@@ -14755,7 +14755,7 @@ label.color-swatch__item,
     background: #fff;
     margin: 12px 12px 0;
     border-radius: 16px;
-    overflow: hidden;
+    overflow: visible;
     padding: 0 !important;
   }
 
@@ -15132,5 +15132,19 @@ th.table__cell--center { display: none !important; }
     padding: 12px 16px 24px !important;
     box-shadow: 0 -4px 16px rgba(0,0,0,0.08) !important;
     z-index: 20 !important;
+  }
+}
+
+/* ===== CARD PROGRESSO ATACADO FIXO (não rola com os produtos) ===== */
+.mini-cart__progress-wrapper {
+  flex-shrink: 0;
+  padding: 10px 16px 0;
+  background: #fff;
+}
+
+@media screen and (max-width: 640px) {
+  .mini-cart__progress-wrapper {
+    padding: 8px 12px 0;
+    background: #f5f5f5;
   }
 }
