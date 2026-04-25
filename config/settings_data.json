@@ -354,6 +354,23 @@
       "slideshow": {
         "type": "slideshow",
         "blocks": {
+          "image_NBfmnA": {
+            "type": "image",
+            "settings": {
+              "image": "shopify://shop_images/PETIT_POA_1.png",
+              "mobile_image": "shopify://shop_images/MOBILE_POA.svg",
+              "show_overlay": false,
+              "overlay_opacity": 30,
+              "text_color": "#ffffff",
+              "title": "",
+              "content": "",
+              "content_position": "middle_center",
+              "button_background": "#ffffff",
+              "button_text_color": "#000000",
+              "button_text": "",
+              "link": "shopify://collections/petit-poa"
+            }
+          },
           "image_AE3LBD": {
             "type": "image",
             "settings": {
@@ -441,6 +458,7 @@
           }
         },
         "block_order": [
+          "image_NBfmnA",
           "image_AE3LBD",
           "image_gAgiPF",
           "image_RxPPmx",
