@@ -281,5 +281,51 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.mi
     {% render 'exit-popup' %}
     {% render 'conectwhats-checkout' %} <!-- Não remova. Checkout Yampi. -->
 {% capture yampi_snippet_content %}{% include 'YampiSnippet' %}{% endcapture %} {% unless yampi_snippet_content contains 'Liquid error' %} {% include 'YampiSnippet' %} {% endunless %}
-<!-- Não remova. Checkout Yampi. --> </body>
+<!-- Não remova. Checkout Yampi. -->
+
+<script>
+  // Limpa o carrinho automaticamente a cada 20 minutos de inatividade
+  (function() {
+    var INATIVIDADE_MS = 20 * 60 * 1000; // 20 minutos
+    var STORAGE_KEY = 'cart_last_activity';
+
+    function atualizarAtividade() {
+      localStorage.setItem(STORAGE_KEY, Date.now().toString());
+    }
+
+    function limparCarrinho() {
+      fetch('/cart/clear.js', { method: 'POST' })
+        .then(function() {
+          localStorage.removeItem(STORAGE_KEY);
+          // Recarrega se estiver na página do carrinho
+          if (window.location.pathname === '/cart') {
+            window.location.reload();
+          }
+        })
+        .catch(function(err) { console.error('Erro ao limpar carrinho:', err); });
+    }
+
+    function verificarInatividade() {
+      var ultima = parseInt(localStorage.getItem(STORAGE_KEY) || '0', 10);
+      if (ultima && (Date.now() - ultima) >= INATIVIDADE_MS) {
+        limparCarrinho();
+      }
+    }
+
+    // Registra atividade do usuário
+    ['click', 'keydown', 'scroll', 'touchstart'].forEach(function(evt) {
+      document.addEventListener(evt, atualizarAtividade, { passive: true });
+    });
+
+    // Inicializa timestamp se ainda não existir
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      atualizarAtividade();
+    }
+
+    // Verifica a cada minuto
+    setInterval(verificarInatividade, 60 * 1000);
+  })();
+</script>
+
+</body>
 </html>

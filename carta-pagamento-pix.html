@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carta de Pagamento PIX</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .card {
+      background: white;
+      width: 480px;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow:
+        0 4px 6px rgba(0,0,0,0.05),
+        0 20px 60px rgba(0,0,0,0.12),
+        0 0 0 1px rgba(0,0,0,0.04);
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      padding: 32px 36px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+
+    .header::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: -40px;
+      width: 150px; height: 150px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 50%;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, #32d583, #12b76a);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(50,213,131,0.4);
+    }
+
+    .logo-icon svg { width: 22px; height: 22px; fill: white; }
+
+    .logo-text {
+      font-size: 18px;
+      font-weight: 800;
+      color: white;
+      letter-spacing: -0.3px;
+    }
+
+    .logo-text span { color: #32d583; }
+
+    .badge-pix {
+      background: rgba(50,213,131,0.15);
+      border: 1px solid rgba(50,213,131,0.3);
+      color: #32d583;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 99px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .header-title {
+      font-size: 13px;
+      color: rgba(255,255,255,0.55);
+      font-weight: 400;
+      letter-spacing: 0.3px;
+    }
+
+    .header-subtitle {
+      font-size: 22px;
+      font-weight: 700;
+      color: white;
+      margin-top: 4px;
+      letter-spacing: -0.5px;
+    }
+
+    /* Body */
+    .body { padding: 32px 36px; }
+
+    .instruction {
+      text-align: center;
+      font-size: 14px;
+      color: #6b7280;
+      font-weight: 400;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    /* QR Code area */
+    .qr-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 28px;
+    }
+
+    .qr-container {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.06),
+        0 8px 24px rgba(0,0,0,0.06);
+      position: relative;
+    }
+
+    .qr-container::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 21px;
+      background: linear-gradient(135deg, #32d583, #12b76a, #0ea5e9);
+      z-index: -1;
+      opacity: 0.3;
+    }
+
+    .qr-container img {
+      width: 180px;
+      height: 180px;
+      display: block;
+    }
+
+    .qr-placeholder {
+      width: 180px;
+      height: 180px;
+      background: #f9fafb;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: #9ca3af;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .qr-placeholder svg {
+      width: 48px; height: 48px;
+      stroke: #d1d5db;
+    }
+
+    /* Valor */
+    .valor-section {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .valor-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .valor-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1a1a2e;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+
+    .valor-title.aberto { color: #0f3460; }
+
+    .valor-desc {
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.6;
+      max-width: 300px;
+      margin: 0 auto;
+    }
+
+    /* Divider */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+      margin: 24px 0;
+    }
+
+    /* Chave Pix */
+    .chave-section {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+    }
+
+    .chave-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .chave-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chave-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #32d583, #12b76a);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(50,213,131,0.3);
+    }
+
+    .chave-icon svg { width: 18px; height: 18px; fill: white; }
+
+    .chave-label {
+      font-size: 11px;
+      color: #9ca3af;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .chave-tipo {
+      font-size: 13px;
+      color: #374151;
+      font-weight: 600;
+      margin-top: 1px;
+    }
+
+    .chave-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1a1a2e;
+      letter-spacing: 0.3px;
+      text-align: right;
+    }
+
+    /* Info rows */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .info-item {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+
+    .info-item-label {
+      font-size: 10px;
+      color: #9ca3af;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .info-item-value {
+      font-size: 13px;
+      color: #1a1a2e;
+      font-weight: 600;
+    }
+
+    /* Aviso */
+    .aviso {
+      background: linear-gradient(135deg, #fffbeb, #fef3c7);
+      border: 1.5px solid #fde68a;
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    .aviso svg { width: 18px; height: 18px; fill: #f59e0b; flex-shrink: 0; margin-top: 1px; }
+
+    .aviso-text {
+      font-size: 12px;
+      color: #92400e;
+      line-height: 1.5;
+    }
+
+    .aviso-text strong { font-weight: 700; }
+
+    /* Footer */
+    .footer {
+      background: #f8fafc;
+      border-top: 1px solid #e5e7eb;
+      padding: 18px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-left {
+      font-size: 11px;
+      color: #9ca3af;
+      line-height: 1.5;
+    }
+
+    .footer-left strong { color: #6b7280; font-weight: 600; }
+
+    .footer-pix-logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 6px 12px;
+    }
+
+    .pix-symbol {
+      width: 20px; height: 20px;
+      background: linear-gradient(135deg, #32d583, #12b76a);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pix-symbol svg { width: 12px; height: 12px; fill: white; }
+
+    .footer-pix-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #374151;
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .card {
+        box-shadow: none;
+        border-radius: 0;
+        width: 100%;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <!-- Pix icon -->
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="logo-text">Empório<span>Body</span></span>
+      </div>
+      <span class="badge-pix">● PIX</span>
+    </div>
+    <div class="header-title">Carta de Pagamento</div>
+    <div class="header-subtitle">Transferência via Pix</div>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <p class="instruction">
+      Faça um Pix usando este QR Code ou copie a chave abaixo para realizar o pagamento.
+    </p>
+
+    <!-- QR Code -->
+    <div class="qr-wrapper">
+      <div class="qr-container">
+        <!-- SUBSTITUA O SRC ABAIXO PELA IMAGEM DO SEU QR CODE -->
+        <div class="qr-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+            <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/>
+            <rect x="18" y="14" width="3" height="3"/><rect x="14" y="18" width="3" height="3"/>
+            <rect x="18" y="18" width="3" height="3"/>
+          </svg>
+          Cole aqui a imagem<br>do QR Code
+        </div>
+        <!-- EXEMPLO COM IMAGEM:
+        <img src="qrcode.png" alt="QR Code Pix">
+        -->
+      </div>
+    </div>
+
+    <!-- Valor -->
+    <div class="valor-section">
+      <div class="valor-label">Valor</div>
+      <div class="valor-title aberto">valor em aberto</div>
+      <p class="valor-desc">
+        Você deverá colocar o valor que foi combinado com o recebedor ao realizar o pagamento.
+      </p>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Chave Pix -->
+    <div class="chave-section">
+      <div class="chave-row">
+        <div class="chave-left">
+          <div class="chave-icon">
+            <svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          </div>
+          <div>
+            <div class="chave-label">Chave Pix</div>
+            <div class="chave-tipo">CNPJ</div>
+          </div>
+        </div>
+        <div class="chave-value">63.586.056/0001-90</div>
+      </div>
+    </div>
+
+    <!-- Info Grid -->
+    <div class="info-grid">
+      <div class="info-item">
+        <div class="info-item-label">Beneficiário</div>
+        <div class="info-item-value">Empório Body</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-label">Banco</div>
+        <div class="info-item-value">— —</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-label">Tipo de chave</div>
+        <div class="info-item-value">CNPJ</div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-label">Validade</div>
+        <div class="info-item-value">Sem expiração</div>
+      </div>
+    </div>
+
+    <!-- Aviso -->
+    <div class="aviso">
+      <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13" stroke="white" stroke-width="2"/><line x1="12" y1="17" x2="12.01" y2="17" stroke="white" stroke-width="2"/></svg>
+      <p class="aviso-text">
+        <strong>Atenção:</strong> Confirme sempre o nome do beneficiário antes de concluir o pagamento. Em caso de dúvidas, entre em contato conosco antes de realizar a transferência.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-left">
+      <strong>Empório Body</strong><br>
+      CNPJ 63.586.056/0001-90
+    </div>
+    <div class="footer-pix-logo">
+      <div class="pix-symbol">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/></svg>
+      </div>
+      <span class="footer-pix-text">PIX</span>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
