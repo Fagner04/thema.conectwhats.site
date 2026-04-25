@@ -148,9 +148,7 @@
                     {%- unless ws_price -%}{%- assign ws_price = line_item.product.metafields.custom.wholesale_price -%}{%- endunless -%}
                     {%- assign mc_show_wholesale = false -%}
                     {%- if ws_price and ws_price > 0 and mc_wholesale_active -%}
-                      {%- if item_has_min == false or item_reached -%}
-                        {%- assign mc_show_wholesale = true -%}
-                      {%- endif -%}
+                      {%- assign mc_show_wholesale = true -%}
                     {%- endif -%}
                     {%- if mc_show_wholesale -%}
                       {%- if ws_price < 1000 -%}{%- assign ws_price_cents = ws_price | times: 100 -%}
