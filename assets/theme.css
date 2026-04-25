@@ -15140,6 +15140,18 @@ th.table__cell--center { display: none !important; }
   flex-shrink: 0;
   padding: 10px 16px 0;
   background: #fff;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mini-cart__progress-wrapper .cw-wholesale-progress {
+  width: 100%;
+  margin: 0;
+}
+
+.mini-cart__progress-wrapper .cw-card-pending {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media screen and (max-width: 640px) {
