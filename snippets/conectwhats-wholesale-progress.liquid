@@ -206,23 +206,7 @@
 </style>
 
 <div class="cw-wholesale-progress">
-  {%- if wholesale_active -%}
-    <div class="cw-card-active">
-      <div class="cw-card-active-top">
-        <div class="cw-icon-wrap-active">
-          <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-        </div>
-        <div class="cw-active-text">
-          <p class="cw-active-title">✓ Atacado Ativo!</p>
-          <p class="cw-active-sub">Você está pagando preço de atacado</p>
-        </div>
-        <span class="cw-badge-count">{{ total_items }}/{{ wholesale_min }} peças</span>
-      </div>
-      <div class="cw-bar-wrap-active">
-        <div class="cw-bar-fill-active"></div>
-      </div>
-    </div>
-  {%- else -%}
+  {%- unless wholesale_active -%}
     <div class="cw-card-pending">
       <div class="cw-card-pending-top">
         <div class="cw-icon-wrap-pending">
@@ -242,7 +226,7 @@
         <span>Meta: {{ wholesale_min }} peças</span>
       </div>
     </div>
-  {%- endif -%}
+  {%- endunless -%}
 </div>
 
 <script>
