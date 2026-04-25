@@ -15155,9 +15155,11 @@ th.table__cell--center { display: none !important; }
 
 @media screen and (max-width: 640px) {
   .mini-cart__progress-wrapper {
-    padding: 8px 12px 0;
-    background: #f5f5f5;
-    width: 100%;
+    padding: 0;
+    margin: 8px 12px 0;
+    width: calc(100% - 24px);
+    background: transparent;
     box-sizing: border-box;
+    overflow: hidden;
   }
 }
