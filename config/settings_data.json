@@ -103,7 +103,7 @@
     "atacado_enabled": true,
     "atacado_min_qty": 12,
     "conectwhats_atacado_enabled": true,
-    "conectwhats_atacado_min_qty": 6,
+    "conectwhats_atacado_min_qty": 12,
     "acessorio_min_enabled": true,
     "acessorio_min_value": "50",
     "addzap": true,
