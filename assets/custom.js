@@ -179,25 +179,11 @@ document.addEventListener('variant:changed', function(event) {
   }
   
   function initCartWarning() {
-    function triggerCartWarning() {
-      if (typeof window.showCartWarning === 'function') {
-        setTimeout(function() { window.showCartWarning(); }, 300);
-      }
-    }
+    // Só aparece na página /cart
+    if (window.location.pathname !== '/cart') return;
     
-    // Só mostra ao clicar no botão "Finalizar Compra" do mini cart
-    document.addEventListener('click', function(e) {
-      var btn = e.target.closest('a[href*="/checkout"], button[name="checkout"], a[href="/cart"]');
-      if (btn) {
-        e.preventDefault();
-        window.cartWarningPendingRedirect = btn.href || '/checkout';
-        triggerCartWarning();
-      }
-    });
-    
-    // Para a página /cart, mostra ao carregar
-    if (window.location.pathname === '/cart') {
-      triggerCartWarning();
+    if (typeof window.showCartWarning === 'function') {
+      setTimeout(function() { window.showCartWarning(); }, 500);
     }
   }
   
