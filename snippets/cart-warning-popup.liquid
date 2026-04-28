@@ -209,6 +209,9 @@
 let cartWarningShown = false;
 
 function showCartWarning() {
+  // Só aparece na página /cart
+  if (window.location.pathname !== '/cart') return;
+
   // Verifica se deve mostrar apenas uma vez por sessão
   if ({{ settings.cart_warning_show_once | json }} && sessionStorage.getItem('cartWarningShown')) {
     return;
