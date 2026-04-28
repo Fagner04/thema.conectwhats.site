@@ -185,19 +185,15 @@ document.addEventListener('variant:changed', function(event) {
       }
     }
     
-    // Observa quando o mini cart abre (aria-hidden muda para false)
-    var miniCart = document.querySelector('.mini-cart');
-    if (miniCart) {
-      var observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutation) {
-          if (mutation.attributeName === 'aria-hidden') {
-            var isOpen = miniCart.getAttribute('aria-hidden') === 'false';
-            if (isOpen) triggerCartWarning();
-          }
-        });
-      });
-      observer.observe(miniCart, { attributes: true });
-    }
+    // Só mostra ao clicar no botão "Finalizar Compra" do mini cart
+    document.addEventListener('click', function(e) {
+      var btn = e.target.closest('a[href*="/checkout"], button[name="checkout"], a[href="/cart"]');
+      if (btn) {
+        e.preventDefault();
+        window.cartWarningPendingRedirect = btn.href || '/checkout';
+        triggerCartWarning();
+      }
+    });
     
     // Para a página /cart, mostra ao carregar
     if (window.location.pathname === '/cart') {
