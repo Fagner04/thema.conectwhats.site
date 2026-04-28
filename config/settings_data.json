@@ -9,7 +9,7 @@
  */
 {
   "current": {
-    "popup_home": true,
+    "popup_home": false,
     "popup_image": "shopify://shop_images/POP_UP_16120ac6-4fc5-4930-95ee-711cb77dbc4f.svg",
     "img_popup": "shopify://collections/petit-poa",
     "cookie_time": 60,
@@ -101,9 +101,9 @@
     "enable_category_installments": true,
     "promo_qty_vezes": 3,
     "atacado_enabled": true,
-    "atacado_min_qty": 6,
+    "atacado_min_qty": 12,
     "conectwhats_atacado_enabled": true,
-    "conectwhats_atacado_min_qty": 6,
+    "conectwhats_atacado_min_qty": 12,
     "acessorio_min_enabled": true,
     "acessorio_min_value": "50",
     "addzap": true,
@@ -138,9 +138,9 @@
     "cart_empty_button_link": "shopify://collections/all",
     "cart_show_free_shipping_threshold": false,
     "cart_free_shipping_threshold": "0",
-    "cart_warning_enable": false,
-    "cart_warning_message": "\"Condições de compra: vendas no atacado para revenda, não realizamos trocas.\"",
-    "cart_warning_type": "warning",
+    "cart_warning_enable": true,
+    "cart_warning_message": "\"Condições de compra: vendas no atacado para revenda, não realizamos trocas.\" a não ser defeitos atacado somente para revenda , varejo fazenmos trocas normalmente",
+    "cart_warning_type": "info",
     "cart_warning_bg_color": "#ffffff",
     "cart_warning_text_color": "#000000",
     "cart_warning_delay": 2,
