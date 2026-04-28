@@ -31,7 +31,7 @@
         <header class="page__header page__header--stack">
           <h1 class="page__title heading h1">{{ 'cart.general.title' | t }}</h1>
           
-          <div style="max-width:600px;">
+          <div style="display:none;">
             {% render 'conectwhats-wholesale-progress' %}
           </div>
           
@@ -98,6 +98,12 @@
             LINE ITEMS
             --------------------------------------------------------------------------------------
             {%- endcomment -%}
+
+            {%- if settings.conectwhats_atacado_enabled -%}
+              <div style="margin-bottom:16px;">
+                {% render 'conectwhats-wholesale-progress' %}
+              </div>
+            {%- endif -%}
 
             <div class="card">
               <div class="table-wrapper">
@@ -470,6 +476,41 @@
                       <span class="cart-recap__price-line-label">{{ 'cart.general.total' | t }}</span>
                       <span class="cart-recap__price-line-price" id="cart-total-original">{{ cart.total_price | money }}</span>
                     </div>
+
+                    {%- comment -%} Resumo de economia atacado {%- endcomment -%}
+                    {%- if settings.conectwhats_atacado_enabled -%}
+                      {%- assign ct_wholesale_min = settings.conectwhats_atacado_min_qty | default: 6 -%}
+                      {%- if cart.item_count >= ct_wholesale_min -%}
+                        {%- assign ct_wholesale_total = 0 -%}
+                        {%- assign ct_original_total = 0 -%}
+                        {%- assign ct_has_ws = false -%}
+                        {%- for item in cart.items -%}
+                          {%- assign ws_p = item.product.metafields.custom.wholesale_price.value -%}
+                          {%- unless ws_p -%}{%- assign ws_p = item.product.metafields.custom.wholesale_price -%}{%- endunless -%}
+                          {%- assign ct_original_total = ct_original_total | plus: item.final_line_price -%}
+                          {%- if ws_p and ws_p > 0 -%}
+                            {%- assign ct_has_ws = true -%}
+                            {%- if ws_p < 1000 -%}{%- assign ws_cents = ws_p | times: 100 -%}{%- else -%}{%- assign ws_cents = ws_p -%}{%- endif -%}
+                            {%- assign ct_wholesale_total = ct_wholesale_total | plus: ws_cents | times: item.quantity -%}
+                          {%- else -%}
+                            {%- assign ct_wholesale_total = ct_wholesale_total | plus: item.final_line_price -%}
+                          {%- endif -%}
+                        {%- endfor -%}
+                        {%- if ct_has_ws and ct_wholesale_total < ct_original_total -%}
+                          {%- assign ct_savings = ct_original_total | minus: ct_wholesale_total -%}
+                          <div style="margin-top:8px;padding:10px 12px;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                              <span style="font-size:13px;color:#166534;font-weight:600;">🏷️ Preço atacado</span>
+                              <span style="font-size:13px;color:#16A34A;font-weight:700;">{{ ct_wholesale_total | money }}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+                              <span style="font-size:12px;color:#166534;">Você economizou</span>
+                              <span style="font-size:13px;color:#16A34A;font-weight:700;">{{ ct_savings | money }}</span>
+                            </div>
+                          </div>
+                        {%- endif -%}
+                      {%- endif -%}
+                    {%- endif -%}
                     
                     {% if settings.atacado_enabled %}
                     <div id="atacado-discount-line" class="cart-recap__price-line cart-recap__price-line--highlight text--pull" style="display: none;">
