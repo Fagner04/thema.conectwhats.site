@@ -173,79 +173,37 @@ document.addEventListener('variant:changed', function(event) {
 (function() {
   'use strict';
   
-  // Aguarda o DOM estar pronto
   function ready(fn) {
-    if (document.readyState !== 'loading') {
-      fn();
-    } else {
-      document.addEventListener('DOMContentLoaded', fn);
-    }
+    if (document.readyState !== 'loading') fn();
+    else document.addEventListener('DOMContentLoaded', fn);
   }
   
-  // Função principal
   function initCartWarning() {
-    // Função para mostrar o popup de aviso
     function triggerCartWarning() {
       if (typeof window.showCartWarning === 'function') {
-        setTimeout(function() {
-          window.showCartWarning();
-        }, 300);
+        setTimeout(function() { window.showCartWarning(); }, 300);
       }
     }
     
-    // Detecta quando o carrinho é aberto (drawer)
-    const cartTriggers = document.querySelectorAll('[data-action="toggle-mini-cart"]');
-    
-    cartTriggers.forEach(function(trigger) {
-      trigger.addEventListener('click', function() {
-        triggerCartWarning();
+    // Observa quando o mini cart abre (aria-hidden muda para false)
+    var miniCart = document.querySelector('.mini-cart');
+    if (miniCart) {
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.attributeName === 'aria-hidden') {
+            var isOpen = miniCart.getAttribute('aria-hidden') === 'false';
+            if (isOpen) triggerCartWarning();
+          }
+        });
       });
-    });
-    
-    // Detecta clique no ícone do carrinho (tanto drawer quanto page)
-    const cartToggle = document.querySelector('.header__cart-toggle');
-    
-    if (cartToggle) {
-      cartToggle.addEventListener('click', function(e) {
-        const hasDrawerAction = cartToggle.getAttribute('data-action') === 'toggle-mini-cart';
-        
-        if (!hasDrawerAction) {
-          // É carrinho tipo page
-          e.preventDefault();
-          window.cartWarningPendingRedirect = cartToggle.href;
-          triggerCartWarning();
-          setTimeout(function() {
-            if (window.cartWarningPendingRedirect) {
-              window.location.href = window.cartWarningPendingRedirect;
-            }
-          }, 5000);
-        }
-        // drawer: não intercepta, deixa o tema abrir normalmente
-      });
+      observer.observe(miniCart, { attributes: true });
     }
     
-    // Listener para quando produtos são adicionados ao carrinho
-    document.addEventListener('product:added', function(event) {
+    // Para a página /cart, mostra ao carregar
+    if (window.location.pathname === '/cart') {
       triggerCartWarning();
-    });
-    
-    // Listener para quando o carrinho é atualizado/aberto (drawer)
-    document.addEventListener('cart:refresh', function(event) {
-      const miniCart = document.querySelector('#mini-cart');
-      if (miniCart && miniCart.getAttribute('aria-hidden') === 'false') {
-        triggerCartWarning();
-      }
-    });
-    
-    // Para carrinho tipo page, também mostra o popup quando a página do carrinho é carregada
-    if (window.location.pathname === '/cart' || window.location.pathname.includes('/cart')) {
-      // Verifica se há itens no carrinho
-      if (window.theme && window.theme.cartCount > 0) {
-        triggerCartWarning();
-      }
     }
   }
   
-  // Inicializa quando o DOM estiver pronto
   ready(initCartWarning);
 })();
