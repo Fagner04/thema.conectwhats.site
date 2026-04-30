@@ -139,7 +139,7 @@
     "cart_show_free_shipping_threshold": false,
     "cart_free_shipping_threshold": "0",
     "cart_warning_enable": true,
-    "cart_warning_message": "\"Condições de compra: vendas no atacado para revenda, não realizamos trocas.\" a não ser defeitos atacado somente para revenda , varejo fazenmos trocas normalmente",
+    "cart_warning_message": "\"Informamos que nossas vendas de atacado são destinadas à revenda e, por isso, só efetuamos trocas por defeito. Para clientes do varejo, as trocas funcionam normalmente!\"",
     "cart_warning_type": "info",
     "cart_warning_bg_color": "#ffffff",
     "cart_warning_text_color": "#000000",
