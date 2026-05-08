@@ -356,6 +356,7 @@
         "blocks": {
           "image_JNQazk": {
             "type": "image",
+            "disabled": true,
             "settings": {
               "image": "shopify://shop_images/WhatsApp_Image_2026-05-08_at_10.49.29.jpg",
               "mobile_image": "shopify://shop_images/MOBILE_BANNER_COLECAO.png",
