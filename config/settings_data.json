@@ -442,10 +442,10 @@
           "image_JNQazk": {
             "type": "image",
             "settings": {
-              "image": "shopify://shop_images/Colecao-Mirage.png",
-              "mobile_image": "shopify://shop_images/Banner-site_2.png",
+              "image": "shopify://shop_images/CAPA_COLECAO_WELLNESS_1_e60e091d-3ee1-4211-a814-c9a2eaafa6a5.png",
+              "mobile_image": "shopify://shop_images/MOBILE_BANNER_COLECAO.png",
               "show_overlay": true,
-              "overlay_opacity": 30,
+              "overlay_opacity": 20,
               "text_color": "#ffffff",
               "title": "",
               "content": "",
@@ -453,7 +453,7 @@
               "button_background": "#ffffff",
               "button_text_color": "#000000",
               "button_text": "",
-              "link": "shopify://collections/mirage"
+              "link": "shopify://collections/wellness"
             }
           }
         },
