@@ -364,10 +364,10 @@
               "text_color": "#ffffff",
               "title": "",
               "content": "",
-              "content_position": "middle_center",
+              "content_position": "middle_right",
               "button_background": "#ffffff",
               "button_text_color": "#000000",
-              "button_text": "",
+              "button_text": "Coleção disponivel as 09h00, 09/05",
               "link": "shopify://collections/wellness"
             }
           },
