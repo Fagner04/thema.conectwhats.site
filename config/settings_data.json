@@ -9,7 +9,7 @@
  */
 {
   "current": {
-    "popup_home": false,
+    "popup_home": true,
     "popup_image": "shopify://shop_images/BANNER_24H_DE_ATACADO.png",
     "img_popup": "shopify://collections/fitness",
     "cookie_time": 60,
