@@ -1,3 +1,5 @@
+<div id="mini-cart-overlay" class="mini-cart-overlay" aria-hidden="true"></div>
+
 <form method="post" action="{{ routes.cart_url }}" id="mini-cart" class="mini-cart" aria-hidden="true" novalidate="novalidate" data-item-count="{{ cart.item_count }}">
   <input type="hidden" name="attributes[collection_products_per_page]" value="">
   <input type="hidden" name="attributes[collection_layout]" value="">
@@ -279,3 +281,57 @@
     </div>
   {%- endif -%}
 </form>
+
+<script>
+(function() {
+  function isMobile() {
+    return window.matchMedia('(max-width: 640px)').matches;
+  }
+
+  var overlay = document.getElementById('mini-cart-overlay');
+  var miniCart = document.getElementById('mini-cart');
+
+  if (!overlay || !miniCart) return;
+
+  function openDrawer() {
+    if (!isMobile()) return;
+    overlay.classList.add('is-visible');
+    requestAnimationFrame(function() {
+      overlay.classList.add('is-active');
+    });
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    if (!isMobile()) return;
+    overlay.classList.remove('is-active');
+    document.body.style.overflow = '';
+    setTimeout(function() {
+      overlay.classList.remove('is-visible');
+    }, 300);
+  }
+
+  // Observa mudanças no aria-hidden do mini cart
+  var observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.attributeName === 'aria-hidden') {
+        var hidden = miniCart.getAttribute('aria-hidden') === 'true';
+        if (hidden) {
+          closeDrawer();
+        } else {
+          openDrawer();
+        }
+      }
+    });
+  });
+
+  observer.observe(miniCart, { attributes: true });
+
+  // Fechar ao clicar no overlay
+  overlay.addEventListener('click', function() {
+    // Dispara o toggle do tema
+    var toggleBtn = document.querySelector('[data-action="toggle-mini-cart"]');
+    if (toggleBtn) toggleBtn.click();
+  });
+})();
+</script>
