@@ -3183,20 +3183,14 @@ img.lazyload[data-sizes=auto] {
     height: 100vh !important;
     max-height: 100vh !important;
     border-radius: 0 !important;
-    overflow-y: auto;
     z-index: 9999;
   }
 
-  .mini-cart__content {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .mini-cart__inner,
   .mini-cart__content--empty {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    flex: 1;
   }
 }
 
@@ -14864,10 +14858,19 @@ label.color-swatch__item,
 
 /* ===== BOTÃO FIXO NO RODAPÉ MOBILE ===== */
 @media screen and (max-width: 640px) {
+  .mini-cart {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
   .mini-cart__inner {
     display: flex !important;
     flex-direction: column !important;
-    height: calc(100vh - 57px) !important;
+    flex: 1 !important;
+    overflow: hidden !important;
+    min-height: 0 !important;
+    height: 100% !important;
   }
 
   .mini-cart__content:not(.mini-cart__content--empty) {
@@ -14875,20 +14878,27 @@ label.color-swatch__item,
     overflow-y: auto !important;
     -webkit-overflow-scrolling: touch !important;
     margin-bottom: 0 !important;
+    min-height: 0 !important;
   }
 
   .mini-cart__recap {
+    flex-shrink: 0 !important;
     position: sticky !important;
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    background: #fff !important;
+    background: var(--secondary-background, #fff) !important;
     border-top: 1px solid #EFEFEF !important;
     border-radius: 0 !important;
     margin: 0 !important;
     padding: 14px 20px 24px !important;
     z-index: 20 !important;
     box-shadow: 0 -4px 16px rgba(0,0,0,0.08) !important;
+  }
+
+  .mini-cart__line-item-list {
+    max-height: none !important;
+    overflow: visible !important;
   }
 }
 
