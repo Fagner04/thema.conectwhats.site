@@ -9,7 +9,7 @@
  */
 {
   "current": {
-    "popup_home": true,
+    "popup_home": false,
     "popup_image": "shopify://shop_images/BANNER_24H_DE_ATACADO.png",
     "img_popup": "shopify://collections/fitness",
     "cookie_time": 60,
@@ -101,9 +101,9 @@
     "enable_category_installments": true,
     "promo_qty_vezes": 3,
     "atacado_enabled": true,
-    "atacado_min_qty": 6,
+    "atacado_min_qty": 12,
     "conectwhats_atacado_enabled": true,
-    "conectwhats_atacado_min_qty": 6,
+    "conectwhats_atacado_min_qty": 12,
     "acessorio_min_enabled": true,
     "acessorio_min_value": "50",
     "addzap": true,
